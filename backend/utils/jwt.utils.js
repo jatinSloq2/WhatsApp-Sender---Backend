@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const ACCESS_SECRET  = process.env.JWT_ACCESS_SECRET;
+const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
-const ACCESS_TTL     = process.env.JWT_ACCESS_TTL  || '15m';
-const REFRESH_TTL    = process.env.JWT_REFRESH_TTL || '7d';
+const ACCESS_TTL = process.env.JWT_ACCESS_TTL || '15m';
+const REFRESH_TTL = process.env.JWT_REFRESH_TTL || '7d';
 
 // ─── Sign ─────────────────────────────────────────────
 export const signAccessToken = (userId) =>
@@ -22,18 +24,18 @@ export const verifyRefreshToken = (token) =>
 // ─── Cookie helpers ───────────────────────────────────
 const cookieOptions = (maxAge) => ({
   httpOnly: true,          // JS cannot read it — prevents XSS theft
-  secure:   process.env.NODE_ENV === 'production',
+  secure: process.env.NODE_ENV === 'production',
   sameSite: 'strict',
-  path:     '/',
+  path: '/',
   maxAge,                  // in ms
 });
 
 export const setAuthCookies = (res, accessToken, refreshToken) => {
-  res.cookie('accessToken',  accessToken,  cookieOptions(15 * 60 * 1000));          // 15 min
+  res.cookie('accessToken', accessToken, cookieOptions(15 * 60 * 1000));          // 15 min
   res.cookie('refreshToken', refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000)); // 7 days
 };
 
 export const clearAuthCookies = (res) => {
-  res.cookie('accessToken',  '', { ...cookieOptions(0), maxAge: 0 });
+  res.cookie('accessToken', '', { ...cookieOptions(0), maxAge: 0 });
   res.cookie('refreshToken', '', { ...cookieOptions(0), maxAge: 0 });
 };
