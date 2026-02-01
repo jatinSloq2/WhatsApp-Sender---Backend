@@ -1,0 +1,33 @@
+# ─── Environment ──────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.production
+
+# ─── Node ─────────────────────────────────────────────
+node_modules/
+package-lock.json
+
+# ─── Logs ─────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── OS ───────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── MongoDB ──────────────────────────────────────────
+dump/
+
+# ─── Coverage ─────────────────────────────────────────
+coverage/
