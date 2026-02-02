@@ -3,47 +3,113 @@ import mongoose from 'mongoose';
 import Plan from '../models/plan.model.js';
 import User from '../models/user.model.js';
 
-// ─── Plan definitions ─────────────────────────────────
 const plans = [
     // ─── FREE ───────────────────────────────────────────
     {
-        name: 'FREE', billingCycle: 'MONTHLY', price: 0,
-        creditsIncluded: 50, maxCampaignsPerMonth: 2, maxRecipientsPerCampaign: 100,
-        features: { analyticsAccess: false, prioritySupport: false, customTemplates: false, apiAccess: false },
+        name: 'FREE',
+        billingCycle: 'MONTHLY',
+        price: 0,
+        creditsIncluded: 500,
+        maxCampaignsPerMonth: 20,
+        maxRecipientsPerCampaign: 1000,
+        features: {
+            analyticsAccess: false,
+            prioritySupport: false,
+            customTemplates: false,
+            apiAccess: false,
+        },
     },
+
     // ─── STARTER ────────────────────────────────────────
     {
-        name: 'STARTER', billingCycle: 'MONTHLY', price: 19,
-        creditsIncluded: 500, maxCampaignsPerMonth: 10, maxRecipientsPerCampaign: 1000,
-        features: { analyticsAccess: true, prioritySupport: false, customTemplates: false, apiAccess: false },
+        name: 'STARTER',
+        billingCycle: 'MONTHLY',
+        price: 49,
+        creditsIncluded: 5000,
+        maxCampaignsPerMonth: 100,
+        maxRecipientsPerCampaign: 10000,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: false,
+            customTemplates: false,
+            apiAccess: false,
+        },
     },
     {
-        name: 'STARTER', billingCycle: 'YEARLY', price: 190,
-        creditsIncluded: 6000, maxCampaignsPerMonth: 10, maxRecipientsPerCampaign: 1000,
-        features: { analyticsAccess: true, prioritySupport: false, customTemplates: false, apiAccess: false },
+        name: 'STARTER',
+        billingCycle: 'YEARLY',
+        price: 290,
+        creditsIncluded: 60000,
+        maxCampaignsPerMonth: 100,
+        maxRecipientsPerCampaign: 10000,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: false,
+            customTemplates: false,
+            apiAccess: false,
+        },
     },
+
     // ─── PRO ────────────────────────────────────────────
     {
-        name: 'PRO', billingCycle: 'MONTHLY', price: 49,
-        creditsIncluded: 2000, maxCampaignsPerMonth: 50, maxRecipientsPerCampaign: 5000,
-        features: { analyticsAccess: true, prioritySupport: true, customTemplates: true, apiAccess: false },
+        name: 'PRO',
+        billingCycle: 'MONTHLY',
+        price: 99,
+        creditsIncluded: 20000,
+        maxCampaignsPerMonth: 500,
+        maxRecipientsPerCampaign: 50000,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: false,
+        },
     },
     {
-        name: 'PRO', billingCycle: 'YEARLY', price: 490,
-        creditsIncluded: 24000, maxCampaignsPerMonth: 50, maxRecipientsPerCampaign: 5000,
-        features: { analyticsAccess: true, prioritySupport: true, customTemplates: true, apiAccess: false },
+        name: 'PRO',
+        billingCycle: 'YEARLY',
+        price: 990,
+        creditsIncluded: 240000,
+        maxCampaignsPerMonth: 500,
+        maxRecipientsPerCampaign: 50000,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: false,
+        },
     },
+
     // ─── ENTERPRISE ─────────────────────────────────────
     {
-        name: 'ENTERPRISE', billingCycle: 'MONTHLY', price: 149,
-        creditsIncluded: 10000, maxCampaignsPerMonth: 200, maxRecipientsPerCampaign: 50000,
-        features: { analyticsAccess: true, prioritySupport: true, customTemplates: true, apiAccess: true },
+        name: 'ENTERPRISE',
+        billingCycle: 'MONTHLY',
+        price: 249,
+        creditsIncluded: 100000,
+        maxCampaignsPerMonth: 2000,
+        maxRecipientsPerCampaign: 500000,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: true,
+        },
     },
     {
-        name: 'ENTERPRISE', billingCycle: 'YEARLY', price: 1490,
-        creditsIncluded: 120000, maxCampaignsPerMonth: 200, maxRecipientsPerCampaign: 50000,
-        features: { analyticsAccess: true, prioritySupport: true, customTemplates: true, apiAccess: true },
+        name: 'ENTERPRISE',
+        billingCycle: 'YEARLY',
+        price: 2490,
+        creditsIncluded: 1200000,
+        maxCampaignsPerMonth: 2000,
+        maxRecipientsPerCampaign: 500000,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: true,
+        },
     },
+
     // ─── MASTER (internal — admin only) ─────────────────
     {
         name: 'MASTER',
@@ -52,15 +118,20 @@ const plans = [
         creditsIncluded: null,
         maxCampaignsPerMonth: null,
         maxRecipientsPerCampaign: null,
-        features: { analyticsAccess: true, prioritySupport: true, customTemplates: true, apiAccess: true },
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: true,
+        },
         isInternal: true,
     },
 ];
 
 // ─── Admin seed config (override via .env) ────────────
-const ADMIN_NAME = process.env.ADMIN_NAME || 'Super Admin';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@yourapp.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@12345';
+const ADMIN_NAME = process.env.ADMIN_NAME;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // ═══════════════════════════════════════════════════════
 (async () => {
@@ -73,7 +144,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@12345';
         const insertedPlans = await Plan.insertMany(plans);
         console.log(`✓ Seeded ${insertedPlans.length} plans:`);
         insertedPlans.forEach((p) =>
-            console.log(`    • ${p.name} (${p.billingCycle}) — $${p.price}/period` +
+            console.log(`    • ${p.name} (${p.billingCycle}) — ${p.price}/period` +
                 (p.isInternal ? '  [INTERNAL]' : ''))
         );
 

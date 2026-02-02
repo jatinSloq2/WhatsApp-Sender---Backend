@@ -4,6 +4,7 @@ import { generateOTP, otpExpiry } from '../utils/otp.utils.js';
 import { sendOTPEmail } from '../utils/sendOTPEmail.js';
 import { sendPasswordResetEmail } from '../utils/sendPasswordResetEmail.js';
 import User from '../models/user.model.js';
+import Plan from '../models/plan.model.js';
 import {
     clearAuthCookies,
     setAuthCookies,
@@ -41,7 +42,22 @@ export const register = async (req, res) => {
         throw new ApiError(409, 'Email already registered.');
     }
 
+    // Find the FREE MONTHLY plan
+    const freePlan = await Plan.findOne({
+        name: 'FREE',
+        billingCycle: 'MONTHLY'
+    });
+
+    if (!freePlan) {
+        throw new ApiError(500, 'FREE plan not found. Please contact support.');
+    }
+
     const otp = generateOTP();
+
+    // Calculate subscription dates
+    const startDate = new Date();
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1); // 1 month from now
 
     const user = await User.create({
         name,
@@ -50,6 +66,17 @@ export const register = async (req, res) => {
         emailOTP: otp,
         emailOTPExp: otpExpiry(),
         isVerified: false,
+        subscription: {
+            planId: freePlan._id,
+            billingCycle: 'MONTHLY',
+            startedAt: startDate,
+            expiresAt: expiryDate,
+            isActive: true,
+        },
+        credits: {
+            balance: freePlan.creditsIncluded || 0,
+            lastRefilled: startDate,
+        },
     });
 
     await sendOTPEmail({
@@ -110,7 +137,7 @@ export const verifyOTP = async (req, res) => {
         email,
         emailOTP: otp,
         emailOTPExp: { $gt: Date.now() },
-    });
+    }).populate('subscription.planId', 'name billingCycle price creditsIncluded features');
 
     if (!user) {
         throw new ApiError(400, 'OTP is invalid or expired.');
@@ -180,7 +207,9 @@ export const refreshToken = async (req, res) => {
         throw new ApiError(401, 'Refresh token invalid or expired.');
     }
 
-    const user = await User.findById(payload.sub);
+    const user = await User.findById(payload.sub)
+        .populate('subscription.planId', 'name billingCycle price creditsIncluded features');
+
     if (!user) {
         throw new ApiError(401, 'User not found.');
     }
