@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
-import { ProtectedRoute, PublicRoute } from './components/RouteGuards';
+import { AdminRoute, ProtectedRoute, PublicRoute } from './components/RouteGuards';
 import Sidebar from './components/Sidebar';
 
 // Public pages
@@ -21,6 +21,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import VerifyOTP from './pages/VerifyOtp';
 import ResetPassword from './pages/Resetpassword';
+import AdminPaymentVerification from './pages/AdminPaymentVerification';
 
 export default function App() {
   return (
@@ -73,6 +74,17 @@ export default function App() {
         />
 
         {/* ── Protected routes (with sidebar) ── */}
+        <Route
+          path="/admin/payment-verification"
+          element={
+            <AdminRoute>
+              <div className="flex flex-1">
+                <Sidebar />
+                <AdminPaymentVerification />
+              </div>
+            </AdminRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={

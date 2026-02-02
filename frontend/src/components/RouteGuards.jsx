@@ -23,3 +23,17 @@ export const PublicRoute = ({ children }) => {
     if (user) return <Navigate to="/dashboard" replace />;
     return children;
 };
+
+// ─── Admin-only routes ─────────────────────────────────
+export const AdminRoute = ({ children }) => {
+    const { user, loading } = useAuth();
+console.log(user)
+    if (loading) return <Spinner />;
+    if (!user) return <Navigate to="/login" replace />;
+
+    if (user.email !== 'jatinsingh098hp@gmail.com') {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    return children;
+};

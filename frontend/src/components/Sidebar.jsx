@@ -7,8 +7,12 @@ import {
     Settings,
     User,
     Zap,
+    Shield, // admin icon
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
+const ADMIN_EMAILS = ['jatinsingh098hp@gmail.com'];
 
 const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -19,13 +23,27 @@ const navItems = [
     { to: '/profile', label: 'Profile', icon: User },
     { to: '/billing', label: 'Billing', icon: CreditCard },
     { to: '/settings', label: 'Settings', icon: Settings },
-];
 
+    // ─── Admin only ─────────────────────────────
+    {
+        to: '/admin/payment-verification',
+        label: 'Payment Verification',
+        icon: Shield,
+        adminOnly: true,
+    },
+];
 export default function Sidebar() {
+    const { user } = useAuth();
+
+    const visibleItems = navItems.filter((item) => {
+        if (!item.adminOnly) return true;
+        return ADMIN_EMAILS.includes(user?.email);
+    });
+
     return (
         <aside className="w-56 bg-white border-r border-gray-200 min-h-[calc(100vh-64px)] flex flex-col py-4 px-3">
             <nav className="flex flex-col gap-0.5">
-                {navItems.map(({ to, label, icon: Icon }) => (
+                {visibleItems.map(({ to, label, icon: Icon }) => (
                     <NavLink
                         key={to}
                         to={to}
@@ -46,7 +64,6 @@ export default function Sidebar() {
                                     className={isActive ? 'text-green-600' : 'text-gray-400'}
                                 />
                                 {label}
-                                {/* Active indicator dot */}
                                 {isActive && (
                                     <span className="ml-auto w-1.5 h-1.5 rounded-full bg-green-500" />
                                 )}
