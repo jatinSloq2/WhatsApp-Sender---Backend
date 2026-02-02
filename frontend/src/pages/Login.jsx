@@ -16,8 +16,10 @@ export default function Login() {
         setError('');
         setLoading(true);
         try {
+            // Login sends OTP to email
             await login(email, password);
-            navigate('/dashboard');
+            // Redirect to OTP verification page
+            navigate('/verify-otp', { state: { email } });
         } catch (err) {
             setError(err.message || 'Login failed');
         } finally {
@@ -53,11 +55,19 @@ export default function Login() {
 
                         {/* Password */}
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Password</label>
+                            <div className="flex items-center justify-between">
+                                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Password</label>
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-xs text-green-600 hover:text-green-700 font-semibold hover:underline"
+                                >
+                                    Forgot?
+                                </Link>
+                            </div>
                             <div className="relative">
                                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                                 <input
-                                    type="password"
+                                    type="password"  
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}

@@ -12,35 +12,42 @@ const userSchema = new mongoose.Schema(
         },
 
         // ─── Identity ───────────────────────────────────
-        name:  { type: String, required: true, trim: true },
+        name: { type: String, required: true, trim: true },
         email: { type: String, required: true, unique: true, lowercase: true, trim: true },
         password: { type: String, required: true, select: false },   // never returned by default
 
         // ─── Subscription ───────────────────────────────
         subscription: {
-            planId:       { type: mongoose.Schema.Types.ObjectId, ref: 'Plan', default: null },
+            planId: { type: mongoose.Schema.Types.ObjectId, ref: 'Plan', default: null },
             billingCycle: { type: String, enum: ['MONTHLY', 'YEARLY', 'LIFETIME'], default: null }, // ← LIFETIME added
-            startedAt:    { type: Date, default: null },
-            expiresAt:    { type: Date, default: null },   // null = never expires (MASTER/LIFETIME)
-            isActive:     { type: Boolean, default: false },
+            startedAt: { type: Date, default: null },
+            expiresAt: { type: Date, default: null },   // null = never expires (MASTER/LIFETIME)
+            isActive: { type: Boolean, default: false },
         },
 
         // ─── Credits ────────────────────────────────────
         credits: {
-            balance:      { type: Number, default: 0, min: 0 },
+            balance: { type: Number, default: 0, min: 0 },
             lastRefilled: { type: Date, default: null },
         },
 
         // ─── Campaigns usage (rolling monthly counter) ─
         campaignsUsedThisMonth: { type: Number, default: 0 },
-        campaignsMonthReset:    { type: Date, default: null },
+        campaignsMonthReset: { type: Date, default: null },
 
         // ─── Auth flags ─────────────────────────────────
-        isVerified:             { type: Boolean, default: false },
-        emailVerifyToken:       { type: String, select: false, default: null },
-        emailVerifyExp:         { type: Date,   select: false, default: null },
-        passwordResetToken:     { type: String, select: false, default: null },
-        passwordResetExp:       { type: Date,   select: false, default: null },
+        isVerified: { type: Boolean, default: false },
+        emailVerifyToken: { type: String, select: false, default: null },
+        emailVerifyExp: { type: Date, select: false, default: null },
+        passwordResetToken: { type: String, select: false, default: null },
+        passwordResetExp: { type: Date, select: false, default: null },
+        // user.model.js (add these fields)
+        emailOTP: String,
+        emailOTPExp: Date,
+        isVerified: {
+            type: Boolean,
+            default: false,
+        }
     },
     { timestamps: true }
 );

@@ -21,8 +21,10 @@ export default function Signup() {
         }
         setLoading(true);
         try {
+            // Register sends OTP to email
             await register(name, email, password);
-            navigate('/dashboard');
+            // Redirect to OTP verification page
+            navigate('/verify-otp', { state: { email } });
         } catch (err) {
             setError(err.message || 'Registration failed');
         } finally {

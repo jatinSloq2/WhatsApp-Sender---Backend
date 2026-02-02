@@ -5,8 +5,9 @@ import {
     logout,
     refreshToken,
     register,
+    resendOTP,
     resetPassword,
-    verifyEmail,
+    verifyOTP
 } from '../controllers/auth.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
@@ -15,8 +16,11 @@ const router = Router();
 // ── Public ────────────────────────────────────────────
 router.post('/register', register);
 router.post('/login', login);
+
+router.post('/verify-otp', verifyOTP);
+router.post('/resend-otp', resendOTP);
+
 router.post('/refresh', refreshToken);
-router.get('/verify-email/:token', verifyEmail);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 

@@ -1,9 +1,8 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
 import { ProtectedRoute, PublicRoute } from './components/RouteGuards';
+import Sidebar from './components/Sidebar';
 
 // Public pages
 import Home from './pages/Home';
@@ -11,14 +10,16 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 
 // Authenticated pages
-import Dashboard from './pages/Dashboard';
-import Campaigns from './pages/Campaigns';
-import Plans from './pages/Plans';
-import Credits from './pages/Credits';
 import Analytics from './pages/Analytics';
-import Profile from './pages/Profile';
 import Billing from './pages/Billing';
+import Campaigns from './pages/Campaigns';
+import Credits from './pages/Credits';
+import Dashboard from './pages/Dashboard';
+import ForgotPassword from './pages/ForgetPassword';
+import Plans from './pages/Plans';
+import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import VerifyOTP from './pages/VerifyOtp';
 
 export default function App() {
   return (
@@ -42,6 +43,22 @@ export default function App() {
           element={
             <PublicRoute>
               <Signup />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/verify-otp"
+          element={
+            <PublicRoute>
+              <VerifyOTP />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
             </PublicRoute>
           }
         />
