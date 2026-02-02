@@ -92,7 +92,7 @@ export default function AdminPaymentVerification() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 p-6">
+        <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-50 p-6">
             {/* Header */}
             <div className="max-w-7xl mx-auto mb-8">
                 <h1 className="text-4xl font-black text-slate-900 mb-2">Payment Verification</h1>

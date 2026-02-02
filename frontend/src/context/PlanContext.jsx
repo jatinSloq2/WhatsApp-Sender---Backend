@@ -95,9 +95,9 @@ export const PlansProvider = ({ children }) => {
           setUser({
             ...user,
             subscription: body.data.subscription,
-            credits: { 
-              ...user.credits, 
-              balance: body.data.creditsBalance 
+            credits: {
+              ...user.credits,
+              balance: body.data.creditsBalance
             },
           });
         }
@@ -112,6 +112,105 @@ export const PlansProvider = ({ children }) => {
     },
     [user, setUser]
   );
+
+  // ─── Submit Payment Proof (Manual Subscription) ───────
+  const submitPaymentProof = useCallback(
+    async (proofData) => {
+      const { planId, billingCycle, amount, transactionId, paymentProof, isFree } = proofData;
+
+      if (!planId || !billingCycle) {
+        throw new Error('Plan ID and billing cycle are required');
+      }
+
+      setLoading(true);
+      try {
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('planId', planId);
+        formData.append('billingCycle', billingCycle);
+
+        // For paid plans, add payment details
+        if (!isFree) {
+          if (!amount || !transactionId || !paymentProof) {
+            throw new Error('Amount, transaction ID, and payment proof are required for paid plans');
+          }
+          formData.append('amount', amount.toString());
+          formData.append('transactionId', transactionId);
+          formData.append('paymentProof', paymentProof);
+        } else {
+          // For free plans
+          formData.append('isFree', 'true');
+        }
+
+        console.log('Submitting to API:', `${API}/api/plans/subscribe-manual`);
+        console.log('FormData contents:', {
+          planId,
+          billingCycle,
+          amount,
+          transactionId,
+          isFree,
+          hasFile: !!paymentProof
+        });
+
+        const res = await fetch(`${API}/api/plans/subscribe-manual`, {
+          method: 'POST',
+          credentials: 'include',
+          // DON'T set Content-Type header - browser will set it with boundary for multipart/form-data
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error?.message || error.message || 'Payment submission failed');
+        }
+
+        const body = await res.json();
+
+        // Update user context if subscription was activated (free plan)
+        if (body.data?.subscription && setUser && user) {
+          setUser({
+            ...user,
+            subscription: body.data.subscription,
+            credits: {
+              ...user.credits,
+              balance: body.data.creditsBalance
+            },
+          });
+        }
+
+        return body.data;
+      } catch (error) {
+        console.error('Error submitting payment proof:', error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, setUser]
+  );
+
+  // ─── Get My Payment Requests ──────────────────────────
+  const getMyPaymentRequests = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/api/plans/my-payment-requests`, {
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error?.message || 'Failed to fetch payment requests');
+      }
+
+      const body = await res.json();
+      return body.data;
+    } catch (error) {
+      console.error('Error fetching payment requests:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // ─── Cancel Subscription ──────────────────────────────
   const cancelSubscription = useCallback(async () => {
@@ -133,9 +232,9 @@ export const PlansProvider = ({ children }) => {
       if (setUser && user) {
         setUser({
           ...user,
-          subscription: { 
-            ...user.subscription, 
-            isActive: false 
+          subscription: {
+            ...user.subscription,
+            isActive: false
           },
         });
       }
@@ -154,6 +253,8 @@ export const PlansProvider = ({ children }) => {
     getPlans,
     getPlan,
     subscribeToPlan,
+    submitPaymentProof,
+    getMyPaymentRequests,
     cancelSubscription,
   };
 

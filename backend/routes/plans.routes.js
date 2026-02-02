@@ -14,13 +14,7 @@ import { authenticate, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-// ── Public (anyone can browse plans) ──────────────────
-router.get('/', listPlans);
-router.get('/:planId', getPlan);
 
-// ── Protected (must be logged in to subscribe) ────────
-router.post('/subscribe', authenticate, subscribeToPlan);
-router.post('/cancel', authenticate, cancelSubscription);
 
 
 // ─── Multer configuration for file uploads ────────────
@@ -58,5 +52,13 @@ router.get('/my-payment-requests', authenticate, getMyPaymentRequests);
 // ─── Admin routes (require admin role) ────────────────
 router.get('/pending-payments', authenticate, requireAdmin, getPendingPayments);
 router.post('/verify-payment/:requestId', authenticate, requireAdmin, verifyPayment);
+
+// ── Public (anyone can browse plans) ──────────────────
+router.get('/', listPlans);
+
+// ── Protected (must be logged in to subscribe) ────────
+router.post('/subscribe', authenticate, subscribeToPlan);
+router.post('/cancel', authenticate, cancelSubscription);
+router.get('/:planId', getPlan);
 
 export default router;

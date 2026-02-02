@@ -19,14 +19,16 @@ const featureLabels = {
   apiAccess: 'API Access',
 };
 
-// Payment Modal Component
+// Improved PaymentModal with better error handling
+
 function PaymentModal({ plan, onClose, onSubmitProof }) {
-  const [upiId] = useState('7240440461@ybl'); // Replace with your actual UPI ID
+  const [upiId] = useState('7240440461@ybl');
   const [copied, setCopied] = useState(false);
   const [paymentProof, setPaymentProof] = useState(null);
   const [transactionId, setTransactionId] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Calculate total with GST
   const baseAmount = plan.price;
@@ -34,10 +36,7 @@ function PaymentModal({ plan, onClose, onSubmitProof }) {
   const gstAmount = Math.round(baseAmount * gstRate);
   const totalAmount = baseAmount + gstAmount;
 
-  // Generate UPI payment link
   const upiLink = `upi://pay?pa=${upiId}&pn=YourBusinessName&am=${totalAmount}&cu=INR&tn=Payment for ${plan.name} Plan`;
-
-  // Generate QR code URL (using free QR code API)
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
 
   const copyToClipboard = (text) => {
@@ -49,19 +48,60 @@ function PaymentModal({ plan, onClose, onSubmitProof }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrorMessage('File size must be less than 5MB');
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setErrorMessage('Please upload an image file');
+        return;
+      }
+
       setPaymentProof(file);
       setPreviewUrl(URL.createObjectURL(file));
+      setErrorMessage('');
     }
   };
 
   const handleSubmit = async () => {
-    if (!paymentProof || !transactionId.trim()) {
-      alert('Please upload payment screenshot and enter transaction ID');
+    // Clear previous errors
+    setErrorMessage('');
+
+    // Validation
+    if (!paymentProof) {
+      setErrorMessage('Please upload payment screenshot');
+      return;
+    }
+
+    if (!transactionId.trim()) {
+      setErrorMessage('Please enter transaction ID');
+      return;
+    }
+
+    // Validate transaction ID format (typically 12 digits)
+    if (transactionId.trim().length < 10) {
+      setErrorMessage('Transaction ID seems too short. Please verify.');
       return;
     }
 
     setSubmitting(true);
+
     try {
+      console.log('Submitting payment proof with data:', {
+        planId: plan._id,
+        planName: plan.name,
+        billingCycle: plan.billingCycle,
+        amount: totalAmount,
+        transactionId: transactionId.trim(),
+        fileName: paymentProof.name,
+        fileSize: paymentProof.size,
+        fileType: paymentProof.type
+      });
+
+      // Call the parent handler
       await onSubmitProof({
         planId: plan._id,
         billingCycle: plan.billingCycle,
@@ -69,8 +109,20 @@ function PaymentModal({ plan, onClose, onSubmitProof }) {
         transactionId: transactionId.trim(),
         paymentProof,
       });
+
+      console.log('Payment proof submitted successfully');
+
     } catch (error) {
-      alert('Failed to submit payment proof. Please try again.');
+      console.error('Payment proof submission error:', error);
+
+      // Set a more descriptive error message
+      if (error.response?.data?.message) {
+        setErrorMessage(error.response.data.message);
+      } else if (error.message) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('Failed to submit payment proof. Please try again.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -99,6 +151,17 @@ function PaymentModal({ plan, onClose, onSubmitProof }) {
 
         {/* Content */}
         <div className="p-6">
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
+              <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-red-900 mb-1">Error</p>
+                <p className="text-sm text-red-700">{errorMessage}</p>
+              </div>
+            </div>
+          )}
+
           {/* Amount Breakdown */}
           <div className="bg-slate-50 rounded-2xl p-6 mb-6 border-2 border-slate-200">
             <h3 className="font-black text-slate-900 mb-4 flex items-center gap-2">
@@ -132,7 +195,6 @@ function PaymentModal({ plan, onClose, onSubmitProof }) {
               Open any UPI app and scan this code
             </p>
 
-            {/* QR Code */}
             <div className="bg-white rounded-2xl p-6 inline-block shadow-lg mb-4">
               <img
                 src={qrCodeUrl}
@@ -193,7 +255,10 @@ function PaymentModal({ plan, onClose, onSubmitProof }) {
               <input
                 type="text"
                 value={transactionId}
-                onChange={(e) => setTransactionId(e.target.value)}
+                onChange={(e) => {
+                  setTransactionId(e.target.value);
+                  setErrorMessage('');
+                }}
                 placeholder="Enter 12-digit transaction ID"
                 className="w-full px-4 py-3 bg-white border-2 border-amber-300 rounded-xl font-medium focus:border-amber-500 focus:outline-none"
               />
@@ -220,7 +285,7 @@ function PaymentModal({ plan, onClose, onSubmitProof }) {
                   className="w-full px-4 py-3 bg-white border-2 border-dashed border-amber-300 rounded-xl font-medium hover:border-amber-500 cursor-pointer flex items-center justify-center gap-2 transition-colors"
                 >
                   <Upload size={18} />
-                  {paymentProof ? paymentProof.name : 'Choose screenshot'}
+                  {paymentProof ? paymentProof.name : 'Choose screenshot (max 5MB)'}
                 </label>
               </div>
             </div>
@@ -329,6 +394,7 @@ export default function Plans() {
 
   // Check if user is on this plan
   const isCurrentPlan = (planId) => {
+    console.log(user)
     if (!user?.subscription?.planId) return false;
     const userPlanId = typeof user.subscription.planId === 'object'
       ? user.subscription.planId._id
@@ -574,15 +640,7 @@ export default function Plans() {
                     </div>
                   )}
 
-                  {/* Current Plan Badge */}
-                  {isCurrent && (
-                    <div className="absolute -top-4 right-6 z-10">
-                      <span className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-blue-500 text-white text-xs font-black rounded-full shadow-lg uppercase">
-                        <Check size={14} />
-                        Current
-                      </span>
-                    </div>
-                  )}
+                 
 
                   <div className="p-8">
                     {/* Plan Header */}

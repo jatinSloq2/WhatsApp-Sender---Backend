@@ -6,6 +6,8 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import { connectDB } from './config/mongoDb.js';
 import { errorHandler } from './middleware/errorhandler.js';
@@ -17,8 +19,14 @@ import userRoutes from './routes/user.routes.js';
 
 const app = express();
 
+// ─── ES Module equivalents for __dirname ─────────────
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // ─── Core Middleware ─────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow images to be loaded
+}));
 app.use(cors({ origin: process.env.CLIENT_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -27,6 +35,11 @@ app.use(cookieParser());
 app.use(
     morgan(':date[iso] :method :url → :status (:response-time ms)')
 );
+
+// ─── Serve Static Files (Uploads) ────────────────────
+// This allows accessing uploaded files via URL
+// Example: http://localhost:5000/uploads/payment-proofs/proof-123456.jpg
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Routes ──────────────────────────────────────────
 app.use('/api/auth', authRoutes);
