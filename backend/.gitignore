@@ -31,3 +31,6 @@ dump/
 
 # ─── Coverage ─────────────────────────────────────────
 coverage/
+
+uploads
+uploads/
