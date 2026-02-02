@@ -20,6 +20,7 @@ import Plans from './pages/Plans';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import VerifyOTP from './pages/VerifyOtp';
+import ResetPassword from './pages/Resetpassword';
 
 export default function App() {
   return (
@@ -59,6 +60,14 @@ export default function App() {
           element={
             <PublicRoute>
               <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            <PublicRoute>
+              <ResetPassword />
             </PublicRoute>
           }
         />

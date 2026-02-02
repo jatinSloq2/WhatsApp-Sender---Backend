@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { ApiError } from '../middleware/errorHandler.js';
 import { generateOTP, otpExpiry } from '../utils/otp.utils.js';
 import { sendOTPEmail } from '../utils/sendOTPEmail.js';
+import { sendPasswordResetEmail } from '../utils/sendPasswordResetEmail.js';
 import User from '../models/user.model.js';
 import {
     clearAuthCookies,
@@ -57,18 +58,15 @@ export const register = async (req, res) => {
         otp,
     });
 
-
     res.status(201).json({
         success: true,
         message: 'OTP sent to email. Please verify.',
     });
 };
 
-
 // ═══════════════════════════════════════════════════════
 // POST /api/auth/login
 // ═══════════════════════════════════════════════════════
-// POST /api/auth/login
 export const login = async (req, res) => {
     const { email, password } = req.body;
 
@@ -92,14 +90,15 @@ export const login = async (req, res) => {
         otp,
     });
 
-
     res.json({
         success: true,
         message: 'OTP sent to email.',
     });
 };
 
+// ═══════════════════════════════════════════════════════
 // POST /api/auth/verify-otp
+// ═══════════════════════════════════════════════════════
 export const verifyOTP = async (req, res) => {
     const { email, otp } = req.body;
 
@@ -132,8 +131,9 @@ export const verifyOTP = async (req, res) => {
     });
 };
 
-
+// ═══════════════════════════════════════════════════════
 // POST /api/auth/resend-otp
+// ═══════════════════════════════════════════════════════
 export const resendOTP = async (req, res) => {
     const { email } = req.body;
 
@@ -151,18 +151,17 @@ export const resendOTP = async (req, res) => {
     user.emailOTPExp = otpExpiry();
     await user.save({ validateModifiedOnly: true });
 
-
     await sendOTPEmail({
         email: user.email,
         name: user.name,
         otp,
     });
+
     res.json({
         success: true,
         message: 'OTP resent successfully.',
     });
 };
-
 
 // ═══════════════════════════════════════════════════════
 // POST /api/auth/refresh   — reads refreshToken cookie
@@ -229,22 +228,53 @@ export const verifyEmail = async (req, res) => {
 // ═══════════════════════════════════════════════════════
 export const forgotPassword = async (req, res) => {
     const { email } = req.body;
-    if (!email) throw new ApiError(400, 'email is required.');
 
-    const user = await User.findOne({ email });
-    // Always respond 200 — don't reveal whether email exists
-    if (!user) {
-        return res.json({ success: true, message: 'If this email exists, a reset link has been sent.' });
+    if (!email) {
+        throw new ApiError(400, 'email is required.');
     }
 
+    const user = await User.findOne({ email });
+
+    // Always respond with success to prevent email enumeration
+    if (!user) {
+        return res.json({
+            success: true,
+            message: 'If this email exists, a reset link has been sent.'
+        });
+    }
+
+    // Generate secure random token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    user.passwordResetToken = resetToken;
-    user.passwordResetExp = Date.now() + 1 * 60 * 60 * 1000; // 1 h
+
+    // Save hashed token to database for security
+    user.passwordResetToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+    user.passwordResetExp = Date.now() + 60 * 60 * 1000; // 1 hour
+
     await user.save({ validateModifiedOnly: true });
 
-    // TODO: send password reset email with resetToken
+    // Send email with plain token (not hashed)
+    try {
+        await sendPasswordResetEmail({
+            email: user.email,
+            name: user.name,
+            resetToken, // Send plain token in email
+        });
+    } catch (error) {
+        // If email fails, clear the reset token
+        user.passwordResetToken = null;
+        user.passwordResetExp = null;
+        await user.save({ validateModifiedOnly: true });
 
-    res.json({ success: true, message: 'If this email exists, a reset link has been sent.' });
+        throw new ApiError(500, 'Error sending password reset email. Please try again.');
+    }
+
+    res.json({
+        success: true,
+        message: 'If this email exists, a reset link has been sent.'
+    });
 };
 
 // ═══════════════════════════════════════════════════════
@@ -258,8 +288,14 @@ export const resetPassword = async (req, res) => {
         throw new ApiError(400, 'Password must be at least 8 characters.');
     }
 
+    // Hash the token from URL to compare with database
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
     const user = await User.findOne({
-        passwordResetToken: token,
+        passwordResetToken: hashedToken,
         passwordResetExp: { $gt: Date.now() },
     });
 
@@ -267,10 +303,14 @@ export const resetPassword = async (req, res) => {
         throw new ApiError(400, 'Reset token is invalid or has expired.');
     }
 
-    user.password = password;   // pre('save') will hash it
+    // Update password and clear reset token
+    user.password = password; // pre('save') will hash it
     user.passwordResetToken = null;
     user.passwordResetExp = null;
     await user.save();
 
-    res.json({ success: true, message: 'Password has been reset.' });
+    res.json({
+        success: true,
+        message: 'Password has been reset successfully. You can now login with your new password.'
+    });
 };
