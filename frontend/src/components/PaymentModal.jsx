@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, CheckCircle2, Copy, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
+
 export function PaymentModal({ plan, onClose, onSubmitProof }) {
     const upiId = '7240440461@ybl';
 
