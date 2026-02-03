@@ -1,136 +1,187 @@
-import { Loader, Lock, Mail, User } from 'lucide-react';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Loader2, Lock, Mail, User, MessageSquare, Send, Zap, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+// shadcn/ui
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
 
 export default function Signup() {
     const { register } = useAuth();
     const navigate = useNavigate();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        setError("");
+
         if (password !== confirmPassword) {
-            return setError('Passwords do not match.');
+            setError("Passwords do not match");
+            return;
         }
+
         setLoading(true);
         try {
-            // Register sends OTP to email
             await register(name, email, password);
-            // Redirect to OTP verification page
-            navigate('/verify-otp', { state: { email } });
+            navigate("/verify-otp", { state: { email } });
         } catch (err) {
-            setError(err.message || 'Registration failed');
+            setError(err.message || "Registration failed");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-[calc(100vh-64px)] bg-gray-50 flex items-center justify-center px-4 animate-fadeIn">
-            <div className="w-full max-w-sm">
+        <div className="min-h-[calc(100vh-64px)] grid lg:grid-cols-2">
+            {/* Left branding */}
+            <div className="hidden lg:flex flex-col justify-center px-16 bg-gradient-to-br from-green-600 to-green-700 text-white">
+                <h1 className="text-4xl font-bold leading-tight">
+                    Start Messaging at Scale
+                </h1>
+                <p className="mt-4 text-green-100 max-w-md">
+                    Create your account and launch bulk campaigns or AI chatbots in minutes.
+                </p>
 
-                {/* Card */}
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
-                    <h1 className="text-xl font-bold text-gray-900 mb-1 text-center">Create account</h1>
-                    <p className="text-sm text-gray-500 text-center mb-7">Start sending bulk campaigns for free</p>
-
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        {/* Name */}
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Name</label>
-                            <div className="relative">
-                                <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="text"
-                                    required
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Jatin Mehta"
-                                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Email */}
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Email</label>
-                            <div className="relative">
-                                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="you@example.com"
-                                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Password */}
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Password</label>
-                            <div className="relative">
-                                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="password"
-                                    required
-                                    minLength={8}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Min 8 characters"
-                                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Confirm Password */}
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Confirm Password</label>
-                            <div className="relative">
-                                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="password"
-                                    required
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Re-enter password"
-                                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Error */}
-                        {error && (
-                            <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                                {error}
-                            </div>
-                        )}
-
-                        {/* Submit */}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors py-2.5 rounded-xl shadow-sm mt-1"
-                        >
-                            {loading ? <Loader size={16} className="animate-spin" /> : null}
-                            {loading ? 'Creating account…' : 'Create Account'}
-                        </button>
-                    </form>
-
-                    {/* Footer link */}
-                    <p className="text-xs text-gray-500 text-center mt-6">
-                        Already have an account?{' '}
-                        <Link to="/login" className="text-green-600 font-semibold hover:underline">Sign in</Link>
-                    </p>
+                <div className="mt-10 space-y-5">
+                    <Feature icon={Send} title="Bulk Campaigns" desc="Reach thousands of users with one click." />
+                    <Feature icon={MessageSquare} title="AI Chatbots" desc="Automate conversations and support." />
+                    <Feature icon={Zap} title="Instant Setup" desc="No complex configuration required." />
+                    <Feature icon={ShieldCheck} title="Secure & Reliable" desc="OTP verification and encrypted data." />
                 </div>
+            </div>
+
+            {/* Right signup */}
+            <div className="flex items-center justify-center px-4 bg-slate-50">
+                <Card className="w-full max-w-sm rounded-2xl shadow-md">
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-xl">Create your account</CardTitle>
+                        <CardDescription>Start sending bulk campaigns for free</CardDescription>
+                    </CardHeader>
+
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            {/* Name */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="name">Name</Label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="name"
+                                        type="text"
+                                        placeholder="Jatin Mehta"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                        className="pl-9"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Email */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="email">Email</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="you@example.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                        className="pl-9"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Password */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="password">Password</Label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        placeholder="Minimum 8 characters"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        minLength={8}
+                                        required
+                                        className="pl-9"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Confirm Password */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="confirmPassword"
+                                        type="password"
+                                        placeholder="Re-enter password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                        className="pl-9"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Error */}
+                            {error && (
+                                <Alert variant="destructive">
+                                    <AlertDescription className="text-xs">{error}</AlertDescription>
+                                </Alert>
+                            )}
+
+                            {/* Submit */}
+                            <Button
+                                type="submit"
+                                className="w-full bg-green-600 hover:bg-green-700"
+                                disabled={loading}
+                            >
+                                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {loading ? "Creating account…" : "Create Account"}
+                            </Button>
+                        </form>
+
+                        <Separator className="my-6" />
+
+                        <p className="text-center text-xs text-muted-foreground">
+                            Already have an account?{" "}
+                            <Link to="/login" className="font-medium text-green-600 hover:underline">
+                                Sign in
+                            </Link>
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    );
+}
+
+function Feature({ icon: Icon, title, desc }) {
+    return (
+        <div className="flex gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">
+                <Icon className="h-5 w-5" />
+            </div>
+            <div>
+                <h3 className="font-semibold">{title}</h3>
+                <p className="text-sm text-green-100">{desc}</p>
             </div>
         </div>
     );
