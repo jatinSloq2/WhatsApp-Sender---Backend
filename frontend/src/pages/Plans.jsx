@@ -1,10 +1,10 @@
-import { BarChart, Check, Code, Copy, CreditCard, Loader2, Shield, Sparkles, TrendingUp, X, Zap, AlertCircle, QrCode, CheckCircle2, Upload } from 'lucide-react';
+import { AlertCircle, BarChart, Check, Code, CreditCard, Loader2, Shield, Sparkles, TrendingUp, X, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PaymentModal } from '../components/PaymentModal';
 import { useAuth } from '../context/AuthContext';
 import { usePlans } from '../context/PlanContext';
 
-// Feature icons mapping
 const featureIcons = {
   analyticsAccess: BarChart,
   prioritySupport: Shield,
@@ -19,350 +19,12 @@ const featureLabels = {
   apiAccess: 'API Access',
 };
 
-// Improved PaymentModal with better error handling
 
-function PaymentModal({ plan, onClose, onSubmitProof }) {
-  const [upiId] = useState('7240440461@ybl');
-  const [copied, setCopied] = useState(false);
-  const [paymentProof, setPaymentProof] = useState(null);
-  const [transactionId, setTransactionId] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  // Calculate total with GST
-  const baseAmount = plan.price;
-  const gstRate = 0.18;
-  const gstAmount = Math.round(baseAmount * gstRate);
-  const totalAmount = baseAmount + gstAmount;
-
-  const upiLink = `upi://pay?pa=${upiId}&pn=YourBusinessName&am=${totalAmount}&cu=INR&tn=Payment for ${plan.name} Plan`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setErrorMessage('File size must be less than 5MB');
-        return;
-      }
-
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setErrorMessage('Please upload an image file');
-        return;
-      }
-
-      setPaymentProof(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      setErrorMessage('');
-    }
-  };
-
-  const handleSubmit = async () => {
-    // Clear previous errors
-    setErrorMessage('');
-
-    // Validation
-    if (!paymentProof) {
-      setErrorMessage('Please upload payment screenshot');
-      return;
-    }
-
-    if (!transactionId.trim()) {
-      setErrorMessage('Please enter transaction ID');
-      return;
-    }
-
-    // Validate transaction ID format (typically 12 digits)
-    if (transactionId.trim().length < 10) {
-      setErrorMessage('Transaction ID seems too short. Please verify.');
-      return;
-    }
-
-    setSubmitting(true);
-
-    try {
-      console.log('Submitting payment proof with data:', {
-        planId: plan._id,
-        planName: plan.name,
-        billingCycle: plan.billingCycle,
-        amount: totalAmount,
-        transactionId: transactionId.trim(),
-        fileName: paymentProof.name,
-        fileSize: paymentProof.size,
-        fileType: paymentProof.type
-      });
-
-      // Call the parent handler
-      await onSubmitProof({
-        planId: plan._id,
-        billingCycle: plan.billingCycle,
-        amount: totalAmount,
-        transactionId: transactionId.trim(),
-        paymentProof,
-      });
-
-      console.log('Payment proof submitted successfully');
-
-    } catch (error) {
-      console.error('Payment proof submission error:', error);
-
-      // Set a more descriptive error message
-      if (error.response?.data?.message) {
-        setErrorMessage(error.response.data.message);
-      } else if (error.message) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage('Failed to submit payment proof. Please try again.');
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-6 rounded-t-3xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-black mb-1">Complete Payment</h2>
-              <p className="text-emerald-100 text-sm font-medium">
-                {plan.name} Plan - {plan.billingCycle === 'MONTHLY' ? 'Monthly' : 'Yearly'}
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-6">
-          {/* Error Message */}
-          {errorMessage && (
-            <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
-              <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-bold text-red-900 mb-1">Error</p>
-                <p className="text-sm text-red-700">{errorMessage}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Amount Breakdown */}
-          <div className="bg-slate-50 rounded-2xl p-6 mb-6 border-2 border-slate-200">
-            <h3 className="font-black text-slate-900 mb-4 flex items-center gap-2">
-              <CreditCard size={20} className="text-emerald-600" />
-              Payment Breakdown
-            </h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-medium">Base Amount:</span>
-                <span className="font-bold text-slate-900">₹{baseAmount.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 font-medium">GST (18%):</span>
-                <span className="font-bold text-slate-900">₹{gstAmount.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="h-px bg-slate-300 my-3"></div>
-              <div className="flex justify-between text-lg">
-                <span className="text-slate-900 font-black">Total Amount:</span>
-                <span className="font-black text-emerald-600">₹{totalAmount.toLocaleString('en-IN')}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* QR Code Section */}
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mb-6 border-2 border-purple-200 text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <QrCode size={32} className="text-white" />
-            </div>
-            <h3 className="font-black text-slate-900 mb-2">Scan QR Code to Pay</h3>
-            <p className="text-slate-600 text-sm mb-4 font-medium">
-              Open any UPI app and scan this code
-            </p>
-
-            <div className="bg-white rounded-2xl p-6 inline-block shadow-lg mb-4">
-              <img
-                src={qrCodeUrl}
-                alt="Payment QR Code"
-                className="w-64 h-64"
-              />
-            </div>
-
-            <p className="text-xs text-slate-500 font-medium">
-              Works with Google Pay, PhonePe, Paytm, BHIM & all UPI apps
-            </p>
-          </div>
-
-          {/* UPI ID Section */}
-          <div className="bg-blue-50 rounded-2xl p-6 mb-6 border-2 border-blue-200">
-            <h3 className="font-black text-slate-900 mb-3">Or Pay Using UPI ID</h3>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={upiId}
-                readOnly
-                className="flex-1 px-4 py-3 bg-white border-2 border-blue-300 rounded-xl font-mono font-bold text-slate-900"
-              />
-              <button
-                onClick={() => copyToClipboard(upiId)}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors flex items-center gap-2 shadow-lg"
-              >
-                {copied ? (
-                  <>
-                    <CheckCircle2 size={18} />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy size={18} />
-                    Copy
-                  </>
-                )}
-              </button>
-            </div>
-            <p className="text-xs text-slate-600 mt-3 font-medium">
-              Amount to pay: <span className="font-black text-emerald-600">₹{totalAmount.toLocaleString('en-IN')}</span>
-            </p>
-          </div>
-
-          {/* Payment Proof Upload */}
-          <div className="bg-amber-50 rounded-2xl p-6 border-2 border-amber-200">
-            <h3 className="font-black text-slate-900 mb-4 flex items-center gap-2">
-              <Upload size={20} className="text-amber-600" />
-              Upload Payment Proof
-            </h3>
-
-            {/* Transaction ID */}
-            <div className="mb-4">
-              <label className="block text-sm font-bold text-slate-900 mb-2">
-                Transaction ID / UTR Number *
-              </label>
-              <input
-                type="text"
-                value={transactionId}
-                onChange={(e) => {
-                  setTransactionId(e.target.value);
-                  setErrorMessage('');
-                }}
-                placeholder="Enter 12-digit transaction ID"
-                className="w-full px-4 py-3 bg-white border-2 border-amber-300 rounded-xl font-medium focus:border-amber-500 focus:outline-none"
-              />
-              <p className="text-xs text-slate-600 mt-1 font-medium">
-                Find this in your payment app after completing the transaction
-              </p>
-            </div>
-
-            {/* File Upload */}
-            <div className="mb-4">
-              <label className="block text-sm font-bold text-slate-900 mb-2">
-                Payment Screenshot *
-              </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="payment-proof"
-                />
-                <label
-                  htmlFor="payment-proof"
-                  className="w-full px-4 py-3 bg-white border-2 border-dashed border-amber-300 rounded-xl font-medium hover:border-amber-500 cursor-pointer flex items-center justify-center gap-2 transition-colors"
-                >
-                  <Upload size={18} />
-                  {paymentProof ? paymentProof.name : 'Choose screenshot (max 5MB)'}
-                </label>
-              </div>
-            </div>
-
-            {/* Preview */}
-            {previewUrl && (
-              <div className="mb-4">
-                <label className="block text-sm font-bold text-slate-900 mb-2">Preview:</label>
-                <img
-                  src={previewUrl}
-                  alt="Payment proof preview"
-                  className="w-full max-w-sm rounded-xl border-2 border-amber-300"
-                />
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              onClick={handleSubmit}
-              disabled={submitting || !paymentProof || !transactionId.trim()}
-              className="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 size={20} />
-                  Submit for Verification
-                </>
-              )}
-            </button>
-
-            <p className="text-xs text-slate-600 mt-3 text-center font-medium">
-              Your payment will be verified within 24 hours. You'll receive a confirmation email once approved.
-            </p>
-          </div>
-
-          {/* Instructions */}
-          <div className="mt-6 bg-slate-50 rounded-2xl p-6 border-2 border-slate-200">
-            <h4 className="font-black text-slate-900 mb-3 text-sm">Payment Instructions:</h4>
-            <ol className="space-y-2 text-xs text-slate-600 font-medium">
-              <li className="flex items-start gap-2">
-                <span className="font-black text-emerald-600 flex-shrink-0">1.</span>
-                <span>Scan the QR code or copy the UPI ID</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-black text-emerald-600 flex-shrink-0">2.</span>
-                <span>Pay the exact amount: ₹{totalAmount.toLocaleString('en-IN')}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-black text-emerald-600 flex-shrink-0">3.</span>
-                <span>Take a screenshot of the successful payment</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-black text-emerald-600 flex-shrink-0">4.</span>
-                <span>Upload the screenshot and enter transaction ID above</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-black text-emerald-600 flex-shrink-0">5.</span>
-                <span>We'll verify and activate your plan within 24 hours</span>
-              </li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function Plans() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { getPlans, submitPaymentProof, loading: plansLoading } = usePlans();
-
   const [plans, setPlans] = useState([]);
   const [billingCycle, setBillingCycle] = useState('MONTHLY');
   const [subscribing, setSubscribing] = useState(null);
@@ -370,8 +32,6 @@ export default function Plans() {
   const [error, setError] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-
-  // Load plans on mount
   useEffect(() => {
     loadPlans();
   }, []);
@@ -447,17 +107,13 @@ export default function Plans() {
 
   // Handle payment proof submission
   const handlePaymentProofSubmit = async (proofData) => {
-    try {
-      await submitPaymentProof(proofData);
-      setShowPaymentModal(false);
-      setSelectedPlan(null);
-      setMessage({
-        type: 'success',
-        text: 'Payment proof submitted! We will verify and activate your plan within 24 hours. Check your email for updates.'
-      });
-    } catch (err) {
-      throw err;
-    }
+    await submitPaymentProof(proofData);
+    setShowPaymentModal(false);
+    setSelectedPlan(null);
+    setMessage({
+      type: 'success',
+      text: 'Payment proof submitted! We will verify and activate your plan within 24 hours. Check your email for updates.'
+    });
   };
 
   // Format currency in INR
@@ -467,17 +123,6 @@ export default function Plans() {
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(price);
-  };
-
-  // Get plan badge color
-  const getPlanColor = (planName) => {
-    const colors = {
-      FREE: 'gray',
-      STARTER: 'blue',
-      PRO: 'purple',
-      ENTERPRISE: 'green',
-    };
-    return colors[planName] || 'gray';
   };
 
   // Calculate yearly savings
@@ -640,7 +285,7 @@ export default function Plans() {
                     </div>
                   )}
 
-                 
+
 
                   <div className="p-8">
                     {/* Plan Header */}
