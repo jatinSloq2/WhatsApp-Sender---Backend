@@ -80,7 +80,9 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
     /* ── render ── */
     return (
         <Dialog open onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-3xl border-0 p-0 shadow-2xl [&>button.absolute]:hidden">
+            <DialogContent className="max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar rounded-3xl border-gray-300 p-0 shadow-2xl [scrollbar-width:none]
+    [&::-webkit-scrollbar]:hidden
+ [&>button.absolute]:hidden">
                 {/* ── gradient header ── */}
                 <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white p-6 rounded-t-3xl">
                     <DialogHeader className="p-0 space-y-1">

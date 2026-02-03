@@ -5,47 +5,35 @@ import User from '../models/user.model.js';
 
 // ─── Preset packs ─────────────────────────────────────
 const CREDIT_PACKS = [
-  { id: 'pack_100',  credits: 100,  price: 99   },
-  { id: 'pack_500',  credits: 500,  price: 399  },
-  { id: 'pack_1000', credits: 1000, price: 699  },
-  { id: 'pack_5000', credits: 5000, price: 2499 },
+  { id: 'pack_50', credits: 50, price: 10 },
+  { id: 'pack_100', credits: 100, price: 20 },
+  { id: 'pack_500', credits: 500, price: 72 },
+  { id: 'pack_1000', credits: 1000, price: 125 },
 ];
 
 // ─── Custom-amount tiers (must stay in sync with frontend) ─
-const CUSTOM_RATE_TIERS = [
-  { min: 1,    max: 100,   rate: 0.99 },
-  { min: 101,  max: 500,   rate: 0.80 },
-  { min: 501,  max: 1000,  rate: 0.70 },
-  { min: 1001, max: 10000, rate: 0.50 },
+const CUSTOM_CREDIT_TIERS = [
+  { min: 50, max: 199, creditsPerRupee: 5 }, // ₹1 = 5 credits
+  { min: 200, max: 499, creditsPerRupee: 6 },
+  { min: 500, max: 999, creditsPerRupee: 7 },
+  { min: 1000, max: 2999, creditsPerRupee: 8 },
+  { min: 3000, max: 5999, creditsPerRupee: 9 },
+  { min: 6000, max: 10000, creditsPerRupee: 10 }, // ₹1 = 10 credits
 ];
+
 const CUSTOM_MIN = 50;
 const CUSTOM_MAX = 10000;
 
 const GST_RATE = 0.18;
 
 // ─── helpers ──────────────────────────────────────────
-/** Blended base price for N credits using tiered rates */
 function calcCustomPrice(credits) {
-  let total     = 0;
-  let remaining = credits;
-
-  for (const tier of CUSTOM_RATE_TIERS) {
-    if (remaining <= 0) break;
-    const chunkStart  = credits - remaining;           // how many already priced
-    const tierStart   = tier.min - 1;                  // 0-based start of this tier
-    const tierEnd     = tier.max;                      // 0-based end (inclusive)
-
-    if (chunkStart >= tierEnd) continue;               // already past this tier
-
-    const effectiveStart = Math.max(chunkStart, tierStart);
-    const chunkInTier    = Math.min(tierEnd, credits) - effectiveStart;
-
-    if (chunkInTier > 0) {
-      total     += chunkInTier * tier.rate;
-      remaining -= chunkInTier;
-    }
-  }
-  return Math.round(total);                            // whole rupee, matches frontend
+  const tier = CUSTOM_CREDIT_TIERS.find(
+    t => credits >= t.min && credits <= t.max
+  );
+  if (!tier) throw new Error('Invalid credit amount');
+  const price = credits / tier.creditsPerRupee;
+  return Math.max(1, Math.ceil(price));
 }
 
 /** Return a preset pack or null */
@@ -56,7 +44,7 @@ const findPack = (packId) => CREDIT_PACKS.find((p) => p.id === packId);
 // ═══════════════════════════════════════════════════════
 export const listCreditPacks = async (_req, res) => {
   const packs = CREDIT_PACKS.map((p) => {
-    const gstAmount   = Math.round(p.price * GST_RATE);
+    const gstAmount = Math.round(p.price * GST_RATE);
     return { ...p, gstAmount, totalAmount: p.price + gstAmount };
   });
   res.json({ success: true, data: packs });
@@ -74,9 +62,9 @@ export const getBalance = async (req, res) => {
 // GET /api/credits/history
 // ═══════════════════════════════════════════════════════
 export const getCreditHistory = async (req, res) => {
-  const page  = parseInt(req.query.page,  10) || 1;
+  const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 20;
-  const skip  = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
   const [transactions, total] = await Promise.all([
     CreditTransaction.find({ userId: req.user._id })
@@ -103,9 +91,9 @@ export const buyCreditPackManual = async (req, res) => {
   const { packId, amount, transactionId, credits: creditsRaw } = req.body;
 
   // ── basic guards ──
-  if (!packId)                  throw new ApiError(400, 'packId is required.');
+  if (!packId) throw new ApiError(400, 'packId is required.');
   if (!amount || !transactionId) throw new ApiError(400, 'Amount and transaction ID are required.');
-  if (!req.file)                throw new ApiError(400, 'Payment proof screenshot is required.');
+  if (!req.file) throw new ApiError(400, 'Payment proof screenshot is required.');
 
   // ── resolve credits & expected base amount ──
   let resolvedCredits, baseAmount;
@@ -117,17 +105,17 @@ export const buyCreditPackManual = async (req, res) => {
       throw new ApiError(400, `Credits must be between ${CUSTOM_MIN} and ${CUSTOM_MAX}.`);
 
     resolvedCredits = credits;
-    baseAmount      = calcCustomPrice(credits);
+    baseAmount = calcCustomPrice(credits);
   } else {
     // ── PRESET path ──
     const pack = findPack(packId);
     if (!pack) throw new ApiError(400, 'Invalid credit pack.');
     resolvedCredits = pack.credits;
-    baseAmount      = pack.price;
+    baseAmount = pack.price;
   }
 
   // ── amount verification (base + GST) ──
-  const gstAmount   = Math.round(baseAmount * GST_RATE);
+  const gstAmount = Math.round(baseAmount * GST_RATE);
   const expectedAmt = baseAmount + gstAmount;
 
   if (parseFloat(amount) !== expectedAmt)
@@ -139,15 +127,15 @@ export const buyCreditPackManual = async (req, res) => {
 
   // ── persist ──
   const purchaseRequest = await CreditPurchaseRequest.create({
-    userId:       req.user._id,
+    userId: req.user._id,
     packId,                                      // 'pack_custom' or 'pack_XXX'
-    packCredits:   resolvedCredits,
-    amount:        expectedAmt,
+    packCredits: resolvedCredits,
+    amount: expectedAmt,
     baseAmount,
     gstAmount,
     transactionId: transactionId.trim(),
-    paymentProof:  req.file.path,
-    status:        'PENDING',
+    paymentProof: req.file.path,
+    status: 'PENDING',
   });
 
   res.json({
@@ -155,7 +143,7 @@ export const buyCreditPackManual = async (req, res) => {
     message: 'Payment proof submitted successfully. Credits will be added within 24 hours.',
     data: {
       requestId: purchaseRequest._id,
-      status:    purchaseRequest.status,
+      status: purchaseRequest.status,
       estimatedVerificationTime: '24 hours',
     },
   });
@@ -193,7 +181,7 @@ export const verifyCreditPurchase = async (req, res) => {
   if (req.user.role !== 'ADMIN')
     throw new ApiError(403, 'Only admins can verify credit purchases.');
 
-  const { requestId }      = req.params;
+  const { requestId } = req.params;
   const { action, reason } = req.body;
 
   if (!['APPROVE', 'REJECT'].includes(action))
@@ -211,23 +199,23 @@ export const verifyCreditPurchase = async (req, res) => {
 
   if (action === 'APPROVE') {
     const user = await User.findById(purchaseRequest.userId._id);
-    user.credits.balance     += purchaseRequest.packCredits;
+    user.credits.balance += purchaseRequest.packCredits;
     user.credits.lastRefilled = now;
     await user.save();
 
     await CreditTransaction.create({
-      userId:      user._id,
-      type:         'PURCHASE',
-      amount:       purchaseRequest.packCredits,
+      userId: user._id,
+      type: 'PURCHASE',
+      amount: purchaseRequest.packCredits,
       balanceAfter: user.credits.balance,
       meta: {
         paymentRequestId: purchaseRequest._id,
-        transactionId:    purchaseRequest.transactionId,
+        transactionId: purchaseRequest.transactionId,
         note: `Purchased ${purchaseRequest.packCredits} credits${purchaseRequest.packId === 'pack_custom' ? ' (custom)' : ''} — verified`,
       },
     });
 
-    purchaseRequest.status     = 'APPROVED';
+    purchaseRequest.status = 'APPROVED';
     purchaseRequest.verifiedBy = req.user._id;
     purchaseRequest.verifiedAt = now;
     await purchaseRequest.save();
@@ -240,10 +228,10 @@ export const verifyCreditPurchase = async (req, res) => {
   }
 
   // ── REJECT ──
-  purchaseRequest.status          = 'REJECTED';
+  purchaseRequest.status = 'REJECTED';
   purchaseRequest.rejectionReason = reason || 'Verification failed';
-  purchaseRequest.verifiedBy      = req.user._id;
-  purchaseRequest.verifiedAt      = now;
+  purchaseRequest.verifiedBy = req.user._id;
+  purchaseRequest.verifiedAt = now;
   await purchaseRequest.save();
 
   res.json({

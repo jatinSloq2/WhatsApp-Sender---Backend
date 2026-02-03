@@ -1,7 +1,18 @@
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   AlertCircle,
   BarChart2,
   Check,
+  CheckCircle2,
   Code,
   CreditCard,
   Loader2,
@@ -9,11 +20,11 @@ import {
   Sparkles,
   TrendingUp,
   X,
-  Zap,CheckCircle2 
+  Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PaymentModal } from "../components/PaymentModal"; // ← shared modal
+import { PaymentModal } from "../components/PaymentModal";
 import { useAuth } from "../context/AuthContext";
 import { usePlans } from "../context/PlanContext";
 
@@ -65,7 +76,6 @@ export default function Plans() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  /* fetch */
   useEffect(() => { loadPlans(); }, []);
 
   const loadPlans = async () => {
@@ -117,7 +127,7 @@ export default function Plans() {
   const calculateYearlySavings = (monthlyPrice) =>
     formatPrice(monthlyPrice * 12 * 0.2);
 
-  /* ── loading / error screens ── */
+  /* ── loading ── */
   if (plansLoading && plans.length === 0) {
     return (
       <div className="min-h-[calc(100vh-64px)] flex items-center justify-center">
@@ -129,15 +139,18 @@ export default function Plans() {
     );
   }
 
+  /* ── error ── */
   if (error) {
     return (
       <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white rounded-2xl border-2 border-red-300 p-8 text-center shadow-lg">
-          <AlertCircle className="w-14 h-14 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Unable to Load Plans</h2>
-          <p className="text-gray-500 mb-6">{error}</p>
-          <button onClick={loadPlans} className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all">Try Again</button>
-        </div>
+        <Card className="max-w-md w-full border-2 border-red-300 rounded-2xl shadow-lg">
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-14 h-14 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Unable to Load Plans</h2>
+            <p className="text-gray-500 mb-6">{error}</p>
+            <Button onClick={loadPlans} className="bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl">Try Again</Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -166,15 +179,11 @@ export default function Plans() {
       )}
 
       {/* ══════════════ HERO ══════════════ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-green-50 via-white to-teal-50">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-green-200 rounded-full blur-3xl opacity-20 -z-10" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200 rounded-full blur-3xl opacity-20 -z-10" />
-
+      <section className="relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-6 pt-20 pb-16 text-center">
-          {/* badge */}
-          <span className="inline-flex items-center gap-2 text-sm font-bold text-green-700 bg-green-100 border-2 border-green-300 px-4 py-2 rounded-full shadow-sm mb-6">
+          <Badge variant="secondary" className="inline-flex items-center gap-2 bg-green-100 text-green-700 border-2 border-green-300 px-4 py-2 rounded-full font-semibold text-sm shadow-sm mb-6">
             <Sparkles size={16} className="text-green-600" /> Choose Your Plan
-          </span>
+          </Badge>
 
           <h1 className="text-5xl sm:text-6xl font-black text-black tracking-tight leading-tight mb-4">
             Scale your campaigns
@@ -190,36 +199,52 @@ export default function Plans() {
       {/* ══════════════ MESSAGE BANNER ══════════════ */}
       {message.text && (
         <section className="max-w-6xl mx-auto px-6 pt-4">
-          <div className={`flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-semibold border-2 shadow-sm ${message.type === "success" ? "bg-green-50 text-green-700 border-green-300"
-              : message.type === "info" ? "bg-blue-50 text-blue-700 border-blue-300"
-                : "bg-red-50 text-red-700 border-red-300"
+          <Alert variant={message.type === "success" ? "default" : message.type === "info" ? "default" : "destructive"} className={`rounded-xl border-2 shadow-sm ${message.type === "success" ? "bg-green-50 border-green-300"
+              : message.type === "info" ? "bg-blue-50 border-blue-300"
+                : "bg-red-50 border-red-300"
             }`}>
-            {message.type === "success" ? <Check size={18} /> : message.type === "info" ? <AlertCircle size={18} /> : <X size={18} />}
-            <span>{message.text}</span>
-            <button onClick={() => setMessage({ type: "", text: "" })} className="ml-auto"><X size={16} /></button>
-          </div>
+            {message.type === "success" ? <Check size={18} className="text-green-600" />
+              : message.type === "info" ? <AlertCircle size={18} className="text-blue-600" />
+                : <X size={18} className="text-red-500" />
+            }
+            <AlertDescription className={`font-semibold ${message.type === "success" ? "text-green-700"
+                : message.type === "info" ? "text-blue-700"
+                  : "text-red-700"
+              }`}>
+              {message.text}
+            </AlertDescription>
+            <Button variant="ghost" size="sm" onClick={() => setMessage({ type: "", text: "" })} className="ml-auto p-0 h-auto hover:bg-transparent">
+              <X size={16} />
+            </Button>
+          </Alert>
         </section>
       )}
 
       {/* ══════════════ BILLING TOGGLE ══════════════ */}
-      <section className="max-w-6xl mx-auto px-6 py-6 flex justify-center">
+      <section className="max-w-6xl mx-auto px-6 pb-15 flex justify-center">
         <div className="inline-flex items-center gap-1 p-1.5 bg-gray-100 rounded-2xl shadow-sm border-2 border-gray-200">
-          <button
+          <Button
+            variant={billingCycle === "MONTHLY" ? "default" : "ghost"}
             onClick={() => setBillingCycle("MONTHLY")}
-            className={`px-8 py-3 text-sm font-bold rounded-xl transition-all duration-200 ${billingCycle === "MONTHLY" ? "bg-green-600 text-white shadow-md" : "text-gray-600 hover:text-black"
+            className={`px-8 py-3 text-sm font-bold rounded-xl transition-all duration-200 ${billingCycle === "MONTHLY"
+                ? "bg-green-600 text-white shadow-md hover:bg-green-600"
+                : "text-gray-600 hover:text-black hover:bg-transparent"
               }`}
-          >Monthly</button>
+          >Monthly</Button>
 
-          <button
+          <Button
+            variant={billingCycle === "YEARLY" ? "default" : "ghost"}
             onClick={() => setBillingCycle("YEARLY")}
-            className={`px-8 py-3 text-sm font-bold rounded-xl transition-all duration-200 relative ${billingCycle === "YEARLY" ? "bg-green-600 text-white shadow-md" : "text-gray-600 hover:text-black"
+            className={`px-8 py-3 text-sm font-bold rounded-xl transition-all duration-200 relative ${billingCycle === "YEARLY"
+                ? "bg-green-600 text-white shadow-md hover:bg-green-600"
+                : "text-gray-600 hover:text-black hover:bg-transparent"
               }`}
           >
             Yearly
-            <span className="absolute -top-5 -right-10 bg-gradient-to-r from-green-500 to-teal-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg">
+            <Badge className="absolute -top-5 -right-10 bg-gradient-to-r from-green-500 to-teal-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg border-0">
               SAVE 20%
-            </span>
-          </button>
+            </Badge>
+          </Button>
         </div>
       </section>
 
@@ -231,13 +256,13 @@ export default function Plans() {
           </div>
         ) : (
           <div className={`gap-6 mx-auto ${filteredPlans.length < 4 ? "flex justify-center flex-wrap" : "grid md:grid-cols-2 lg:grid-cols-4"}`}>
-            {filteredPlans.map((plan, idx) => {
+            {filteredPlans.map((plan) => {
               const isPopular = plan.name === "PRO";
               const isCurrent = isCurrentPlan(plan._id);
               const isFree = plan.price === 0;
 
               return (
-                <div
+                <Card
                   key={plan._id}
                   className={`relative bg-white rounded-2xl transition-all duration-300 ${isPopular
                       ? "border-4 border-green-600 shadow-2xl shadow-green-200 scale-[1.04]"
@@ -249,25 +274,28 @@ export default function Plans() {
                   {/* Popular badge */}
                   {isPopular && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                      <span className="inline-flex items-center gap-2 px-5 py-1.5 bg-gradient-to-r from-green-600 to-teal-600 text-white text-xs font-black rounded-full shadow-lg uppercase tracking-wider">
+                      <Badge className="inline-flex items-center gap-2 px-5 py-1.5 bg-gradient-to-r from-green-600 to-teal-600 text-white text-xs font-black rounded-full shadow-lg border-0 uppercase tracking-wider">
                         <TrendingUp size={14} /> Most Popular
-                      </span>
+                      </Badge>
                     </div>
                   )}
 
-                  <div className="p-7">
-                    {/* plan name + price */}
-                    <h3 className="text-2xl font-black text-black mb-3">{plan.name}</h3>
-                    <div className="flex items-baseline gap-2 mb-1">
+                  <CardHeader className="px-7 pt-7 pb-0">
+                    <CardTitle className="text-2xl font-black text-black">{plan.name}</CardTitle>
+                    <div className="flex items-baseline gap-2 mt-3">
                       <span className="text-4xl font-black text-black">{formatPrice(plan.price)}</span>
                       <span className="text-gray-500 font-semibold">/{billingCycle === "MONTHLY" ? "mo" : "yr"}</span>
                     </div>
                     {billingCycle === "YEARLY" && !isFree && (
-                      <p className="text-xs text-green-600 font-semibold">Save {calculateYearlySavings(plan.price / 0.8 / 12)} per year</p>
+                      <CardDescription className="text-xs text-green-600 font-semibold mt-1">
+                        Save {calculateYearlySavings(plan.price / 0.8 / 12)} per year
+                      </CardDescription>
                     )}
+                  </CardHeader>
 
+                  <CardContent className="px-7 pb-7 pt-5">
                     {/* credits badge */}
-                    <div className="mt-5 mb-5 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-xl">
+                    <div className="mb-5 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-xl">
                       <div className="flex items-center gap-2">
                         <Zap size={18} className="text-amber-500" />
                         <span className="font-black text-black text-sm">
@@ -303,34 +331,37 @@ export default function Plans() {
                         const label = FEATURE_LABELS[key];
                         return (
                           <div key={key} className="flex items-center gap-2.5 text-sm">
-                            {Icon ? <Icon size={17} className="text-green-600 flex-shrink-0" /> : <CheckCircle2 size={17} className="text-green-600 flex-shrink-0" />}
+                            {Icon
+                              ? <Icon size={17} className="text-green-600 flex-shrink-0" />
+                              : <CheckCircle2 size={17} className="text-green-600 flex-shrink-0" />
+                            }
                             <span className="text-gray-700">{label}</span>
                           </div>
                         );
                       })}
                     </div>
 
-                    {/* CTA button */}
-                    <button
+                    {/* CTA */}
+                    <Button
                       onClick={() => handleSubscribe(plan)}
                       disabled={subscribing === plan._id || isCurrent}
-                      className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all shadow-md ${isCurrent
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                      className={`w-full rounded-xl font-bold text-sm shadow-md transition-all ${isCurrent
+                          ? "bg-gray-100 text-gray-400 hover:bg-gray-100 shadow-none cursor-not-allowed"
                           : isPopular
                             ? "bg-green-600 hover:bg-green-700 text-white shadow-green-200"
                             : "bg-white hover:bg-gray-50 text-black border-2 border-gray-300"
                         }`}
                     >
                       {subscribing === plan._id ? (
-                        <><Loader2 size={17} className="animate-spin" /> Processing…</>
+                        <><Loader2 size={17} className="animate-spin mr-2" /> Processing…</>
                       ) : isCurrent ? (
                         "Current Plan"
                       ) : (
-                        <><CreditCard size={17} /> {isFree ? "Get Started Free" : "Subscribe Now"}</>
+                        <><CreditCard size={17} className="mr-2" /> {isFree ? "Get Started Free" : "Subscribe Now"}</>
                       )}
-                    </button>
-                  </div>
-                </div>
+                    </Button>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
@@ -339,49 +370,57 @@ export default function Plans() {
 
       {/* ══════════════ WHAT HAPPENS WHEN YOU UPGRADE ══════════════ */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
-        <div className="bg-gradient-to-br from-green-50 via-teal-50 to-green-50 border-2 border-green-300 rounded-2xl p-10 shadow-sm">
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-black text-black mb-3">What happens when you upgrade?</h2>
-            <p className="text-gray-600 max-w-xl mx-auto">Understanding your subscription and how it works</p>
-          </div>
+        <Card className="bg-gradient-to-br from-green-50 via-teal-50 to-green-50 border-2 border-green-300 rounded-2xl shadow-none">
+          <CardHeader className="px-10 pt-10 pb-2 text-center">
+            <CardTitle className="text-4xl font-black text-black">What happens when you upgrade?</CardTitle>
+            <CardDescription className="text-gray-600 max-w-xl mx-auto mt-2">
+              Understanding your subscription and how it works
+            </CardDescription>
+          </CardHeader>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { gradient: "from-green-600 to-teal-600", icon: Zap, title: "Instant Credit Refill", desc: "Credits are added immediately to your balance. Start sending campaigns right away." },
-              { gradient: "from-blue-500 to-teal-500", icon: TrendingUp, title: "Auto-Renewal Protection", desc: "Your plan automatically renews each billing period. Credits refill, limits reset. Cancel anytime." },
-              { gradient: "from-green-600 to-blue-600", icon: Shield, title: "Premium Features Unlocked", desc: "Access advanced analytics, priority support, and custom templates based on your plan." },
-            ].map(({ gradient, icon: Icon, title, desc }) => (
-              <div key={title} className="text-center">
-                <div className={`w-18 h-18 mx-auto bg-gradient-to-br ${gradient} rounded-2xl flex items-center justify-center shadow-lg mb-4`} style={{ width: 72, height: 72 }}>
-                  <Icon size={30} className="text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-black mb-2">{title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* payment & billing details box */}
-          <div className="mt-10 bg-white border-2 border-green-300 rounded-2xl p-6 shadow-sm">
-            <h4 className="font-bold text-black text-base flex items-center gap-2 mb-4">
-              <CreditCard size={18} className="text-green-600" /> Payment & Billing Details
-            </h4>
-            <div className="space-y-3">
+          <CardContent className="px-10 pb-10">
+            <div className="grid md:grid-cols-3 gap-8 mt-8">
               {[
-                "Secure payment processing with industry-standard encryption",
-                "Automatic billing on your renewal date — cancel anytime before renewal",
-                "Unused credits roll over if you upgrade, but expire at plan end if you cancel",
-                "Yearly plans save 20% and include 12 months of credits upfront",
-                "All prices in Indian Rupees (INR) — GST applicable as per regulations",
-              ].map((txt, i) => (
-                <div key={i} className="flex items-start gap-2.5">
-                  <Check size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-700">{txt}</span>
+                { gradient: "from-green-600 to-teal-600", icon: Zap, title: "Instant Credit Refill", desc: "Credits are added immediately to your balance. Start sending campaigns right away." },
+                { gradient: "from-blue-500 to-teal-500", icon: TrendingUp, title: "Auto-Renewal Protection", desc: "Your plan automatically renews each billing period. Credits refill, limits reset. Cancel anytime." },
+                { gradient: "from-green-600 to-blue-600", icon: Shield, title: "Premium Features Unlocked", desc: "Access advanced analytics, priority support, and custom templates based on your plan." },
+              ].map(({ gradient, icon: Icon, title, desc }) => (
+                <div key={title} className="text-center">
+                  <div className={`mx-auto bg-gradient-to-br ${gradient} rounded-2xl flex items-center justify-center shadow-lg mb-4`} style={{ width: 72, height: 72 }}>
+                    <Icon size={30} className="text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-black mb-2">{title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+
+            {/* payment & billing details */}
+            <Card className="mt-10 bg-white border-2 border-green-300 rounded-2xl shadow-none">
+              <CardHeader className="px-6 pt-6 pb-2">
+                <CardTitle className="text-base font-bold text-black flex items-center gap-2">
+                  <CreditCard size={18} className="text-green-600" /> Payment & Billing Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-6 pb-6">
+                <div className="space-y-3">
+                  {[
+                    "Secure payment processing with industry-standard encryption",
+                    "Automatic billing on your renewal date — cancel anytime before renewal",
+                    "Unused credits roll over if you upgrade, but expire at plan end if you cancel",
+                    "Yearly plans save 20% and include 12 months of credits upfront",
+                    "All prices in Indian Rupees (INR) — GST applicable as per regulations",
+                  ].map((txt, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <Check size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{txt}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
       </section>
 
       {/* ══════════════ FAQ ══════════════ */}
@@ -392,15 +431,17 @@ export default function Plans() {
 
         <div className="space-y-4">
           {FAQS.map((faq, i) => (
-            <details key={i} className="group bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-green-600 transition-all">
-              <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none">
-                <span className="font-bold text-gray-800 text-base">{faq.q}</span>
-                <span className="text-green-600 text-2xl group-open:rotate-45 transition-transform duration-200 flex-shrink-0 ml-4">+</span>
-              </summary>
-              <div className="px-6 pb-5">
-                <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
-              </div>
-            </details>
+            <Card key={i} className="group bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-green-600 transition-all">
+              <details>
+                <summary className="flex items-center justify-between px-4 cursor-pointer list-none">
+                  <span className="font-bold text-gray-800 text-base">{faq.q}</span>
+                  <span className="text-green-600 text-2xl group-open:rotate-45 transition-transform duration-200 flex-shrink-0 ml-4">+</span>
+                </summary>
+                <CardContent className="px-6 pb-5 pt-0">
+                  <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
+                </CardContent>
+              </details>
+            </Card>
           ))}
         </div>
       </section>
