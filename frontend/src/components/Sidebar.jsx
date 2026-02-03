@@ -26,14 +26,8 @@ const navItems = [
 
     // ─── Admin only ─────────────────────────────
     {
-        to: '/admin/payment-verification',
+        to: '/admin/verification',
         label: 'Payment Verification',
-        icon: Shield,
-        adminOnly: true,
-    },
-    {
-        to: '/admin/credit-verification',
-        label: 'Credit Verification',
         icon: Shield,
         adminOnly: true,
     },

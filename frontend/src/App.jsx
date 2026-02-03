@@ -21,8 +21,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import VerifyOTP from './pages/VerifyOtp';
 import ResetPassword from './pages/Resetpassword';
-import AdminPaymentVerification from './pages/AdminPaymentVerification';
-import AdminCreditVerification from './pages/Admincreditverification';
+import AdminVerification from './pages/AdminPaymentVerification';
 
 export default function App() {
   return (
@@ -74,29 +73,20 @@ export default function App() {
           }
         />
 
+        {/* ── Admin routes (with sidebar) ── */}
+        <Route
+          path="/admin/verification"
+          element={
+            <AdminRoute>
+              <div className="flex flex-1">
+                <Sidebar />
+                <AdminVerification />
+              </div>
+            </AdminRoute>
+          }
+        />
+
         {/* ── Protected routes (with sidebar) ── */}
-        <Route
-          path="/admin/payment-verification"
-          element={
-            <AdminRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <AdminPaymentVerification />
-              </div>
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/credit-verification"
-          element={
-            <AdminRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <AdminCreditVerification />
-              </div>
-            </AdminRoute>
-          }
-        />
         <Route
           path="/dashboard"
           element={
