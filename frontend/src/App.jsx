@@ -22,6 +22,7 @@ import Settings from './pages/Settings';
 import VerifyOTP from './pages/VerifyOtp';
 import ResetPassword from './pages/Resetpassword';
 import AdminPaymentVerification from './pages/AdminPaymentVerification';
+import AdminCreditVerification from './pages/Admincreditverification';
 
 export default function App() {
   return (
@@ -81,6 +82,17 @@ export default function App() {
               <div className="flex flex-1">
                 <Sidebar />
                 <AdminPaymentVerification />
+              </div>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/credit-verification"
+          element={
+            <AdminRoute>
+              <div className="flex flex-1">
+                <Sidebar />
+                <AdminCreditVerification />
               </div>
             </AdminRoute>
           }

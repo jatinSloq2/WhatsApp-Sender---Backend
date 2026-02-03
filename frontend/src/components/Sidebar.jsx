@@ -31,6 +31,12 @@ const navItems = [
         icon: Shield,
         adminOnly: true,
     },
+    {
+        to: '/admin/credit-verification',
+        label: 'Credit Verification',
+        icon: Shield,
+        adminOnly: true,
+    },
 ];
 export default function Sidebar() {
     const { user } = useAuth();
