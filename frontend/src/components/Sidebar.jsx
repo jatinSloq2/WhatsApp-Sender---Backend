@@ -104,11 +104,10 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
                                     {({ isActive }) => (
                                         <>
                                             <div
-                                                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
-                                                    isActive
+                                                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${isActive
                                                         ? 'bg-white border-2 border-green-300 shadow-sm'
                                                         : 'bg-gray-100 border-2 border-gray-200 group-hover:bg-white group-hover:border-green-200'
-                                                }`}
+                                                    }`}
                                             >
                                                 <Icon
                                                     size={18}
@@ -294,7 +293,7 @@ export default function Sidebar() {
 
     return (
         <aside className="hidden lg:flex w-64 bg-white border-r-2 border-gray-200 h-[calc(100vh-64px)] sticky top-16 overflow-hidden">
-            <SidebarContent onLinkClick={() => {}} showBranding={false} />
+            <SidebarContent onLinkClick={() => { }} showBranding={false} />
         </aside>
     );
 }
