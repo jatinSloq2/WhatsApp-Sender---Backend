@@ -198,8 +198,8 @@ export default function Plans() {
 
       {/* ══════════════ MESSAGE BANNER ══════════════ */}
       {message.text && (
-        <section className="max-w-6xl mx-auto px-6 pt-4">
-          <Alert variant={message.type === "success" ? "default" : message.type === "info" ? "default" : "destructive"} className={`rounded-xl border-2 shadow-sm ${message.type === "success" ? "bg-green-50 border-green-300"
+        <section className="max-w-6xl mx-auto px-6 pt-4 mb-10">
+          <Alert variant={message.type === "success" ? "default" : message.type === "info" ? "default" : "destructive"} className={`rounded-xl border-2 shadow-sm flex ${message.type === "success" ? "bg-green-50 border-green-300"
               : message.type === "info" ? "bg-blue-50 border-blue-300"
                 : "bg-red-50 border-red-300"
             }`}>

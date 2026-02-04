@@ -17,6 +17,7 @@ const creditTransactionSchema = new mongoose.Schema(
                 'CAMPAIGN_SPEND',   // credits consumed by a campaign
                 'REFUND',           // credits returned (e.g. failed campaign)
                 'PLAN_UPGRADE_BONUS', // bonus credits on upgrade
+                "ADMIN_MANUAL"
             ],
         },
         amount: {

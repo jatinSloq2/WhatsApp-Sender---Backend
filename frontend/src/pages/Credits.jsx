@@ -279,11 +279,23 @@ export default function Credits() {
   const handlePurchase = (pack) => { setSelectedPack(pack); setShowModal(true); };
 
   const handleProofSubmit = async (proofData) => {
-    await submitCreditProof(proofData);
-    setShowModal(false); setSelectedPack(null);
-    setMessage({ type: "success", text: "Payment proof submitted! Credits will be added within 24 hours." });
+    // Ensure credits is included for custom packs
+    const submissionData = {
+      ...proofData,
+      // Add credits from selectedPack if it's a custom pack
+      ...(selectedPack.id === 'pack_custom' && { credits: selectedPack.credits }),
+    };
+
+    await submitCreditProof(submissionData);
+    setShowModal(false);
+    setSelectedPack(null);
+    setMessage({
+      type: "success",
+      text: "Payment proof submitted! Credits will be added within 24 hours."
+    });
     loadMyRequests();
   };
+
 
   /* status badge */
   const statusBadge = (status) => {
@@ -298,22 +310,27 @@ export default function Credits() {
   return (
     <div className="min-h-[calc(100vh-64px)] mx-auto">
 
-      {/* ── shared PaymentModal ── */}
       {showModal && selectedPack && (
         <PaymentModal
           item={{
-            name: `${selectedPack.credits.toLocaleString("en-IN")} Credits${selectedPack.id === "pack_custom" ? " (Custom)" : ""}`,
+            name: `${selectedPack.credits.toLocaleString("en-IN")} Credits${selectedPack.id === "pack_custom" ? " (Custom)" : ""
+              }`,
             subtitle: "Credit Pack Purchase",
             baseAmount: selectedPack.price,
             gstAmount: selectedPack.gstAmount,
             totalAmount: selectedPack.totalAmount,
-            
           }}
           extraPayload={{
             packId: selectedPack.id,
-            ...(selectedPack.id === "pack_custom" && { credits: selectedPack.credits }),
+            // Include credits for custom packs
+            ...(selectedPack.id === "pack_custom" && {
+              credits: selectedPack.credits
+            }),
           }}
-          onClose={() => { setShowModal(false); setSelectedPack(null); }}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedPack(null);
+          }}
           onSubmitProof={handleProofSubmit}
         />
       )}
@@ -364,7 +381,7 @@ export default function Credits() {
       {/* ══════════════ MESSAGE BANNER ══════════════ */}
       {message.text && (
         <section className="max-w-6xl mx-auto px-6 pb-3">
-          <Alert variant={message.type === "success" ? "default" : "destructive"} className={`rounded-xl border-2 shadow-sm ${message.type === "success" ? "bg-green-50 border-green-300" : "bg-red-50 border-red-300"
+          <Alert variant={message.type === "success" ? "default" : "destructive"} className={`rounded-xl border-2 flex shadow-sm ${message.type === "success" ? "bg-green-50 border-green-300" : "bg-red-50 border-red-300"
             }`}>
             {message.type === "success" ? <Check size={18} className="text-green-600" /> : <AlertCircle size={18} className="text-red-500" />}
             <AlertDescription className={`font-semibold ${message.type === "success" ? "text-green-700" : "text-red-700"}`}>

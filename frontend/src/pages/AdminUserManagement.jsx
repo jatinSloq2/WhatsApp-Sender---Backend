@@ -330,13 +330,13 @@ export default function AdminUserManagement() {
                 {/* Message Alert */}
                 {message.text && (
                     <Alert
-                        className={`mb-6 rounded-xl border-2 ${message.type === 'success'
-                                ? 'bg-green-50 border-green-300'
-                                : 'bg-red-50 border-red-300'
+                        className={`mb-6 rounded-xl border-2 flex items-center justify-between ${message.type === 'success'
+                            ? 'bg-green-50 border-green-300'
+                            : 'bg-red-50 border-red-300'
                             }`}
                     >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                        <div className="flex w-full">
+                            <div className="flex items-center gap-2 w-full">
                                 {message.type === 'success' ? (
                                     <CheckCircle2 size={18} className="text-green-600" />
                                 ) : (
@@ -344,8 +344,8 @@ export default function AdminUserManagement() {
                                 )}
                                 <span
                                     className={`font-semibold ${message.type === 'success'
-                                            ? 'text-green-700'
-                                            : 'text-red-700'
+                                        ? 'text-green-700'
+                                        : 'text-red-700'
                                         }`}
                                 >
                                     {message.text}
@@ -898,8 +898,8 @@ export default function AdminUserManagement() {
                                                 </Badge>
                                                 <span
                                                     className={`font-bold text-lg ${txn.amount > 0
-                                                            ? 'text-green-600'
-                                                            : 'text-red-600'
+                                                        ? 'text-green-600'
+                                                        : 'text-red-600'
                                                         }`}
                                                 >
                                                     {txn.amount > 0 ? '+' : ''}

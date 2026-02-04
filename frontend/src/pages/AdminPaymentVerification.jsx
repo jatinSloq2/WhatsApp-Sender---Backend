@@ -382,20 +382,22 @@ export default function AdminVerification() {
                 {/* ═══════════════════════════════════════════════════════ */}
                 {message.text && (
                     <Alert
-                        className={`mb-6 rounded-xl border-2 ${message.type === 'success'
+                        className={`mb-6 rounded-xl border-2 flex items-center justify-between ${message.type === 'success'
                             ? 'bg-green-50 border-green-300'
                             : 'bg-red-50 border-red-300'
                             }`}
                     >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                        <div className="flex w-full">
+                            <div className="flex items-center gap-2 w-full">
                                 {message.type === 'success' ? (
                                     <CheckCircle2 size={18} className="text-green-600" />
                                 ) : (
                                     <AlertCircle size={18} className="text-red-600" />
                                 )}
                                 <span
-                                    className={`font-semibold ${message.type === 'success' ? 'text-green-700' : 'text-red-700'
+                                    className={`font-semibold ${message.type === 'success'
+                                        ? 'text-green-700'
+                                        : 'text-red-700'
                                         }`}
                                 >
                                     {message.text}

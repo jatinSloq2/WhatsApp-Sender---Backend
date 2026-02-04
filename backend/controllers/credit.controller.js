@@ -89,6 +89,7 @@ export const getCreditHistory = async (req, res) => {
 // ═══════════════════════════════════════════════════════
 export const buyCreditPackManual = async (req, res) => {
   const { packId, amount, transactionId, credits: creditsRaw } = req.body;
+  
   // ── basic guards ──
   if (!packId) throw new ApiError(400, 'packId is required.');
   if (!amount || !transactionId) throw new ApiError(400, 'Amount and transaction ID are required.');
@@ -99,10 +100,19 @@ export const buyCreditPackManual = async (req, res) => {
 
   if (packId === 'pack_custom') {
     // ── CUSTOM path ──
+    if (!creditsRaw) {
+      throw new ApiError(400, 'Credits amount is required for custom packs.');
+    }
+    
     const credits = parseInt(creditsRaw, 10);
-    if (isNaN(credits) || credits < CUSTOM_MIN || credits > CUSTOM_MAX)
-      console.log(credits)
+    
+    if (isNaN(credits)) {
+      throw new ApiError(400, 'Invalid credits amount. Must be a number.');
+    }
+    
+    if (credits < CUSTOM_MIN || credits > CUSTOM_MAX) {
       throw new ApiError(400, `Credits must be between ${CUSTOM_MIN} and ${CUSTOM_MAX}.`);
+    }
 
     resolvedCredits = credits;
     baseAmount = calcCustomPrice(credits);
@@ -118,12 +128,21 @@ export const buyCreditPackManual = async (req, res) => {
   const gstAmount = Math.round(baseAmount * GST_RATE);
   const expectedAmt = baseAmount + gstAmount;
 
-  if (parseFloat(amount) !== expectedAmt)
-    throw new ApiError(400, `Amount mismatch. Expected ₹${expectedAmt} but received ₹${amount}.`);
+  if (parseFloat(amount) !== expectedAmt) {
+    throw new ApiError(
+      400, 
+      `Amount mismatch. Expected ₹${expectedAmt} (Base: ₹${baseAmount} + GST: ₹${gstAmount}) but received ₹${amount}.`
+    );
+  }
 
   // ── duplicate txn guard ──
-  const existing = await CreditPurchaseRequest.findOne({ transactionId: transactionId.trim() });
-  if (existing) throw new ApiError(409, 'This transaction ID has already been submitted.');
+  const existing = await CreditPurchaseRequest.findOne({ 
+    transactionId: transactionId.trim() 
+  });
+  
+  if (existing) {
+    throw new ApiError(409, 'This transaction ID has already been submitted.');
+  }
 
   // ── persist ──
   const purchaseRequest = await CreditPurchaseRequest.create({
@@ -144,6 +163,8 @@ export const buyCreditPackManual = async (req, res) => {
     data: {
       requestId: purchaseRequest._id,
       status: purchaseRequest.status,
+      credits: resolvedCredits,
+      amount: expectedAmt,
       estimatedVerificationTime: '24 hours',
     },
   });
@@ -223,7 +244,11 @@ export const verifyCreditPurchase = async (req, res) => {
     return res.json({
       success: true,
       message: 'Credit purchase approved and credits added.',
-      data: { userId: user._id, creditsAdded: purchaseRequest.packCredits, creditsBalance: user.credits.balance },
+      data: { 
+        userId: user._id, 
+        creditsAdded: purchaseRequest.packCredits, 
+        creditsBalance: user.credits.balance 
+      },
     });
   }
 
@@ -237,7 +262,10 @@ export const verifyCreditPurchase = async (req, res) => {
   res.json({
     success: true,
     message: 'Credit purchase request rejected.',
-    data: { requestId: purchaseRequest._id, reason: purchaseRequest.rejectionReason },
+    data: { 
+      requestId: purchaseRequest._id, 
+      reason: purchaseRequest.rejectionReason 
+    },
   });
 };
 
