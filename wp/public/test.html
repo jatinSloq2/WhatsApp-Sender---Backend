@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Baileys API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e2e8f0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(37, 211, 102, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 8px 0;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            font-size: 14px;
+            color: #e2e8f0;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #64748b;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #25D366;
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        button.btn-danger:hover {
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        button.btn-secondary {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .qr-container {
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        #qrCode {
+            max-width: 280px;
+            border: 3px solid #25D366;
+            border-radius: 20px;
+            padding: 15px;
+            background: white;
+            box-shadow: 0 10px 40px rgba(37, 211, 102, 0.2);
+            display: none;
+            animation: scaleIn 0.5s ease;
+        }
+
+        #qrCode.show {
+            display: block;
+        }
+
+        .loader {
+            border: 3px solid rgba(37, 211, 102, 0.2);
+            border-top: 3px solid #25D366;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .loader.show {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 8px 0;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .status-connected {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-disconnected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .log {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            height: 350px;
+            overflow-y: auto;
+            color: #94a3b8;
+        }
+
+        .log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 4px;
+        }
+
+        .log::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .log::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .log-entry {
+            margin: 8px 0;
+            padding: 8px 12px;
+            border-left: 3px solid #475569;
+            border-radius: 4px;
+            background: rgba(30, 41, 59, 0.4);
+            animation: slideInLeft 0.3s ease;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .log-entry.error {
+            color: #fca5a5;
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .log-entry.success {
+            color: #86efac;
+            border-left-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .log-entry.info {
+            color: #7dd3fc;
+            border-left-color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        .response-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 12px 0;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .response-box pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+            color: #cbd5e1;
+            font-family: 'Monaco', monospace;
+        }
+
+        .instructions {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 16px 0;
+        }
+
+        .instructions strong {
+            color: #60a5fa;
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            margin-top: 10px;
+            color: #cbd5e1;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            #qrCode {
+                max-width: 240px;
+            }
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-indicator.online {
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .status-indicator.offline {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .button-group button {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 WhatsApp Baileys API Tester</h1>
+            <p>Professional Testing Interface for WhatsApp Business API</p>
+        </div>
+
+        <div class="grid">
+            <!-- Server Configuration -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Server Configuration</div>
+                </div>
+                <input type="text" id="serverUrl" value="http://146.88.24.113:4000" placeholder="Server URL">
+                <input type="text" id="sessionId" placeholder="Session ID (auto-generated)">
+                <button onclick="testHealth()">🔍 Test Server Health</button>
+                <div id="healthStatus"></div>
+            </div>
+
+            <!-- Session Management -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔐</div>
+                    <div class="card-title">Session Management</div>
+                </div>
+                <button onclick="createSession()">🆕 Create New Session</button>
+                <div class="button-group">
+                    <button onclick="checkStatus()">📊 Status</button>
+                    <button onclick="listSessions()">📋 List All</button>
+                </div>
+                <button onclick="deleteSession()" class="btn-danger">🗑️ Delete Session</button>
+                <div id="sessionStatus"></div>
+            </div>
+        </div>
+
+        <!-- QR Code Display -->
+        <div class="card qr-section">
+            <div class="card-header" style="justify-content: center;">
+                <div class="card-icon">📷</div>
+                <div class="card-title">QR Code Scanner</div>
+            </div>
+            <div class="instructions">
+                <strong>📱 How to Connect Your WhatsApp</strong>
+                <ol>
+                    <li>Click "Create New Session" button above</li>
+                    <li>Wait for the QR code to appear below</li>
+                    <li>Open WhatsApp on your mobile device</li>
+                    <li>Navigate to Settings → Linked Devices</li>
+                    <li>Tap "Link a Device" and scan the QR code</li>
+                    <li>Wait for the connection confirmation</li>
+                </ol>
+            </div>
+            <div class="loader" id="qrLoader"></div>
+            <div class="qr-container">
+                <img id="qrCode" alt="QR Code will appear here">
+            </div>
+            <div id="qrStatus"></div>
+        </div>
+
+        <div class="grid">
+            <!-- Message Sending -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">💬</div>
+                    <div class="card-title">Send Message</div>
+                </div>
+                <input type="text" id="recipient" placeholder="Recipient (e.g., 919876543210)">
+                <textarea id="message" rows="3"
+                    placeholder="Type your message here...">Hello! This is a test message from WhatsApp Baileys API 🚀</textarea>
+                <input type="text" id="mediaUrl" placeholder="Media URL (optional)">
+                <button onclick="sendMessage()">📤 Send Message</button>
+                <div id="messageStatus"></div>
+            </div>
+
+            <!-- Bulk Message Sending -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📢</div>
+                    <div class="card-title">Bulk Messages</div>
+                </div>
+                <textarea id="bulkNumbers" rows="3"
+                    placeholder="Enter numbers separated by commas&#10;e.g., 919876543210, 919988776655"></textarea>
+                <textarea id="bulkMessage" rows="3"
+                    placeholder="Your bulk message...">Hello, this is a bulk message test 🚀</textarea>
+                <input type="text" id="bulkMediaUrl" placeholder="Media URL (optional)">
+                <button onclick="sendBulkMessages()">📤 Send Bulk Messages</button>
+                <div id="bulkStatus"></div>
+            </div>
+        </div>
+
+        <!-- Response Log -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">📋</div>
+                <div class="card-title">API Response Log</div>
+            </div>
+            <button onclick="clearLog()" class="btn-secondary">🧹 Clear Log</button>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = '';
+        let statusCheckInterval = null;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            log('Log cleared', 'info');
+        }
+
+        function getServerUrl() {
+            return document.getElementById('serverUrl').value.trim();
+        }
+
+        function getSessionId() {
+            let sessionId = document.getElementById('sessionId').value.trim();
+            if (!sessionId) {
+                sessionId = `session_${Date.now()}`;
+                document.getElementById('sessionId').value = sessionId;
+            }
+            currentSessionId = sessionId;
+            return sessionId;
+        }
+
+        function showLoader(elementId) {
+            document.getElementById(elementId).classList.add('show');
+        }
+
+        function hideLoader(elementId) {
+            document.getElementById(elementId).classList.remove('show');
+        }
+
+        function startStatusPolling(sessionId) {
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+            }
+
+            log('🔄 Started auto status checking...', 'info');
+
+            statusCheckInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${getServerUrl()}/sessions/status/${sessionId}`);
+                    const data = await response.json();
+
+                    if (data.status === 'connected') {
+                        log('✅ Device connected successfully!', 'success');
+                        document.getElementById('qrCode').classList.remove('show');
+                        hideLoader('qrLoader');
+                        document.getElementById('qrStatus').innerHTML =
+                            '<span class="status-badge status-connected"><span class="status-indicator online pulse"></span>Connected!</span>';
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+                } catch (error) {
+                    console.error('Status check error:', error);
+                }
+            }, 3000);
+        }
+
+        async function testHealth() {
+            log('Testing server connection...', 'info');
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Testing...';
+
+            try {
+                const response = await fetch(`${getServerUrl()}/`);
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    log('✅ Server is online and ready!', 'success');
+                    document.getElementById('healthStatus').innerHTML =
+                        `<span class="status-badge status-connected"><span class="status-indicator online pulse"></span>Server Online</span>
+                         <div class="response-box"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                } else {
+                    log('⚠️ Server responded with unexpected status', 'error');
+                }
+            } catch (error) {
+                log(`❌ Connection failed: ${error.message}`, 'error');
+                document.getElementById('healthStatus').innerHTML =
+                    `<span class="status-badge status-disconnected"><span class="status-indicator offline"></span>Server Offline</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔍 Test Server Health';
+            }
+        }
+
+        async function createSession() {
+            const sessionId = getSessionId();
+            log(`Creating session: ${sessionId}...`, 'info');
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating...';
+
+            document.getElementById('qrCode').classList.remove('show');
+            document.getElementById('qrStatus').innerHTML = '';
+            showLoader('qrLoader');
+
+            try {
+                const response = await fetch(`${getServerUrl()}/sessions/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: sessionId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log('✅ Session created successfully!', 'success');
+
+                    if (data.data.status === 'connected') {
+                        log('✅ Device already connected!', 'success');
+                        hideLoader('qrLoader');
+                        document.getElementById('qrStatus').innerHTML =
+                            '<span class="status-badge status-connected"><span class="status-indicator online pulse"></span>Already Connected!</span>';
+                    } else if (data.data.qr) {
+                        log('📱 QR Code generated - Please scan', 'info');
+                        hideLoader('qrLoader');
+                        const qrImg = document.getElementById('qrCode');
+                        qrImg.src = data.data.qr;
+                        qrImg.classList.add('show');
+                        document.getElementById('qrStatus').innerHTML =
+                            '<span class="status-badge status-pending pulse"><span class="status-indicator" style="background: #eab308;"></span>Waiting for scan...</span>';
+
+                        startStatusPolling(sessionId);
+                    }
+                } else {
+                    log(`❌ Session creation failed: ${data.message}`, 'error');
+                    hideLoader('qrLoader');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                hideLoader('qrLoader');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🆕 Create New Session';
+            }
+        }
+
+        async function checkStatus() {
+            const sessionId = getSessionId();
+            log(`Checking session status...`, 'info');
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Checking...';
+
+            try {
+                const response = await fetch(`${getServerUrl()}/sessions/status/${sessionId}`);
+                const data = await response.json();
+
+                if (response.status === 200 && data.status === 'connected') {
+                    log('✅ Session is CONNECTED and ready!', 'success');
+                    document.getElementById('sessionStatus').innerHTML =
+                        `<span class="status-badge status-connected"><span class="status-indicator online pulse"></span>Connected</span>
+                         <div class="response-box"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                } else {
+                    log(`📊 Status: ${data.status || 'Not found'}`, 'info');
+                    document.getElementById('sessionStatus').innerHTML =
+                        `<span class="status-badge status-disconnected"><span class="status-indicator offline"></span>${data.status || 'Not Connected'}</span>
+                         <div class="response-box">${data.message || 'Session not found'}</div>`;
+                }
+            } catch (error) {
+                log(`❌ Status check failed: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📊 Status';
+            }
+        }
+
+        async function listSessions() {
+            log('Fetching all sessions...', 'info');
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Loading...';
+
+            try {
+                const response = await fetch(`${getServerUrl()}/sessions/list`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const sessions = data.sessions || [];
+                    log(`✅ Found ${sessions.length} active session(s)`, 'success');
+                    document.getElementById('sessionStatus').innerHTML =
+                        `<div class="response-box"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                }
+            } catch (error) {
+                log(`❌ Failed to list sessions: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📋 List All';
+            }
+        }
+
+        async function sendMessage() {
+            const sessionId = getSessionId();
+            const recipient = document.getElementById('recipient').value.trim();
+            const messageText = document.getElementById('message').value.trim();
+            const mediaUrl = document.getElementById('mediaUrl').value.trim();
+
+            if (!recipient || !messageText) {
+                log('❌ Please enter both recipient and message', 'error');
+                return;
+            }
+
+            log(`Sending message to ${recipient}...`, 'info');
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Sending...';
+
+            const payload = {
+                receiver: recipient,
+                message: { text: messageText }
+            };
+
+            if (mediaUrl) {
+                payload.message.image = { url: mediaUrl };
+                payload.message.caption = messageText;
+            }
+
+            try {
+                const response = await fetch(`${getServerUrl()}/message/send?id=${sessionId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log('✅ Message sent successfully!', 'success');
+                    document.getElementById('messageStatus').innerHTML =
+                        `<span class="status-badge status-connected">✓ Delivered</span>
+                         <div class="response-box"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                } else {
+                    log(`❌ Send failed: ${data.message}`, 'error');
+                    document.getElementById('messageStatus').innerHTML =
+                        `<span class="status-badge status-disconnected">✗ Failed</span>
+                         <div class="response-box">${data.message}</div>`;
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📤 Send Message';
+            }
+        }
+
+        async function sendBulkMessages() {
+            const sessionId = getSessionId();
+            const rawNumbers = document.getElementById('bulkNumbers').value.trim();
+            const messageText = document.getElementById('bulkMessage').value.trim();
+            const mediaUrl = document.getElementById('bulkMediaUrl').value.trim();
+
+            if (!rawNumbers || !messageText) {
+                log('❌ Please enter numbers and message', 'error');
+                return;
+            }
+
+            const numbers = rawNumbers.split(',').map(n => n.trim()).filter(n => n.length > 0);
+            log(`Sending bulk messages to ${numbers.length} recipients...`, 'info');
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Processing...';
+
+            const payload = {
+                id: sessionId,
+                numbers: numbers,
+                message: { text: messageText }
+            };
+
+            if (mediaUrl) {
+                payload.message.image = { url: mediaUrl };
+                payload.message.caption = messageText;
+            }
+
+            try {
+                const response = await fetch(`${getServerUrl()}/message/bulk`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log(`✅ Bulk messages queued for ${numbers.length} recipients!`, 'success');
+                    document.getElementById('bulkStatus').innerHTML =
+                        `<span class="status-badge status-connected">✓ Processing ${numbers.length} messages</span>
+                         <div class="response-box"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                } else {
+                    log(`❌ Bulk send failed: ${data.message}`, 'error');
+                    document.getElementById('bulkStatus').innerHTML =
+                        `<span class="status-badge status-disconnected">✗ Failed</span>
+                         <div class="response-box">${data.message}</div>`;
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📤 Send Bulk Messages';
+            }
+        }
+
+        async function deleteSession() {
+            const sessionId = getSessionId();
+
+            if (!confirm(`⚠️ Are you sure you want to delete session: ${sessionId}?`)) {
+                return;
+            }
+
+            log(`Deleting session: ${sessionId}...`, 'info');
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Deleting...';
+
+            try {
+                const response = await fetch(`${getServerUrl()}/sessions/delete/${sessionId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    log('✅ Session deleted successfully', 'success');
+                    document.getElementById('qrCode').classList.remove('show');
+                    document.getElementById('sessionId').value = '';
+                    document.getElementById('sessionStatus').innerHTML = '';
+                    document.getElementById('qrStatus').innerHTML = '';
+                    document.getElementById('messageStatus').innerHTML = '';
+                    document.getElementById('bulkStatus').innerHTML = '';
+                    document.getElementById('healthStatus').innerHTML = '';
+
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                        log('🔄 Auto status checking stopped', 'info');
+                    }
+                } else {
+                    log(`❌ Delete failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🗑️ Delete Session';
+            }
+        }
+
+        // Initialize on page load
+        window.onload = function () {
+            log('🚀 WhatsApp Baileys API Tester loaded successfully', 'success');
+            log('💡 Start by testing server health', 'info');
+            log('📱 Then create a new session and scan the QR code', 'info');
+
+            // Load Google Fonts
+            const fontLink = document.createElement('link');
+            fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
+            fontLink.rel = 'stylesheet';
+            document.head.appendChild(fontLink);
+        };
+
+        // Cleanup on page unload
+        window.onbeforeunload = function () {
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+            }
+        };
+    </script>
+</body>
+
+</html>
