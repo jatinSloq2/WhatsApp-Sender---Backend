@@ -77,22 +77,16 @@ export const SessionProvider = ({ children }) => {
     // GET SINGLE STATUS
     // ─────────────────────────────
     const getSessionStatus = async (sessionId) => {
-        try {
-            const res = await getSessionStatusApi(sessionId);
+        const res = await getSessionStatusApi(sessionId);
+        setSessions((prev) =>
+            prev.map((s) =>
+                s.sessionId === sessionId
+                    ? { ...s, status: res.data.status, phone: res.data.phone }
+                    : s
+            )
+        );
 
-            setSessions((prev) =>
-                prev.map((s) =>
-                    s.sessionId === sessionId
-                        ? { ...s, status: res.data.status, phone: res.data.phone }
-                        : s
-                )
-            );
-
-            return res.data;
-        } catch (err) {
-            handleError(err);
-            throw err;
-        }
+        return res.data;
     };
 
     // ─────────────────────────────

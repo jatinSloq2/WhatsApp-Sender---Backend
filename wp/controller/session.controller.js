@@ -109,7 +109,7 @@ exports.getSessionStatus = async (req, res) => {
         }
 
         if (status === "no_session") {
-            return res.status(404).json({
+            return res.status(200).json({
                 success: false,
                 status: "no_session",
             });

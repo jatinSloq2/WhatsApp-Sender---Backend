@@ -88,23 +88,34 @@ export const getSessionStatus = async (req, res) => {
         const { sessionId } = req.params;
 
         const response = await getRemoteSessionStatus(sessionId);
-
         const { status, data } = response.data;
 
-        await WhatsappSession.findOneAndUpdate(
-            { sessionId },
-            {
+        if (status === "no_session") {
+            // Delete the session from DB if no_session
+            await WhatsappSession.findOneAndDelete({ sessionId });
+
+            return res.json({
+                success: true,
+                status,
+                message: "Session deleted because it does not exist",
+            });
+        } else {
+            // Update session normally
+            const updatedSession = await WhatsappSession.findOneAndUpdate(
+                { sessionId },
+                {
+                    status,
+                    phone: data?.phone || null,
+                },
+                { new: true }
+            );
+
+            return res.json({
+                success: true,
                 status,
                 phone: data?.phone || null,
-            },
-            { new: true }
-        );
-
-        return res.json({
-            success: true,
-            status,
-            phone: data?.phone || null,
-        });
+            });
+        }
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -114,11 +125,12 @@ export const getSessionStatus = async (req, res) => {
     }
 };
 
+
 /**
  * LIST ALL SESSIONS
  * - Read from DB
  * - For each session → check live status
- * - Update DB
+ * - Update DB or delete if no_session
  */
 export const listAllSessions = async (req, res) => {
     try {
@@ -128,8 +140,14 @@ export const listAllSessions = async (req, res) => {
             sessions.map(async (session) => {
                 try {
                     const response = await getRemoteSessionStatus(session.sessionId);
+                    const status = response.data.status;
 
-                    session.status = response.data.status;
+                    if (status === "no_session") {
+                        await WhatsappSession.findOneAndDelete({ sessionId: session.sessionId });
+                        return null; // skip from updatedSessions
+                    }
+
+                    session.status = status;
                     session.phone = response.data?.data?.phone || null;
                     await session.save();
                 } catch {
@@ -143,7 +161,7 @@ export const listAllSessions = async (req, res) => {
 
         return res.json({
             success: true,
-            data: updatedSessions,
+            data: updatedSessions.filter(Boolean), // remove deleted sessions
         });
     } catch (error) {
         return res.status(500).json({
@@ -158,35 +176,44 @@ export const listAllSessions = async (req, res) => {
  * LIST USER SESSIONS
  * - Read user sessions from DB
  * - For each session → check live status
- * - Update DB
+ * - Update DB or delete if no_session
  */
 export const listUserSessions = async (req, res) => {
+    console.log("API")
     try {
         const userId = req.user.id;
 
-        const sessions = await WhatsappSession
-            .find({ userId })
-            .sort({ updatedAt: -1 });
+        const sessions = await WhatsappSession.find({ userId }).sort({ updatedAt: -1 });
 
         const updatedSessions = await Promise.all(
             sessions.map(async (session) => {
                 try {
                     const response = await getRemoteSessionStatus(session.sessionId);
+                    const status = response.data.status;
+                    console.log(`Session ${session.sessionId} status:`, status);
 
-                    session.status = response.data.status;
+                    if (status === "no_session") {
+                        console.log(`Deleting session ${session.sessionId}`);
+                        await WhatsappSession.findOneAndDelete({ sessionId: session.sessionId });
+                        return null;
+                    }
+
+                    session.status = status;
                     session.phone = response.data?.data?.phone || null;
                 } catch (err) {
+                    console.error(`Error fetching status for ${session.sessionId}:`, err.message);
                     session.status = "disconnected";
                 }
 
                 await session.save();
+                console.log(`Saved session ${session.sessionId}`);
                 return session;
             })
         );
 
         return res.json({
             success: true,
-            data: updatedSessions,
+            data: updatedSessions.filter(Boolean), // remove deleted sessions
         });
     } catch (error) {
         return res.status(500).json({
