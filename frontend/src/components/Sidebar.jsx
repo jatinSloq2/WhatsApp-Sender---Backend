@@ -94,10 +94,11 @@ function SidebarContent({ onLinkClick }) {
                                     {({ isActive }) => (
                                         <>
                                             <div
-                                                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${isActive
-                                                    ? 'bg-white border-2 border-green-300 shadow-sm'
-                                                    : 'bg-gray-100 border-2 border-gray-200 group-hover:bg-white group-hover:border-green-200'
-                                                    }`}
+                                                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
+                                                    isActive
+                                                        ? 'bg-white border-2 border-green-300 shadow-sm'
+                                                        : 'bg-gray-100 border-2 border-gray-200 group-hover:bg-white group-hover:border-green-200'
+                                                }`}
                                             >
                                                 <Icon
                                                     size={18}
@@ -137,9 +138,26 @@ function SidebarContent({ onLinkClick }) {
     );
 
     return (
-        <div className="flex flex-col h-full">
-            {/* Navigation Sections */}
-            <div className="flex-1 overflow-y-auto py-6 px-4">
+        <div className="h-full overflow-y-auto scrollbar-hide">
+            {/* App Branding Header - Sticky */}
+            <div className="px-4 pt-6 pb-4 border-b-2 border-gray-200 bg-white sticky top-0 z-10">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center shadow-md border-2 border-green-700">
+                        <Send className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
+                    <div className="flex flex-col leading-none">
+                        <span className="text-xl font-black tracking-tight text-gray-900">
+                            Bulk<span className="text-green-600">Send</span>
+                        </span>
+                        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
+                            Messaging Platform
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Navigation Sections - Scrollable */}
+            <div className="py-6 px-4">
                 <NavSection items={mainItems} />
 
                 {insightItems.length > 0 && (
@@ -164,8 +182,8 @@ function SidebarContent({ onLinkClick }) {
                 )}
             </div>
 
-            {/* Bottom Section - Plan & Credits Info */}
-            <div className="p-4 border-t-2 border-gray-200 space-y-3">
+            {/* Plan & Credits Section - Scrollable */}
+            <div className="px-4 pb-6 pt-4 border-t-2 border-gray-200 space-y-3">
                 {/* Current Plan Card */}
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-4">
                     <div className="flex items-center gap-3 mb-2">
@@ -188,7 +206,7 @@ function SidebarContent({ onLinkClick }) {
                             </div>
                         </div>
                     </div>
-                    {currentPlanName !== "ENTERPRISE" && currentPlanName !== "MASTER" && (
+                    {currentPlanName !== 'ENTERPRISE' && currentPlanName !== 'MASTER' && (
                         <NavLink to="/plans" onClick={onLinkClick}>
                             <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold text-sm py-2.5 rounded-xl transition-all shadow-sm">
                                 <Sparkles className="w-4 h-4 mr-2" />
@@ -199,7 +217,7 @@ function SidebarContent({ onLinkClick }) {
                 </div>
 
                 {/* Credits Card */}
-                {currentPlanName !== "MASTER" && (
+                {currentPlanName !== 'MASTER' && (
                     <div className="bg-gradient-to-br from-green-50 to-teal-50 border-2 border-green-200 rounded-2xl p-4">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="w-10 h-10 rounded-lg bg-white border-2 border-green-300 flex items-center justify-center">
@@ -242,10 +260,7 @@ export function MobileSidebarTrigger() {
                     <Menu className="w-5 h-5 text-gray-600" />
                 </Button>
             </SheetTrigger>
-            <SheetContent
-                side="left"
-                className="w-72 p-0 border-r-2 border-gray-200"
-            >
+            <SheetContent side="left" className="w-72 p-0 border-r-2 border-gray-200">
                 <SidebarContent onLinkClick={() => setOpen(false)} />
             </SheetContent>
         </Sheet>
@@ -258,13 +273,16 @@ export default function Sidebar() {
 
     // Don't show sidebar on public pages
     const publicPages = ['/', '/login', '/signup', '/forgot-password', '/verify-otp'];
-    if (publicPages.includes(location.pathname) || location.pathname.startsWith('/reset-password')) {
+    if (
+        publicPages.includes(location.pathname) ||
+        location.pathname.startsWith('/reset-password')
+    ) {
         return null;
     }
 
     return (
-        <aside className="hidden lg:flex w-64 bg-white border-r-2 border-gray-200 min-h-[calc(100vh-64px)]">
-            <SidebarContent onLinkClick={() => { }} />
+        <aside className="hidden lg:flex w-64 bg-white border-r-2 border-gray-200 h-[calc(100vh-64px)] sticky top-16 overflow-hidden">
+            <SidebarContent onLinkClick={() => {}} />
         </aside>
     );
 }
