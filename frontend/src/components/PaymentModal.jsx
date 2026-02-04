@@ -19,6 +19,7 @@ import {
     Loader2,
     QrCode,
     Upload,
+    X,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -36,7 +37,7 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
 
     const { name, baseAmount, gstAmount, totalAmount, subtitle } = item;
 
-    const upiLink = `upi://pay?pa=${UPI_ID}&pn=BulkSend&am=${totalAmount}&cu=INR&tn=${encodeURIComponent(name)}`;
+    const upiLink = `upi://pay?pa=${UPI_ID}&pn=WhatsBot&am=${totalAmount}&cu=INR&tn=${encodeURIComponent(name)}`;
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(upiLink)}`;
 
     /* ── helpers ── */
@@ -80,25 +81,23 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
     /* ── render ── */
     return (
         <Dialog open onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar rounded-3xl border-gray-300 p-0 shadow-2xl [scrollbar-width:none]
-    [&::-webkit-scrollbar]:hidden
- [&>button.absolute]:hidden">
-                {/* ── gradient header ── */}
-                <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white p-6 rounded-t-3xl">
+            <DialogContent className="max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar border border-gray-200 p-0 shadow-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>button.absolute]:hidden">
+                {/* ── header ── */}
+                <div className="bg-[#25D366] text-white p-6">
                     <DialogHeader className="p-0 space-y-1">
-                        <DialogTitle className="text-2xl font-black text-white leading-tight">
+                        <DialogTitle className="text-2xl font-bold text-white leading-tight">
                             Complete Payment
                         </DialogTitle>
-                        <DialogDescription className="text-green-100 text-sm font-semibold">
+                        <DialogDescription className="text-white/90 text-sm font-medium">
                             {subtitle || name}
                         </DialogDescription>
                     </DialogHeader>
-                    {/* custom close — replaces the default X */}
+                    {/* custom close */}
                     <button
                         onClick={onClose}
                         className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors text-white"
                     >
-                        ✕
+                        <X size={20} />
                     </button>
                 </div>
 
@@ -107,17 +106,17 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
 
                     {/* error */}
                     {error && (
-                        <Alert variant="destructive" className="bg-red-50 border-2 border-red-300 rounded-xl">
+                        <Alert variant="destructive" className="bg-red-50 border-red-200">
                             <AlertCircle className="h-4 w-4 text-red-500" />
                             <AlertDescription className="text-red-700 font-medium">{error}</AlertDescription>
                         </Alert>
                     )}
 
                     {/* ── amount breakdown ── */}
-                    <Card className="bg-gray-50 border-2 border-gray-300 rounded-2xl shadow-none">
+                    <Card className="bg-gray-50 border border-gray-200 shadow-none">
                         <CardContent className="pt-5 pb-5 px-5">
-                            <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2 mb-3">
-                                <CreditCard size={18} className="text-green-600" /> Payment Breakdown
+                            <h3 className="font-semibold text-gray-800 text-sm flex items-center gap-2 mb-3">
+                                <CreditCard size={18} className="text-[#25D366]" /> Payment Breakdown
                             </h3>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
@@ -128,24 +127,24 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                                     <span className="text-gray-500">GST (18%)</span>
                                     <span className="font-semibold text-gray-800">₹{gstAmount.toLocaleString("en-IN")}</span>
                                 </div>
-                                <div className="border-t-2 border-gray-300 pt-2 mt-2 flex justify-between text-base">
-                                    <span className="font-black text-gray-800">Total</span>
-                                    <span className="font-black text-green-600">₹{totalAmount.toLocaleString("en-IN")}</span>
+                                <div className="border-t border-gray-300 pt-2 mt-2 flex justify-between text-base">
+                                    <span className="font-bold text-gray-800">Total</span>
+                                    <span className="font-bold text-[#25D366]">₹{totalAmount.toLocaleString("en-IN")}</span>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* ── QR code ── */}
-                    <Card className="bg-gradient-to-br from-green-50 to-teal-50 border-2 border-green-300 rounded-2xl shadow-none">
+                    <Card className="bg-green-50 border border-green-200 shadow-none">
                         <CardContent className="pt-6 pb-5 px-5 text-center">
-                            <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                            <div className="w-14 h-14 bg-[#25D366] rounded-xl flex items-center justify-center mx-auto mb-3">
                                 <QrCode size={28} className="text-white" />
                             </div>
-                            <h3 className="font-bold text-gray-800 mb-1">Scan QR Code to Pay</h3>
+                            <h3 className="font-semibold text-gray-800 mb-1">Scan QR Code to Pay</h3>
                             <p className="text-gray-500 text-xs mb-4 font-medium">Open any UPI app and scan</p>
 
-                            <div className="bg-white rounded-2xl p-4 inline-block shadow-md border-2 border-gray-200">
+                            <div className="bg-white rounded-xl p-4 inline-block shadow-sm border border-gray-200">
                                 {!qrLoaded && <Skeleton className="w-56 h-56 rounded-lg" />}
                                 <img
                                     src={qrCodeUrl}
@@ -162,21 +161,21 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                     </Card>
 
                     {/* ── UPI ID copy row ── */}
-                    <Card className="bg-blue-50 border-2 border-blue-200 rounded-2xl shadow-none">
+                    <Card className="bg-blue-50 border border-blue-200 shadow-none">
                         <CardContent className="pt-5 pb-5 px-5">
-                            <h3 className="font-bold text-gray-800 text-sm mb-3">Or Pay Using UPI ID</h3>
+                            <h3 className="font-semibold text-gray-800 text-sm mb-3">Or Pay Using UPI ID</h3>
                             <div className="flex items-center gap-3">
                                 <Input
                                     value={UPI_ID}
                                     readOnly
-                                    className="flex-1 border-2 border-blue-300 rounded-xl font-mono font-bold text-gray-800 bg-white focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-300"
+                                    className="flex-1 border border-blue-200 font-mono font-semibold text-gray-800 bg-white focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-300"
                                 />
                                 <Button
                                     variant="default"
                                     onClick={copyToClipboard}
-                                    className={`px-4 rounded-xl font-semibold text-sm transition-all ${copied
-                                        ? "bg-green-100 text-green-700 border-2 border-green-300 hover:bg-green-100"
-                                        : "bg-blue-600 hover:bg-blue-700 text-white"
+                                    className={`px-4 font-semibold text-sm transition-all ${copied
+                                            ? "bg-green-100 text-green-700 border border-green-300 hover:bg-green-100"
+                                            : "bg-blue-600 hover:bg-blue-700 text-white"
                                         }`}
                                 >
                                     {copied
@@ -186,21 +185,21 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                                 </Button>
                             </div>
                             <p className="text-xs text-gray-500 mt-2 font-medium">
-                                Amount: <span className="font-black text-green-600">₹{totalAmount.toLocaleString("en-IN")}</span>
+                                Amount: <span className="font-bold text-[#25D366]">₹{totalAmount.toLocaleString("en-IN")}</span>
                             </p>
                         </CardContent>
                     </Card>
 
                     {/* ── upload proof section ── */}
-                    <Card className="bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-none">
+                    <Card className="bg-amber-50 border border-amber-200 shadow-none">
                         <CardContent className="pt-5 pb-5 px-5">
-                            <h3 className="font-bold text-gray-800 text-sm flex items-center gap-2 mb-4">
+                            <h3 className="font-semibold text-gray-800 text-sm flex items-center gap-2 mb-4">
                                 <Upload size={18} className="text-amber-600" /> Upload Payment Proof
                             </h3>
 
                             {/* transaction ID */}
                             <div className="mb-4 space-y-1.5">
-                                <Label className="text-sm font-semibold text-gray-800">
+                                <Label className="text-sm font-medium text-gray-800">
                                     Transaction ID / UTR <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
@@ -208,14 +207,14 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                                     value={transactionId}
                                     onChange={(e) => { setTxnId(e.target.value); setError(""); }}
                                     placeholder="12-digit transaction ID"
-                                    className="border-2 border-amber-300 rounded-xl bg-white focus-visible:ring-2 focus-visible:ring-green-200 focus-visible:border-green-600 focus-visible:ring-offset-0"
+                                    className="border border-amber-200 bg-white focus-visible:ring-2 focus-visible:ring-[#25D366]/20 focus-visible:border-[#25D366] focus-visible:ring-offset-0"
                                 />
                                 <p className="text-xs text-gray-500">Find this in your payment app after the transaction</p>
                             </div>
 
                             {/* screenshot upload */}
                             <div className="mb-4 space-y-1.5">
-                                <Label className="text-sm font-semibold text-gray-800">
+                                <Label className="text-sm font-medium text-gray-800">
                                     Payment Screenshot <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
@@ -227,7 +226,7 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                                 />
                                 <label
                                     htmlFor="pm-proof-upload"
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-dashed border-amber-300 rounded-xl font-medium text-gray-600 hover:border-green-600 hover:text-green-600 cursor-pointer transition-all"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-dashed border-amber-300 rounded-lg font-medium text-gray-600 hover:border-[#25D366] hover:text-[#25D366] cursor-pointer transition-all"
                                 >
                                     <Upload size={18} />
                                     {paymentProof ? paymentProof.name : "Choose screenshot (max 5 MB)"}
@@ -237,11 +236,11 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                             {/* preview */}
                             {previewUrl && (
                                 <div className="mb-4 space-y-1.5">
-                                    <Label className="text-sm font-semibold text-gray-800">Preview</Label>
+                                    <Label className="text-sm font-medium text-gray-800">Preview</Label>
                                     <img
                                         src={previewUrl}
                                         alt="Proof preview"
-                                        className="w-full max-w-xs rounded-xl border-2 border-amber-300 shadow-sm"
+                                        className="w-full max-w-xs rounded-lg border border-amber-200 shadow-sm"
                                     />
                                 </div>
                             )}
@@ -250,9 +249,9 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                             <Button
                                 onClick={handleSubmit}
                                 disabled={submitting || !paymentProof || !transactionId.trim()}
-                                className={`w-full rounded-xl font-bold text-base shadow-md transition-all ${submitting || !paymentProof || !transactionId.trim()
-                                    ? "bg-gray-200 text-gray-400 hover:bg-gray-200 shadow-none cursor-not-allowed"
-                                    : "bg-green-600 hover:bg-green-700 text-white shadow-green-200"
+                                className={`w-full font-semibold text-base shadow-sm transition-all ${submitting || !paymentProof || !transactionId.trim()
+                                        ? "bg-gray-200 text-gray-400 hover:bg-gray-200 shadow-none cursor-not-allowed"
+                                        : "bg-[#25D366] hover:bg-[#20BD5A] text-white"
                                     }`}
                             >
                                 {submitting
@@ -268,9 +267,9 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                     </Card>
 
                     {/* ── instructions ── */}
-                    <Card className="bg-gray-50 border-2 border-gray-300 rounded-2xl shadow-none">
+                    <Card className="bg-gray-50 border border-gray-200 shadow-none">
                         <CardContent className="pt-5 pb-5 px-5">
-                            <h4 className="font-bold text-gray-800 text-sm mb-3">Payment Instructions</h4>
+                            <h4 className="font-semibold text-gray-800 text-sm mb-3">Payment Instructions</h4>
                             <ol className="space-y-2 text-xs text-gray-600 font-medium">
                                 {[
                                     "Scan the QR code or copy the UPI ID",
@@ -280,7 +279,7 @@ export function PaymentModal({ item, onClose, onSubmitProof, extraPayload = {} }
                                     "We'll verify and credit your account within 24 hours",
                                 ].map((step, i) => (
                                     <li key={i} className="flex items-start gap-2">
-                                        <span className="font-black text-green-600 flex-shrink-0">{i + 1}.</span>
+                                        <span className="font-bold text-[#25D366] flex-shrink-0">{i + 1}.</span>
                                         <span>{step}</span>
                                     </li>
                                 ))}

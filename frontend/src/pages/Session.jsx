@@ -183,25 +183,25 @@ const Session = () => {
     switch (statusUpper) {
       case "CONNECTED":
         return (
-          <Badge className="bg-green-100 text-green-700 border-2 border-green-300 font-semibold">
+          <Badge className="bg-green-100 text-green-700 border-green-200 font-semibold">
             <Wifi className="w-3 h-3 mr-1" /> Connected
           </Badge>
         );
       case "DISCONNECTED":
         return (
-          <Badge className="bg-red-100 text-red-700 border-2 border-red-300 font-semibold">
+          <Badge className="bg-red-100 text-red-700 border-red-200 font-semibold">
             <WifiOff className="w-3 h-3 mr-1" /> Disconnected
           </Badge>
         );
       case "QR_READY":
         return (
-          <Badge className="bg-blue-100 text-blue-700 border-2 border-blue-300 font-semibold">
+          <Badge className="bg-blue-100 text-blue-700 border-blue-200 font-semibold">
             <QrCode className="w-3 h-3 mr-1" /> QR Ready
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="border-2 border-gray-300 font-semibold">
+          <Badge variant="outline" className="border border-gray-300 font-semibold">
             {status}
           </Badge>
         );
@@ -209,29 +209,23 @@ const Session = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-br from-green-50 via-white to-teal-50">
+    <div className="min-h-[calc(100vh-64px)] bg-gray-50">
       
       {/* ══════════════ HERO ══════════════ */}
-      <section className="relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-green-200 rounded-full blur-3xl opacity-20 -z-10" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-200 rounded-full blur-3xl opacity-20 -z-10" />
-        
+      <section className="relative overflow-hidden bg-gradient-to-b from-green-50 to-white">
         <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
-          <Badge className="inline-flex items-center gap-2 bg-green-100 text-green-700 border-2 border-green-300 px-4 py-2 rounded-full font-semibold text-sm mb-6 shadow-sm">
+          <Badge className="inline-flex items-center gap-2 bg-white text-[#25D366] border border-[#25D366]/20 px-4 py-2 font-semibold text-sm mb-6 shadow-sm">
             <MessageSquare className="w-4 h-4" /> WhatsApp Session Management
           </Badge>
 
-          <h1 className="text-5xl sm:text-6xl font-black text-black tracking-tight leading-tight mb-4">
+          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
             Manage Your
             <br />
-            <span className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
-              WhatsApp Sessions
-            </span>
+            <span className="text-[#25D366]">WhatsApp Sessions</span>
           </h1>
 
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Create, connect, and manage multiple WhatsApp sessions for your bulk messaging campaigns.
-            Secure, reliable, and easy to use.
           </p>
         </div>
       </section>
@@ -241,12 +235,12 @@ const Session = () => {
         <section className="max-w-7xl mx-auto px-6 pb-6">
           <Alert
             variant={message.type === "error" ? "destructive" : "default"}
-            className={`rounded-xl border-2 shadow-sm ${
+            className={`border shadow-sm ${
               message.type === "success"
-                ? "bg-green-50 border-green-300"
+                ? "bg-green-50 border-green-200"
                 : message.type === "info"
-                ? "bg-blue-50 border-blue-300"
-                : "bg-red-50 border-red-300"
+                ? "bg-blue-50 border-blue-200"
+                : "bg-red-50 border-red-200"
             }`}
           >
             {message.type === "success" ? (
@@ -257,7 +251,7 @@ const Session = () => {
               <AlertCircle className="h-4 w-4 text-red-600" />
             )}
             <AlertDescription
-              className={`font-semibold ${
+              className={`font-medium ${
                 message.type === "success"
                   ? "text-green-700"
                   : message.type === "info"
@@ -274,19 +268,19 @@ const Session = () => {
       {/* ══════════════ ERROR BANNER ══════════════ */}
       {error && (
         <section className="max-w-7xl mx-auto px-6 pb-6">
-          <Alert variant="destructive" className="rounded-xl border-2 border-red-300 shadow-sm">
+          <Alert variant="destructive" className="border border-red-200 shadow-sm">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="font-semibold">{error}</AlertDescription>
+            <AlertDescription className="font-medium">{error}</AlertDescription>
           </Alert>
         </section>
       )}
 
       {/* ══════════════ CREATE SESSION ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-8">
-        <Card className="bg-white border-2 border-gray-300 rounded-2xl shadow-lg">
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardHeader className="px-8 pt-8 pb-4">
-            <CardTitle className="text-2xl font-black text-black flex items-center gap-2">
-              <Smartphone className="w-6 h-6 text-green-600" />
+            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Smartphone className="w-6 h-6 text-[#25D366]" />
               Create New Session
             </CardTitle>
             <CardDescription className="text-gray-600">
@@ -300,12 +294,12 @@ const Session = () => {
                 value={sessionId}
                 onChange={(e) => setSessionId(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleCreate()}
-                className="flex-1 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:ring-green-600 font-medium"
+                className="flex-1 border-gray-300 focus:border-[#25D366] focus:ring-[#25D366] font-medium h-11"
               />
               <Button
                 onClick={handleCreate}
                 disabled={loading || !sessionId.trim()}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 rounded-xl shadow-md shadow-green-200 transition-all"
+                className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold px-8 shadow-sm h-11"
               >
                 {loading ? (
                   <>
@@ -327,9 +321,9 @@ const Session = () => {
       {/* ══════════════ ACTIVE SESSION QR ══════════════ */}
       {activeSession && qr && (
         <section className="max-w-7xl mx-auto px-6 pb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-teal-50 border-2 border-blue-300 rounded-2xl shadow-lg">
+          <Card className="bg-blue-50 border border-blue-200 shadow-sm">
             <CardHeader className="px-8 pt-8 pb-4 text-center">
-              <CardTitle className="text-2xl font-black text-black flex items-center justify-center gap-2">
+              <CardTitle className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
                 <QrCode className="w-6 h-6 text-blue-600" />
                 Scan QR Code
               </CardTitle>
@@ -339,7 +333,7 @@ const Session = () => {
             </CardHeader>
             <CardContent className="px-8 pb-8">
               <div className="flex flex-col items-center gap-4">
-                <div className="bg-white p-6 rounded-2xl border-4 border-blue-300 shadow-xl">
+                <div className="bg-white p-6 rounded-xl border-2 border-blue-300 shadow-lg">
                   <img
                     src={qr}
                     alt="WhatsApp QR Code"
@@ -347,8 +341,8 @@ const Session = () => {
                   />
                 </div>
                 <div className="text-center">
-                  <p className="font-bold text-black mb-1">Session: {activeSession.sessionId}</p>
-                  <Badge className="bg-blue-100 text-blue-700 border-2 border-blue-300 font-semibold">
+                  <p className="font-semibold text-gray-900 mb-1">Session: {activeSession.sessionId}</p>
+                  <Badge className="bg-blue-100 text-blue-700 border-blue-200 font-semibold">
                     <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                     Waiting for scan...
                   </Badge>
@@ -361,9 +355,9 @@ const Session = () => {
 
       {/* ══════════════ HOW IT WORKS ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-12">
-        <Card className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardHeader className="px-8 pt-8 pb-4">
-            <CardTitle className="text-2xl font-black text-black text-center">
+            <CardTitle className="text-2xl font-bold text-gray-900 text-center">
               How Sessions Work
             </CardTitle>
           </CardHeader>
@@ -391,14 +385,14 @@ const Session = () => {
               ].map(({ icon: Icon, step, title, desc }) => (
                 <div key={step} className="text-center">
                   <div className="relative mb-6">
-                    <div className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-green-100 to-teal-100 border-2 border-green-300 flex items-center justify-center shadow-md">
-                      <Icon className="w-9 h-9 text-green-600" />
+                    <div className="mx-auto w-20 h-20 rounded-2xl bg-green-50 border border-green-200 flex items-center justify-center shadow-sm">
+                      <Icon className="w-9 h-9 text-[#25D366]" />
                     </div>
-                    <span className="absolute -top-2 -right-2 w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-black text-sm">
+                    <span className="absolute -top-2 -right-2 w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-sm">
                       {step}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-black mb-2">{title}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">{desc}</p>
                 </div>
               ))}
@@ -409,12 +403,12 @@ const Session = () => {
 
       {/* ══════════════ SESSIONS TABLE ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-20">
-        <Card className="bg-white border-2 border-gray-300 rounded-2xl shadow-lg">
+        <Card className="bg-white border border-gray-200 shadow-sm">
           <CardHeader className="px-8 pt-8 pb-6">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-2xl font-black text-black flex items-center gap-2">
-                  <Shield className="w-6 h-6 text-green-600" />
+                <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <Shield className="w-6 h-6 text-[#25D366]" />
                   Your Sessions
                 </CardTitle>
                 <CardDescription className="text-gray-600 mt-1">
@@ -424,7 +418,7 @@ const Session = () => {
               <Button
                 onClick={fetchUserSessions}
                 variant="outline"
-                className="border-2 border-gray-300 rounded-xl hover:border-green-600 font-semibold"
+                className="border border-gray-300 hover:border-[#25D366] font-medium"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
@@ -434,7 +428,7 @@ const Session = () => {
           <CardContent className="px-8 pb-8">
             {loading && sessions.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16">
-                <Loader2 className="w-12 h-12 text-green-600 animate-spin mb-4" />
+                <Loader2 className="w-12 h-12 text-[#25D366] animate-spin mb-4" />
                 <p className="text-gray-600 font-medium">Loading sessions...</p>
               </div>
             ) : sessions.length === 0 ? (
@@ -442,24 +436,24 @@ const Session = () => {
                 <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                   <MessageSquare className="w-10 h-10 text-gray-400" />
                 </div>
-                <p className="text-gray-600 font-semibold text-lg mb-2">No sessions yet</p>
+                <p className="text-gray-600 font-medium text-lg mb-2">No sessions yet</p>
                 <p className="text-gray-500 text-sm">Create your first WhatsApp session to get started</p>
               </div>
             ) : (
-              <div className="border-2 border-gray-300 rounded-xl overflow-hidden">
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-50 hover:bg-gray-50">
-                      <TableHead className="font-bold text-black py-4">Session ID</TableHead>
-                      <TableHead className="font-bold text-black">Status</TableHead>
-                      <TableHead className="font-bold text-black">Created</TableHead>
-                      <TableHead className="font-bold text-black text-right">Actions</TableHead>
+                      <TableHead className="font-semibold text-gray-900 py-4">Session ID</TableHead>
+                      <TableHead className="font-semibold text-gray-900">Status</TableHead>
+                      <TableHead className="font-semibold text-gray-900">Created</TableHead>
+                      <TableHead className="font-semibold text-gray-900 text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {sessions.map((session) => (
                       <TableRow key={session.sessionId} className="hover:bg-gray-50">
-                        <TableCell className="font-bold text-black py-4">
+                        <TableCell className="font-semibold text-gray-900 py-4">
                           {session.sessionId}
                         </TableCell>
                         <TableCell>
@@ -482,7 +476,7 @@ const Session = () => {
                                 disabled={reconnectingSession === session.sessionId}
                                 variant="outline"
                                 size="sm"
-                                className="border-2 border-blue-300 text-blue-700 hover:bg-blue-50 font-semibold rounded-lg"
+                                className="border border-blue-300 text-blue-700 hover:bg-blue-50 font-medium"
                               >
                                 {reconnectingSession === session.sessionId ? (
                                   <>
@@ -502,7 +496,7 @@ const Session = () => {
                               disabled={deletingSession === session.sessionId}
                               variant="destructive"
                               size="sm"
-                              className="bg-red-600 hover:bg-red-700 font-semibold rounded-lg"
+                              className="bg-red-600 hover:bg-red-700 font-medium"
                             >
                               {deletingSession === session.sessionId ? (
                                 <>
@@ -530,11 +524,11 @@ const Session = () => {
 
       {/* ══════════════ SECURITY INFO ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-20">
-        <Card className="bg-gradient-to-r from-green-600 to-teal-600 border-0 rounded-2xl shadow-xl text-white">
+        <Card className="bg-[#25D366] border-0 shadow-lg text-white">
           <CardContent className="px-8 py-10">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-black mb-3">Secure & Reliable</h2>
-              <p className="text-green-100 text-lg max-w-2xl mx-auto">
+              <h2 className="text-3xl font-bold mb-3">Secure & Reliable</h2>
+              <p className="text-white/90 text-lg max-w-2xl mx-auto">
                 Your WhatsApp sessions are protected with enterprise-grade security
               </p>
             </div>
@@ -547,10 +541,10 @@ const Session = () => {
               ].map(({ icon: Icon, text }) => (
                 <div
                   key={text}
-                  className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-xl p-6 text-center"
+                  className="bg-white/10 backdrop-blur-sm border border-white/20 p-6 text-center"
                 >
                   <Icon className="w-10 h-10 mx-auto mb-3" />
-                  <p className="font-bold text-base">{text}</p>
+                  <p className="font-medium text-base">{text}</p>
                 </div>
               ))}
             </div>
@@ -560,9 +554,9 @@ const Session = () => {
 
       {/* ══════════════ DELETE CONFIRMATION DIALOG ══════════════ */}
       <Dialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open, sessionId: null })}>
-        <DialogContent className="sm:max-w-md border-2 border-red-300 rounded-2xl">
+        <DialogContent className="sm:max-w-md border border-red-300">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black text-black flex items-center gap-2">
+            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <AlertCircle className="w-6 h-6 text-red-600" />
               Delete Session?
             </DialogTitle>
@@ -571,9 +565,9 @@ const Session = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 my-4">
-            <p className="text-sm font-semibold text-red-900 mb-1">
-              Session ID: <span className="font-black">{deleteDialog.sessionId}</span>
+          <div className="bg-red-50 border border-red-200 p-4 my-4">
+            <p className="text-sm font-medium text-red-900 mb-1">
+              Session ID: <span className="font-bold">{deleteDialog.sessionId}</span>
             </p>
             <p className="text-xs text-red-700">
               This will permanently disconnect and remove this WhatsApp session.
@@ -585,7 +579,7 @@ const Session = () => {
               type="button"
               variant="outline"
               onClick={() => setDeleteDialog({ open: false, sessionId: null })}
-              className="border-2 border-gray-300 rounded-xl font-semibold"
+              className="border border-gray-300 font-medium"
             >
               Cancel
             </Button>
@@ -594,7 +588,7 @@ const Session = () => {
               variant="destructive"
               onClick={() => handleDisconnect(deleteDialog.sessionId)}
               disabled={deletingSession === deleteDialog.sessionId}
-              className="bg-red-600 hover:bg-red-700 rounded-xl font-bold"
+              className="bg-red-600 hover:bg-red-700 font-semibold"
             >
               {deletingSession === deleteDialog.sessionId ? (
                 <>

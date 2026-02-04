@@ -16,6 +16,7 @@ import {
     Crown,
     LayoutDashboard,
     Menu,
+    MessageSquare,
     Package,
     Send,
     Settings,
@@ -80,7 +81,7 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
     const NavSection = ({ title, items }) => (
         <div className="mb-6">
             {title && (
-                <h3 className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
+                <h3 className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
                     {title}
                 </h3>
             )}
@@ -94,42 +95,43 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
                                     onClick={onLinkClick}
                                     className={({ isActive }) =>
                                         [
-                                            'group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200',
+                                            'group relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
                                             isActive
-                                                ? 'bg-gradient-to-r from-green-50 to-teal-50 text-green-700 shadow-sm border-2 border-green-200'
-                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-2 border-transparent',
+                                                ? 'bg-green-50 text-[#25D366] border border-green-200'
+                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-transparent',
                                         ].join(' ')
                                     }
                                 >
                                     {({ isActive }) => (
                                         <>
                                             <div
-                                                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${isActive
-                                                        ? 'bg-white border-2 border-green-300 shadow-sm'
-                                                        : 'bg-gray-100 border-2 border-gray-200 group-hover:bg-white group-hover:border-green-200'
-                                                    }`}
+                                                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
+                                                    isActive
+                                                        ? 'bg-white border border-green-200 shadow-sm'
+                                                        : 'bg-gray-100 border border-gray-200 group-hover:bg-white'
+                                                }`}
                                             >
                                                 <Icon
                                                     size={18}
                                                     strokeWidth={isActive ? 2.5 : 2}
                                                     className={
                                                         isActive
-                                                            ? 'text-green-600'
-                                                            : 'text-gray-500 group-hover:text-green-600'
+                                                            ? 'text-[#25D366]'
+                                                            : 'text-gray-500 group-hover:text-[#25D366]'
                                                     }
                                                 />
                                             </div>
                                             <span className="flex-1">{label}</span>
                                             {badge && (
-                                                <Badge className="bg-green-100 text-green-700 border-green-300 text-xs px-2 py-0 font-bold">
+                                                <Badge className="bg-green-100 text-[#25D366] border-green-200 text-xs px-2 py-0 font-semibold">
                                                     {badge}
                                                 </Badge>
                                             )}
                                             {isActive && (
                                                 <ChevronRight
                                                     size={16}
-                                                    className="text-green-600"
-                                                    strokeWidth={3}
+                                                    className="text-[#25D366]"
+                                                    strokeWidth={2.5}
                                                 />
                                             )}
                                         </>
@@ -150,17 +152,17 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
         <div className="h-full overflow-y-auto scrollbar-hide">
             {/* App Branding Header - Only visible in mobile sidebar */}
             {showBranding && (
-                <div className="px-4 pt-6 pb-4 border-b-2 border-gray-200 bg-white sticky top-0 z-10">
+                <div className="px-4 pt-6 pb-4 border-b border-gray-200 bg-white sticky top-0 z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center shadow-md border-2 border-green-700">
-                            <Send className="w-5 h-5 text-white" strokeWidth={2.5} />
+                        <div className="w-10 h-10 rounded-xl bg-[#25D366] flex items-center justify-center shadow-sm">
+                            <MessageSquare className="w-5 h-5 text-white" strokeWidth={2.5} />
                         </div>
                         <div className="flex flex-col leading-none">
-                            <span className="text-xl font-black tracking-tight text-gray-900">
-                                Bulk<span className="text-green-600">Send</span>
+                            <span className="text-xl font-bold tracking-tight text-gray-900">
+                                WhatsBot
                             </span>
-                            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
-                                Messaging Platform
+                            <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                                WhatsApp Platform
                             </span>
                         </div>
                     </div>
@@ -194,23 +196,23 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
             </div>
 
             {/* Plan & Credits Section - Scrollable */}
-            <div className="px-4 pb-6 pt-4 border-t-2 border-gray-200 space-y-3">
+            <div className="px-4 pb-6 pt-4 border-t border-gray-200 space-y-3">
                 {/* Current Plan Card */}
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-4">
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-lg bg-white border-2 border-purple-300 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-white border border-purple-200 flex items-center justify-center">
                             <Crown className="w-5 h-5 text-purple-600" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                            <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">
                                 Current Plan
                             </p>
                             <div className="flex items-center gap-2">
-                                <p className="text-lg font-black text-purple-700 truncate">
+                                <p className="text-lg font-bold text-purple-700 truncate">
                                     {currentPlanName}
                                 </p>
                                 {isActivePlan && (
-                                    <Badge className="bg-green-100 text-green-700 border-green-300 text-xs px-1.5 py-0 font-bold">
+                                    <Badge className="bg-green-100 text-green-700 border-green-200 text-xs px-1.5 py-0 font-semibold">
                                         Active
                                     </Badge>
                                 )}
@@ -219,7 +221,7 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
                     </div>
                     {currentPlanName !== 'ENTERPRISE' && currentPlanName !== 'MASTER' && (
                         <NavLink to="/plans" onClick={onLinkClick}>
-                            <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold text-sm py-2.5 rounded-xl transition-all shadow-sm">
+                            <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm py-2.5 rounded-lg transition-all shadow-sm">
                                 <Sparkles className="w-4 h-4 mr-2" />
                                 Upgrade Plan
                             </Button>
@@ -229,23 +231,23 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
 
                 {/* Credits Card */}
                 {currentPlanName !== 'MASTER' && (
-                    <div className="bg-gradient-to-br from-green-50 to-teal-50 border-2 border-green-200 rounded-2xl p-4">
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-lg bg-white border-2 border-green-300 flex items-center justify-center">
-                                <Zap className="w-5 h-5 text-green-600" />
+                            <div className="w-10 h-10 rounded-lg bg-white border border-green-200 flex items-center justify-center">
+                                <Zap className="w-5 h-5 text-[#25D366]" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                                <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">
                                     Credits
                                 </p>
-                                <p className="text-lg font-black text-green-700 truncate">
+                                <p className="text-lg font-bold text-[#25D366] truncate">
                                     {currentCredits.toLocaleString('en-IN')}
                                 </p>
                             </div>
                         </div>
 
                         <NavLink to="/credits" onClick={onLinkClick}>
-                            <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-sm py-2.5 rounded-xl transition-all shadow-sm">
+                            <Button className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold text-sm py-2.5 rounded-lg transition-all shadow-sm">
                                 Buy More Credits
                             </Button>
                         </NavLink>
@@ -266,12 +268,12 @@ export function MobileSidebarTrigger() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="lg:hidden w-10 h-10 rounded-xl hover:bg-gray-100 transition-all"
+                    className="lg:hidden w-10 h-10 hover:bg-gray-100 transition-all"
                 >
                     <Menu className="w-5 h-5 text-gray-600" />
                 </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0 border-r-2 border-gray-200">
+            <SheetContent side="left" className="w-72 p-0 border-r border-gray-200">
                 <SidebarContent onLinkClick={() => setOpen(false)} showBranding={true} />
             </SheetContent>
         </Sheet>
@@ -292,8 +294,8 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="hidden lg:flex w-64 bg-white border-r-2 border-gray-200 h-[calc(100vh-64px)] sticky top-16 overflow-hidden">
-            <SidebarContent onLinkClick={() => { }} showBranding={false} />
+        <aside className="hidden lg:flex w-64 bg-white border-r border-gray-200 h-[calc(100vh-64px)] sticky top-16 overflow-hidden">
+            <SidebarContent onLinkClick={() => {}} showBranding={false} />
         </aside>
     );
 }
