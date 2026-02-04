@@ -5,6 +5,7 @@ import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { CreditsProvider } from './context/CreditContext.jsx'
 import { PlansProvider } from './context/PlanContext.jsx'
+import { SessionProvider } from './context/SessionContext.jsx'
 import { UserProvider } from './context/UserContext.jsx'
 import './index.css'
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')).render(
         <UserProvider>
           <PlansProvider>
             <CreditsProvider>
-              <App />
+              <SessionProvider>
+                <App />
+              </SessionProvider>
             </CreditsProvider>
           </PlansProvider>
         </UserProvider>

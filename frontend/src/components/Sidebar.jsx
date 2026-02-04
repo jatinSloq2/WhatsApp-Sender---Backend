@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/tooltip';
 import {
     BarChart2,
+    BluetoothConnectedIcon,
     ChevronRight,
     CreditCard,
     Crown,
@@ -32,6 +33,7 @@ const ADMIN_EMAILS = ['jatinsingh098hp@gmail.com'];
 
 const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, category: 'main' },
+    { to: '/session', label: 'Session', icon: BluetoothConnectedIcon, category: 'main' },
     { to: '/campaigns', label: 'Campaigns', icon: Send, category: 'main' },
     { to: '/plans', label: 'Plans', icon: Package, category: 'main' },
     { to: '/credits', label: 'Credits', icon: Zap, category: 'main', badge: 'New' },

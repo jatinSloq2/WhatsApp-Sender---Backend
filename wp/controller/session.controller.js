@@ -88,137 +88,6 @@ exports.createSession = async (req, res) => {
     }
 };
 
-// exports.createSession = async (req, res) => {
-//     const { id } = req.body;
-
-//     console.log(`[CREATE] Request received for session: ${id}`);
-
-//     if (!id) {
-//         console.log(`[CREATE] Missing session ID`);
-//         return res.status(400).json({ success: false, message: "Session ID required" });
-//     }
-
-//     try {
-//         console.log(`[CREATE] Checking existing session: ${id}`);
-//         const existingStatus = await whatsapp.getSessionStatus(id);
-
-//         console.log(`[CREATE] Existing session status for ${id}: ${existingStatus}`);
-
-//         if (existingStatus === "connected") {
-//             console.log(`[CREATE] Session already connected: ${id}`);
-//             return res.json({
-//                 success: true,
-//                 message: "Session already connected",
-//                 data: { status: "connected" }
-//             });
-//         }
-
-//         if (existingStatus !== "no_session") {
-//             console.log(`[CREATE] Cleaning up old session: ${id}`);
-//             await whatsapp.deleteSession(id);
-
-//             console.log(`[CREATE] Waiting for cleanup...`);
-//             await new Promise(resolve => setTimeout(resolve, 1000));
-//         }
-
-//         console.log(`[CREATE] Creating new session: ${id}`);
-//         const result = await whatsapp.createSession(id);
-
-//         console.log(`[CREATE] Session created: ${id}, status: ${result.status}`);
-
-//         return res.json({
-//             success: true,
-//             message: "Session initializing. Use /sessions/qr/:sessionId to get QR code",
-//             data: { sessionId: id, status: result.status }
-//         });
-//     } catch (error) {
-//         console.error(`[CREATE] Error creating session for ${id}:`, error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Failed to create session",
-//             error: error.message
-//         });
-//     }
-// };
-
-
-
-
-
-
-
-
-// // Get QR code (polled)
-// exports.getQR = async (req, res) => {
-//     const { sessionId } = req.params;
-
-//     console.log(`[QR] Request for QR of session: ${sessionId}`);
-
-//     try {
-//         console.log(`[QR] Fetching session status: ${sessionId}`);
-//         const status = await whatsapp.getSessionStatus(sessionId);
-//         console.log(`[QR] Status for ${sessionId}: ${status}`);
-
-//         if (status === "connected") {
-//             console.log(`[QR] Session already connected: ${sessionId}`);
-//             return res.json({
-//                 success: true,
-//                 status: "connected",
-//                 message: "Device connected"
-//             });
-//         }
-
-//         if (status === "no_session") {
-//             console.log(`[QR] Session not found: ${sessionId}`);
-//             return res.status(404).json({
-//                 success: false,
-//                 status: "no_session",
-//                 message: "Session not found. Please create a session first."
-//             });
-//         }
-
-//         console.log(`[QR] Checking QR string for session: ${sessionId}`);
-//         const qrString = whatsapp.getQR(sessionId);
-
-//         if (qrString) {
-//             console.log(`[QR] QR found. Generating base64 for session: ${sessionId}`);
-
-//             try {
-//                 const qrBase64 = await QRCode.toDataURL(qrString);
-
-//                 console.log(`[QR] QR generated successfully for session: ${sessionId}`);
-//                 return res.json({
-//                     success: true,
-//                     status: "qr_ready",
-//                     data: { qr: qrBase64 }
-//                 });
-//             } catch (err) {
-//                 console.error(`[QR] Error generating QR for ${sessionId}:`, err);
-//                 return res.status(500).json({
-//                     success: false,
-//                     message: "QR generation failed",
-//                     error: err.message
-//                 });
-//             }
-//         }
-
-//         console.log(`[QR] QR not ready yet for session: ${sessionId}`);
-//         return res.json({
-//             success: true,
-//             status: "initializing",
-//             message: "QR not ready yet, please retry"
-//         });
-
-//     } catch (error) {
-//         console.error(`[QR] Error fetching QR for ${sessionId}:`, error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Error getting QR code",
-//             error: error.message
-//         });
-//     }
-// };
-
 exports.getSessionStatus = async (req, res) => {
     const { sessionId } = req.params;
 
@@ -264,33 +133,6 @@ exports.getSessionStatus = async (req, res) => {
     }
 };
 
-// exports.getSessionStatus = async (req, res) => {
-//     const { sessionId } = req.params;
-
-//     console.log(`[STATUS] Request for session status: ${sessionId}`);
-
-//     try {
-//         const status = await whatsapp.getSessionStatus(sessionId);
-//         const sock = whatsapp.getSession(sessionId);
-
-//         console.log(`[STATUS] Current status of ${sessionId}: ${status}`);
-
-//         return res.json({
-//             success: true,
-//             status,
-//             data: sock?.user ? { phone: sock.user.id } : null
-//         });
-//     } catch (error) {
-//         console.error(`[STATUS] Error getting status for ${sessionId}:`, error);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Error getting session status",
-//             error: error.message
-//         });
-//     }
-// };
-
-
 exports.deleteSession = async (req, res) => {
     const { sessionId } = req.params;
 
@@ -334,7 +176,6 @@ exports.listSessions = (req, res) => {
         });
     }
 };
-
 
 exports.retryDisconectedSession = async (req, res) => {
     const { id } = req.body;

@@ -23,6 +23,7 @@ import ResetPassword from './pages/Resetpassword';
 import Settings from './pages/Settings';
 import VerifyOTP from './pages/VerifyOtp';
 import AdminUserManagement from './pages/AdminUserManagement';
+import Session from './pages/Session';
 
 export default function App() {
   return (
@@ -104,6 +105,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/session"
+              element={
+                <ProtectedRoute>
+                  <Session />
                 </ProtectedRoute>
               }
             />
