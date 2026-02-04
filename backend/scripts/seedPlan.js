@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import Plan from '../models/plan.model.js';
 import User from '../models/user.model.js';
 
-const plans = [
+export const plans = [
     // ─── FREE ───────────────────────────────────────────
     {
         name: 'FREE',
@@ -12,6 +12,7 @@ const plans = [
         creditsIncluded: 500,
         maxCampaignsPerMonth: 20,
         maxRecipientsPerCampaign: 1000,
+        maxActiveSessions: 1, // ✅ new field
         features: {
             analyticsAccess: false,
             prioritySupport: false,
@@ -28,6 +29,7 @@ const plans = [
         creditsIncluded: 5000,
         maxCampaignsPerMonth: 100,
         maxRecipientsPerCampaign: 10000,
+        maxActiveSessions: 3,
         features: {
             analyticsAccess: true,
             prioritySupport: false,
@@ -42,6 +44,7 @@ const plans = [
         creditsIncluded: 60000,
         maxCampaignsPerMonth: 100,
         maxRecipientsPerCampaign: 10000,
+        maxActiveSessions: 3,
         features: {
             analyticsAccess: true,
             prioritySupport: false,
@@ -58,6 +61,7 @@ const plans = [
         creditsIncluded: 20000,
         maxCampaignsPerMonth: 500,
         maxRecipientsPerCampaign: 50000,
+        maxActiveSessions: 5,
         features: {
             analyticsAccess: true,
             prioritySupport: true,
@@ -72,6 +76,7 @@ const plans = [
         creditsIncluded: 240000,
         maxCampaignsPerMonth: 500,
         maxRecipientsPerCampaign: 50000,
+        maxActiveSessions: 5,
         features: {
             analyticsAccess: true,
             prioritySupport: true,
@@ -88,6 +93,7 @@ const plans = [
         creditsIncluded: 100000,
         maxCampaignsPerMonth: 2000,
         maxRecipientsPerCampaign: 500000,
+        maxActiveSessions: null, // unlimited
         features: {
             analyticsAccess: true,
             prioritySupport: true,
@@ -102,6 +108,7 @@ const plans = [
         creditsIncluded: 1200000,
         maxCampaignsPerMonth: 2000,
         maxRecipientsPerCampaign: 500000,
+        maxActiveSessions: null, // unlimited
         features: {
             analyticsAccess: true,
             prioritySupport: true,
@@ -118,6 +125,7 @@ const plans = [
         creditsIncluded: null,
         maxCampaignsPerMonth: null,
         maxRecipientsPerCampaign: null,
+        maxActiveSessions: null, // unlimited
         features: {
             analyticsAccess: true,
             prioritySupport: true,
@@ -127,6 +135,7 @@ const plans = [
         isInternal: true,
     },
 ];
+
 
 // ─── Admin seed config (override via .env) ────────────
 const ADMIN_NAME = process.env.ADMIN_NAME;

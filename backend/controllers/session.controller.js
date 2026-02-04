@@ -1,4 +1,6 @@
 import WhatsappSession from "../models/Session.model.js";
+import User from "../models/user.model.js";
+import { plans } from "../scripts/seedPlan.js";
 import {
     createRemoteSession,
     deleteRemoteSession,
@@ -15,10 +17,32 @@ import {
 export const createSession = async (req, res) => {
     try {
         const { sessionId } = req.body;
-        const userId = req.user?.id; // optional
+        const userId = req.user?.id;
 
         if (!sessionId) {
             return res.status(400).json({ success: false, message: "sessionId required" });
+        }
+
+        // Fetch user and plan
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const plan = plans.find(p => p.name === user.planName && p.billingCycle === user.billingCycle);
+        const maxSessions = plan?.maxActiveSessions;
+
+        // Count user's active sessions
+        const activeSessionsCount = await WhatsappSession.countDocuments({
+            userId,
+            status: { $nin: ["disconnected", "no_session"] },
+        });
+
+        if (maxSessions !== null && activeSessionsCount >= maxSessions) {
+            return res.status(403).json({
+                success: false,
+                message: `You have reached your plan's active session limit (${maxSessions}).`,
+            });
         }
 
         // Create or update DB entry
@@ -30,10 +54,8 @@ export const createSession = async (req, res) => {
 
         // Call session server
         const response = await createRemoteSession(sessionId);
-
         const { status, qr } = response.data?.data || {};
 
-        // Update DB with QR / status
         session.status = status || "created";
         if (qr) session.qr = qr;
         await session.save();
