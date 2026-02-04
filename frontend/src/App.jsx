@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 
 // Authenticated pages
+import AdminVerification from './pages/AdminPaymentVerification';
 import Analytics from './pages/Analytics';
 import Billing from './pages/Billing';
 import Campaigns from './pages/Campaigns';
@@ -18,164 +19,144 @@ import Dashboard from './pages/Dashboard';
 import ForgotPassword from './pages/ForgetPassword';
 import Plans from './pages/Plans';
 import Profile from './pages/Profile';
+import ResetPassword from './pages/Resetpassword';
 import Settings from './pages/Settings';
 import VerifyOTP from './pages/VerifyOtp';
-import ResetPassword from './pages/Resetpassword';
-import AdminVerification from './pages/AdminPaymentVerification';
 
 export default function App() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Top navbar — always visible */}
       <Navbar />
 
-      <Routes>
-        {/* ── Public routes (no sidebar) ── */}
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <PublicRoute>
-              <Signup />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/verify-otp"
-          element={
-            <PublicRoute>
-              <VerifyOTP />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            <PublicRoute>
-              <ForgotPassword />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/reset-password/:token"
-          element={
-            <PublicRoute>
-              <ResetPassword />
-            </PublicRoute>
-          }
-        />
+      <div className="flex flex-1">
+        {/* Sidebar - only shows on desktop for protected routes */}
+        <Sidebar />
 
-        {/* ── Admin routes (with sidebar) ── */}
-        <Route
-          path="/admin/verification"
-          element={
-            <AdminRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <AdminVerification />
-              </div>
-            </AdminRoute>
-          }
-        />
+        {/* Main content area */}
+        <main className="flex-1 overflow-x-hidden">
+          <Routes>
+            {/* ── Public routes (no sidebar) ── */}
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <PublicRoute>
+                  <Signup />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/verify-otp"
+              element={
+                <PublicRoute>
+                  <VerifyOTP />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/reset-password/:token"
+              element={
+                <PublicRoute>
+                  <ResetPassword />
+                </PublicRoute>
+              }
+            />
 
-        {/* ── Protected routes (with sidebar) ── */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <Dashboard />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/campaigns"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <Campaigns />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/plans"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <Plans />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/credits"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <Credits />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <Analytics />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <Profile />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/billing"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <Billing />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-1">
-                <Sidebar />
-                <Settings />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+            {/* ── Admin routes (with sidebar on desktop, mobile menu on mobile) ── */}
+            <Route
+              path="/admin/verification"
+              element={
+                <AdminRoute>
+                  <AdminVerification />
+                </AdminRoute>
+              }
+            />
+
+            {/* ── Protected routes (with sidebar on desktop, mobile menu on mobile) ── */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/campaigns"
+              element={
+                <ProtectedRoute>
+                  <Campaigns />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/plans"
+              element={
+                <ProtectedRoute>
+                  <Plans />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/credits"
+              element={
+                <ProtectedRoute>
+                  <Credits />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <Analytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/billing"
+              element={
+                <ProtectedRoute>
+                  <Billing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+      </div>
     </div>
   );
 }
