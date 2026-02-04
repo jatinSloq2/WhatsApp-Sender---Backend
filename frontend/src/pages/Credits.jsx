@@ -14,7 +14,6 @@ import {
   AlertCircle,
   ArrowDownLeft,
   ArrowUpRight,
-  Check,
   CheckCircle2,
   Clock,
   CreditCard,
@@ -24,7 +23,7 @@ import {
   Sparkles,
   TrendingUp,
   X,
-  Zap,
+  Zap
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { PaymentModal } from "../components/PaymentModal";
@@ -65,7 +64,8 @@ function calcCustomPrice(credits) {
 
 function activeRateLabel(credits) {
   for (let i = CUSTOM_RATE_TIERS.length - 1; i >= 0; i--) {
-    if (credits >= CUSTOM_RATE_TIERS[i].min) return `${CUSTOM_RATE_TIERS[i].creditsPerRupee} credits / ₹1`;
+    if (credits >= CUSTOM_RATE_TIERS[i].min)
+      return `${CUSTOM_RATE_TIERS[i].creditsPerRupee} credits / ₹1`;
   }
   return "";
 }
@@ -74,17 +74,41 @@ function activeRateLabel(credits) {
 // TRANSACTION META
 // ─────────────────────────────────────────────────────
 const TXN_META = {
-  PURCHASE: { icon: ArrowUpRight, color: "text-green-600", bg: "bg-green-50", label: "Purchase" },
-  PLAN_REFILL: { icon: RefreshCw, color: "text-blue-600", bg: "bg-blue-50", label: "Plan Refill" },
-  CAMPAIGN_SEND: { icon: ArrowDownLeft, color: "text-red-500", bg: "bg-red-50", label: "Campaign" },
-  ADMIN_ADJUST: { icon: Shield, color: "text-gray-600", bg: "bg-gray-100", label: "Adjustment" },
+  PURCHASE: {
+    icon: ArrowUpRight,
+    color: "text-green-600",
+    bg: "bg-green-50",
+    label: "Purchase"
+  },
+  PLAN_REFILL: {
+    icon: RefreshCw,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    label: "Plan Refill"
+  },
+  CAMPAIGN_SEND: {
+    icon: ArrowDownLeft,
+    color: "text-red-500",
+    bg: "bg-red-50",
+    label: "Campaign"
+  },
+  ADMIN_ADJUST: {
+    icon: Shield,
+    color: "text-gray-600",
+    bg: "bg-gray-100",
+    label: "Adjustment"
+  },
 };
+
 const getTxnMeta = (type) => TXN_META[type] || TXN_META.ADMIN_ADJUST;
 
 const fmtDate = (d) =>
   new Date(d).toLocaleDateString("en-IN", {
-    day: "numeric", month: "short", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
 // ─────────────────────────────────────────────────────
@@ -101,38 +125,57 @@ function CustomAmountCard({ onBuy }) {
 
   const applyValue = (raw) => {
     const n = parseInt(raw, 10);
-    if (isNaN(n)) { setInputVal(raw); setInputErr("Enter a number"); return; }
-    if (n < CUSTOM_MIN) { setInputVal(raw); setInputErr(`Minimum ${CUSTOM_MIN} credits`); return; }
-    if (n > CUSTOM_MAX) { setInputVal(raw); setInputErr(`Maximum ${CUSTOM_MAX.toLocaleString()} credits`); return; }
-    setInputErr(""); setInputVal(String(n)); setCredits(n);
+    if (isNaN(n)) {
+      setInputVal(raw);
+      setInputErr("Enter a number");
+      return;
+    }
+    if (n < CUSTOM_MIN) {
+      setInputVal(raw);
+      setInputErr(`Minimum ${CUSTOM_MIN} credits`);
+      return;
+    }
+    if (n > CUSTOM_MAX) {
+      setInputVal(raw);
+      setInputErr(`Maximum ${CUSTOM_MAX.toLocaleString()} credits`);
+      return;
+    }
+    setInputErr("");
+    setInputVal(String(n));
+    setCredits(n);
   };
 
   return (
-    <Card className="col-span-1 sm:col-span-2 lg:col-span-4 border-2 border-dashed border-green-400 rounded-2xl shadow-sm bg-white mt-10">
-      <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b-2 border-green-200 rounded-t-2xl px-6 py-4">
+    <Card className="col-span-1 sm:col-span-2 lg:col-span-4 border-2 border-dashed border-[#25D366]/50 shadow-sm bg-white">
+      <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b border-green-200 px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-gradient-to-br from-green-600 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
-              <Sparkles size={20} className="text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-[#25D366] to-green-600 flex items-center justify-center shadow-md">
+              <Sparkles size={22} className="text-white" />
             </div>
             <div>
-              <CardTitle className="text-sm font-bold text-gray-800">Pick Your Own Amount</CardTitle>
-              <CardDescription className="text-xs text-gray-500">Rate drops automatically as you buy more</CardDescription>
+              <CardTitle className="text-base font-bold text-gray-900">
+                Pick Your Own Amount
+              </CardTitle>
+              <CardDescription className="text-xs text-gray-600 font-medium">
+                Rate drops automatically as you buy more
+              </CardDescription>
             </div>
           </div>
-          <Badge variant="secondary" className="text-xs font-bold text-teal-700 bg-teal-100 border border-teal-300">Custom</Badge>
+          <Badge className="text-xs font-bold text-[#25D366] bg-green-100 border border-green-200">
+            Custom
+          </Badge>
         </div>
       </CardHeader>
 
       <CardContent className="p-6">
-        <div className="flex flex-col sm:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* left – slider + input */}
-          <div className="flex-1 space-y-4">
-
+          <div className="flex-1 space-y-5">
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-sm font-semibold text-gray-700">Credits</Label>
-                <Badge variant="outline" className="text-xs font-bold text-green-700 bg-green-100 border-green-300">
+              <div className="flex items-center justify-between mb-3">
+                <Label className="text-sm font-semibold text-gray-900">Credits</Label>
+                <Badge variant="outline" className="text-xs font-bold text-green-700 bg-green-50 border-green-200">
                   {activeRateLabel(credits)} marginal
                 </Badge>
               </div>
@@ -143,27 +186,35 @@ function CustomAmountCard({ onBuy }) {
                   value={inputVal}
                   onChange={(e) => applyValue(e.target.value)}
                   onBlur={() => applyValue(inputVal)}
-                  className={`w-28 font-black text-xl text-center border-2 rounded-xl focus-visible:ring-offset-0 ${inputError
-                    ? "border-red-300 bg-red-50 focus-visible:border-red-300 focus-visible:ring-red-200"
-                    : "border-gray-300 focus-visible:border-green-600 focus-visible:ring-green-200"
+                  className={`w-32 font-bold text-2xl text-center border-2 focus-visible:ring-offset-0 ${inputError
+                      ? "border-red-300 bg-red-50 focus-visible:border-red-300 focus-visible:ring-red-200"
+                      : "border-gray-300 focus-visible:border-[#25D366] focus-visible:ring-[#25D366]/20"
                     }`}
                 />
-                <span className="text-gray-400 font-semibold text-sm">credits</span>
+                <span className="text-gray-500 font-semibold">credits</span>
               </div>
-              {inputError && <p className="text-xs text-red-500 font-semibold mt-1">{inputError}</p>}
+              {inputError && (
+                <p className="text-xs text-red-600 font-semibold mt-2">{inputError}</p>
+              )}
             </div>
 
             {/* range slider */}
             <div>
               <input
-                type="range" min={CUSTOM_MIN} max={CUSTOM_MAX} step={10} value={credits}
+                type="range"
+                min={CUSTOM_MIN}
+                max={CUSTOM_MAX}
+                step={10}
+                value={credits}
                 onChange={(e) => {
                   const n = parseInt(e.target.value, 10);
-                  setCredits(n); setInputVal(String(n)); setInputErr("");
+                  setCredits(n);
+                  setInputVal(String(n));
+                  setInputErr("");
                 }}
-                className="w-full accent-green-600 cursor-pointer"
+                className="w-full accent-[#25D366] cursor-pointer h-2"
               />
-              <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <div className="flex justify-between text-xs text-gray-500 font-medium mt-2">
                 <span>{CUSTOM_MIN}</span>
                 <span>{CUSTOM_MAX.toLocaleString()}</span>
               </div>
@@ -177,12 +228,12 @@ function CustomAmountCard({ onBuy }) {
                   <Badge
                     key={t.min}
                     variant={active ? "secondary" : "outline"}
-                    className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-all ${active
-                      ? "bg-green-100 border-green-300 text-green-700"
-                      : "bg-gray-50 border-gray-200 text-gray-400"
+                    className={`text-xs px-3 py-1 font-semibold transition-all ${active
+                        ? "bg-[#25D366] text-white border-[#25D366]"
+                        : "bg-gray-50 border-gray-200 text-gray-500"
                       }`}
                   >
-                    {t.min}–{t.max} → {t.creditsPerRupee} credits / ₹1
+                    {t.min}–{t.max} → {t.creditsPerRupee} credits/₹1
                   </Badge>
                 );
               })}
@@ -190,32 +241,45 @@ function CustomAmountCard({ onBuy }) {
           </div>
 
           {/* right – price summary + CTA */}
-          <Card className="sm:w-52 flex flex-col justify-between bg-gray-50 border-2 border-gray-300 rounded-2xl shadow-none">
+          <Card className="lg:w-64 flex flex-col justify-between bg-gray-50 border border-gray-200 shadow-none">
             <CardContent className="p-5">
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2.5 text-sm mb-5">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Base</span>
-                  <span className="font-semibold text-gray-700">₹{basePrice.toLocaleString("en-IN")}</span>
+                  <span className="text-gray-600">Base Amount</span>
+                  <span className="font-semibold text-gray-900">
+                    ₹{basePrice.toLocaleString("en-IN")}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">GST 18%</span>
-                  <span className="font-semibold text-gray-700">₹{gstAmount.toLocaleString("en-IN")}</span>
+                  <span className="text-gray-600">GST (18%)</span>
+                  <span className="font-semibold text-gray-900">
+                    ₹{gstAmount.toLocaleString("en-IN")}
+                  </span>
                 </div>
-                <div className="border-t-2 border-gray-300 pt-2 mt-1 flex justify-between text-base">
-                  <span className="font-black text-gray-800">Total</span>
-                  <span className="font-black text-green-600">₹{total.toLocaleString("en-IN")}</span>
+                <div className="border-t-2 border-gray-300 pt-2.5 mt-2 flex justify-between text-base">
+                  <span className="font-bold text-gray-900">Total</span>
+                  <span className="font-bold text-[#25D366]">
+                    ₹{total.toLocaleString("en-IN")}
+                  </span>
                 </div>
               </div>
 
               <Button
                 disabled={!!inputError || credits < CUSTOM_MIN}
-                onClick={() => onBuy({ id: "pack_custom", credits, price: basePrice, gstAmount, totalAmount: total })}
-                className={`w-full mt-5 rounded-xl font-bold text-sm shadow-md transition-all ${inputError || credits < CUSTOM_MIN
-                  ? "bg-gray-200 text-gray-400 hover:bg-gray-200 shadow-none cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700 text-white shadow-green-200"
+                onClick={() => onBuy({
+                  id: "pack_custom",
+                  credits,
+                  price: basePrice,
+                  gstAmount,
+                  totalAmount: total
+                })}
+                className={`w-full font-bold text-sm shadow-sm transition-all ${inputError || credits < CUSTOM_MIN
+                    ? "bg-gray-200 text-gray-400 hover:bg-gray-200 cursor-not-allowed"
+                    : "bg-[#25D366] hover:bg-[#20BD5A] text-white"
                   }`}
               >
-                <CreditCard size={16} className="mr-2" /> Buy {credits.toLocaleString()} Credits
+                <CreditCard size={16} className="mr-2" />
+                Buy {credits.toLocaleString()} Credits
               </Button>
             </CardContent>
           </Card>
@@ -230,7 +294,14 @@ function CustomAmountCard({ onBuy }) {
 // ─────────────────────────────────────────────────────
 export default function Credits() {
   const { user } = useAuth();
-  const { loading, getCreditPacks, getBalance, getCreditHistory, submitCreditProof, getMyPurchaseRequests } = useCredits();
+  const {
+    loading,
+    getCreditPacks,
+    getBalance,
+    getCreditHistory,
+    submitCreditProof,
+    getMyPurchaseRequests
+  } = useCredits();
 
   /* state */
   const [packs, setPacks] = useState([]);
@@ -248,27 +319,41 @@ export default function Credits() {
 
   /* fetchers */
   const loadPacks = useCallback(async () => {
-    try { setPacks(await getCreditPacks() || []); }
-    catch (e) { setError(e.message || "Failed to load packs"); }
+    try {
+      setPacks(await getCreditPacks() || []);
+    } catch (e) {
+      setError(e.message || "Failed to load packs");
+    }
   }, [getCreditPacks]);
 
   const loadBalance = useCallback(async () => {
-    try { setBalance(await getBalance()); } catch { }
+    try {
+      setBalance(await getBalance());
+    } catch { }
   }, [getBalance]);
 
   const loadHistory = useCallback(async (page = 1) => {
     try {
       const { transactions, pagination: pg } = await getCreditHistory(page);
-      setHistory(transactions); setPagination(pg);
-    } catch (e) { setError(e.message || "Failed to load history"); }
+      setHistory(transactions);
+      setPagination(pg);
+    } catch (e) {
+      setError(e.message || "Failed to load history");
+    }
   }, [getCreditHistory]);
 
   const loadMyRequests = useCallback(async () => {
-    try { setMyRequests(await getMyPurchaseRequests() || []); } catch { }
+    try {
+      setMyRequests(await getMyPurchaseRequests() || []);
+    } catch { }
   }, [getMyPurchaseRequests]);
 
-  useEffect(() => { loadPacks(); loadBalance(); loadHistory(1); loadMyRequests(); },
-    [loadPacks, loadBalance, loadHistory, loadMyRequests]);
+  useEffect(() => {
+    loadPacks();
+    loadBalance();
+    loadHistory(1);
+    loadMyRequests();
+  }, [loadPacks, loadBalance, loadHistory, loadMyRequests]);
 
   useEffect(() => {
     if (activeTab === "history") loadHistory(historyPage);
@@ -276,13 +361,14 @@ export default function Credits() {
   }, [activeTab]);
 
   /* handlers */
-  const handlePurchase = (pack) => { setSelectedPack(pack); setShowModal(true); };
+  const handlePurchase = (pack) => {
+    setSelectedPack(pack);
+    setShowModal(true);
+  };
 
   const handleProofSubmit = async (proofData) => {
-    // Ensure credits is included for custom packs
     const submissionData = {
       ...proofData,
-      // Add credits from selectedPack if it's a custom pack
       ...(selectedPack.id === 'pack_custom' && { credits: selectedPack.credits }),
     };
 
@@ -296,19 +382,30 @@ export default function Credits() {
     loadMyRequests();
   };
 
-
   /* status badge */
   const statusBadge = (status) => {
     if (status === "APPROVED")
-      return <Badge variant="secondary" className="text-xs font-bold text-green-700 bg-green-100 border border-green-300"><CheckCircle2 size={12} className="mr-1" /> Approved</Badge>;
+      return (
+        <Badge className="text-xs font-bold text-green-700 bg-green-100 border border-green-200">
+          <CheckCircle2 size={12} className="mr-1" /> Approved
+        </Badge>
+      );
     if (status === "REJECTED")
-      return <Badge variant="destructive" className="text-xs font-bold text-red-700 bg-red-100 border border-red-300"><X size={12} className="mr-1" /> Rejected</Badge>;
-    return <Badge variant="outline" className="text-xs font-bold text-amber-700 bg-amber-100 border border-amber-300"><Clock size={12} className="mr-1" /> Pending</Badge>;
+      return (
+        <Badge className="text-xs font-bold text-red-700 bg-red-100 border border-red-200">
+          <X size={12} className="mr-1" /> Rejected
+        </Badge>
+      );
+    return (
+      <Badge className="text-xs font-bold text-amber-700 bg-amber-100 border border-amber-200">
+        <Clock size={12} className="mr-1" /> Pending
+      </Badge>
+    );
   };
 
   /* ── RENDER ── */
   return (
-    <div className="min-h-[calc(100vh-64px)] mx-auto">
+    <div className="min-h-[calc(100vh-64px)] bg-gray-50">
 
       {showModal && selectedPack && (
         <PaymentModal
@@ -322,7 +419,6 @@ export default function Credits() {
           }}
           extraPayload={{
             packId: selectedPack.id,
-            // Include credits for custom packs
             ...(selectedPack.id === "pack_custom" && {
               credits: selectedPack.credits
             }),
@@ -336,41 +432,43 @@ export default function Credits() {
       )}
 
       {/* ══════════════ HERO ══════════════ */}
-      <section className="relative overflow-hidden ">
-        <div className="max-w-6xl mx-auto px-6 pt-20 pb-14 text-center">
-          <Badge variant="secondary" className="inline-flex items-center gap-2 bg-green-100 text-green-700 border-2 border-green-300 px-4 py-2 rounded-full font-semibold text-sm shadow-sm mb-6">
-            <Zap size={16} className="text-green-600" /> Buy Credits
+      <section className="relative overflow-hidden bg-gradient-to-b from-green-50 to-white">
+        <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
+          <Badge className="inline-flex items-center gap-2 bg-white text-[#25D366] border border-[#25D366]/20 px-4 py-2 font-semibold text-sm mb-6 shadow-sm">
+            <Zap size={16} className="text-[#25D366]" /> Buy Credits
           </Badge>
 
-          <h1 className="text-5xl sm:text-6xl font-black text-black tracking-tight leading-tight mb-4">
-            Power your{" "}
-            <span className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">campaigns</span>
+          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
+            Power Your
+            <br />
+            <span className="text-[#25D366]">Campaigns</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-xl mx-auto">
+
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Credits fuel every message you send. Top up anytime — no subscriptions needed.
           </p>
         </div>
       </section>
 
       {/* ══════════════ BALANCE CARD ══════════════ */}
-      <section className="max-w-6xl mx-auto px-6 pt-6 pb-4">
-        <Card className="bg-gradient-to-r from-green-600 to-teal-600 border-0 rounded-2xl shadow-xl shadow-green-200/40">
+      <section className="max-w-7xl mx-auto px-6 pb-6">
+        <Card className="bg-gradient-to-r from-[#25D366] to-green-600 border-0 shadow-lg shadow-green-200/40">
           <CardContent className="p-6 text-white flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-                <Zap size={28} className="text-white" />
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <Zap size={32} className="text-white" />
               </div>
               <div>
-                <p className="text-green-100 text-sm font-semibold">Your Balance</p>
-                <p className="text-4xl font-black">
-                  {balance.toLocaleString("en-IN")} <span className="text-xl font-semibold text-green-200">credits</span>
+                <p className="text-green-100 text-sm font-semibold mb-1">Your Balance</p>
+                <p className="text-4xl font-bold">
+                  {balance.toLocaleString("en-IN")}{" "}
+                  <span className="text-xl font-semibold text-green-100">credits</span>
                 </p>
               </div>
             </div>
             <Button
-              variant="outline"
               onClick={loadBalance}
-              className="border-2 border-white/30 text-white bg-transparent hover:bg-white/10 hover:text-white rounded-xl font-semibold text-sm"
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 font-semibold backdrop-blur-sm"
             >
               <RefreshCw size={16} className="mr-2" /> Refresh
             </Button>
@@ -380,14 +478,33 @@ export default function Credits() {
 
       {/* ══════════════ MESSAGE BANNER ══════════════ */}
       {message.text && (
-        <section className="max-w-6xl mx-auto px-6 pb-3">
-          <Alert variant={message.type === "success" ? "default" : "destructive"} className={`rounded-xl border-2 flex shadow-sm ${message.type === "success" ? "bg-green-50 border-green-300" : "bg-red-50 border-red-300"
-            }`}>
-            {message.type === "success" ? <Check size={18} className="text-green-600" /> : <AlertCircle size={18} className="text-red-500" />}
-            <AlertDescription className={`font-semibold ${message.type === "success" ? "text-green-700" : "text-red-700"}`}>
+        <section className="max-w-7xl mx-auto px-6 pb-6">
+          <Alert
+            variant={message.type === "success" ? "default" : "destructive"}
+            className={`border shadow-sm ${message.type === "success"
+                ? "bg-green-50 border-green-200"
+                : "bg-red-50 border-red-200"
+              }`}
+          >
+            {message.type === "success" ? (
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            ) : (
+              <AlertCircle className="h-4 w-4 text-red-600" />
+            )}
+            <AlertDescription
+              className={`font-medium ${message.type === "success"
+                  ? "text-green-700"
+                  : "text-red-700"
+                }`}
+            >
               {message.text}
             </AlertDescription>
-            <Button variant="ghost" size="sm" onClick={() => setMessage({ type: "", text: "" })} className="ml-auto p-0 h-auto hover:bg-transparent">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMessage({ type: "", text: "" })}
+              className="ml-auto p-0 h-auto hover:bg-transparent"
+            >
               <X size={16} />
             </Button>
           </Alert>
@@ -395,8 +512,8 @@ export default function Credits() {
       )}
 
       {/* ══════════════ TAB BAR ══════════════ */}
-      <section className="max-w-6xl mx-auto px-6 pb-4 pt-2">
-        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
+      <section className="max-w-7xl mx-auto px-6 pb-6">
+        <div className="flex gap-2 bg-white border border-gray-200 p-1.5 w-fit shadow-sm">
           {[
             { key: "packs", label: "Buy Credits", icon: Sparkles },
             { key: "history", label: "History", icon: Clock },
@@ -406,9 +523,9 @@ export default function Credits() {
               key={key}
               variant={activeTab === key ? "default" : "ghost"}
               onClick={() => setActiveTab(key)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === key
-                ? "bg-white text-gray-800 shadow-sm hover:bg-white"
-                : "text-gray-500 hover:text-gray-700 hover:bg-transparent"
+              className={`flex items-center gap-2 px-6 py-2.5 text-sm font-semibold transition-all ${activeTab === key
+                  ? "bg-[#25D366] text-white hover:bg-[#25D366]"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
             >
               <Icon size={16} /> {label}
@@ -421,19 +538,24 @@ export default function Credits() {
             TAB: BUY CREDITS
         ═══════════════════════════════════════════════════ */}
       {activeTab === "packs" && (
-        <section className="max-w-6xl mx-auto px-6 pb-24">
+        <section className="max-w-7xl mx-auto px-6 pb-20">
           {packs.length === 0 && loading ? (
-            <div className="flex justify-center py-20"><Loader2 size={36} className="text-green-600 animate-spin" /></div>
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 size={48} className="text-[#25D366] animate-spin mb-4" />
+              <p className="text-gray-600 font-medium">Loading credit packs...</p>
+            </div>
           ) : packs.length === 0 ? (
-            <Card className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm max-w-md mx-auto">
+            <Card className="bg-white border border-gray-200 shadow-sm max-w-md mx-auto">
               <CardContent className="p-12 text-center">
-                <AlertCircle size={40} className="text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500">No credit packs available right now.</p>
+                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle size={32} className="text-gray-400" />
+                </div>
+                <p className="text-gray-600">No credit packs available right now.</p>
               </CardContent>
             </Card>
           ) : (
             <>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {packs.map((pack) => {
                   const isBestValue = pack.id === "pack_1000";
                   const perCredit = (pack.price / pack.credits).toFixed(2);
@@ -441,53 +563,61 @@ export default function Credits() {
                   return (
                     <Card
                       key={pack.id}
-                      className={`relative bg-white rounded-2xl transition-all duration-300 ${isBestValue
-                        ? "border-4 border-green-600 shadow-xl shadow-green-200 scale-[1.04]"
-                        : "border-2 border-gray-300 hover:border-green-600 hover:shadow-lg"
+                      className={`bg-white transition-all ${isBestValue
+                          ? "border-2 border-[#25D366] shadow-xl shadow-green-100"
+                          : "border border-gray-200 hover:border-[#25D366]/30 hover:shadow-md"
                         }`}
                     >
                       {isBestValue && (
-                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                          <Badge className="inline-flex items-center gap-1.5 px-4 py-1 bg-gradient-to-r from-green-600 to-teal-600 text-white text-xs font-black rounded-full shadow-lg border-0">
-                            <TrendingUp size={13} /> Best Value
-                          </Badge>
+                        <div className="bg-[#25D366] text-white text-center py-2 font-semibold text-sm flex items-center justify-center gap-2">
+                          <TrendingUp size={16} /> Best Value
                         </div>
                       )}
 
-                      <CardHeader className="pb-2 px-6 pt-6">
-                        <div className="flex items-center justify-between">
-                          <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-teal-100 border-2 border-green-300 rounded-xl flex items-center justify-center">
-                            <Zap size={22} className="text-green-600" />
+                      <CardHeader className="pb-3 px-6 pt-6">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="w-12 h-12 bg-green-50 border border-green-200 flex items-center justify-center">
+                            <Zap size={24} className="text-[#25D366]" />
                           </div>
-                          <Badge variant="outline" className="text-xs font-bold text-gray-500 bg-gray-100 border-gray-200">
+                          <Badge variant="outline" className="text-xs font-bold text-gray-600 bg-gray-50 border-gray-200">
                             ₹{perCredit}/credit
                           </Badge>
                         </div>
-                        <CardTitle className="text-3xl font-black text-black mt-3">{pack.credits.toLocaleString("en-IN")}</CardTitle>
-                        <CardDescription className="text-sm text-gray-500">credits</CardDescription>
+                        <CardTitle className="text-3xl font-bold text-gray-900">
+                          {pack.credits.toLocaleString("en-IN")}
+                        </CardTitle>
+                        <CardDescription className="text-sm text-gray-600 font-medium">
+                          credits
+                        </CardDescription>
                       </CardHeader>
 
                       <CardContent className="px-6 pb-6">
-                        <div className="space-y-1.5 mb-5">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Base</span>
-                            <span className="font-semibold text-gray-700">₹{pack.price.toLocaleString("en-IN")}</span>
+                        <div className="space-y-2 mb-5 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Base</span>
+                            <span className="font-semibold text-gray-900">
+                              ₹{pack.price.toLocaleString("en-IN")}
+                            </span>
                           </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">GST 18%</span>
-                            <span className="font-semibold text-gray-700">₹{pack.gstAmount.toLocaleString("en-IN")}</span>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">GST 18%</span>
+                            <span className="font-semibold text-gray-900">
+                              ₹{pack.gstAmount.toLocaleString("en-IN")}
+                            </span>
                           </div>
-                          <div className="border-t-2 border-gray-200 pt-1.5 mt-1.5 flex justify-between text-base">
-                            <span className="font-black text-gray-800">Total</span>
-                            <span className="font-black text-green-600">₹{pack.totalAmount.toLocaleString("en-IN")}</span>
+                          <div className="border-t-2 border-gray-200 pt-2 mt-2 flex justify-between text-base">
+                            <span className="font-bold text-gray-900">Total</span>
+                            <span className="font-bold text-[#25D366]">
+                              ₹{pack.totalAmount.toLocaleString("en-IN")}
+                            </span>
                           </div>
                         </div>
 
                         <Button
                           onClick={() => handlePurchase(pack)}
-                          className={`w-full rounded-xl font-bold text-sm shadow-md transition-all ${isBestValue
-                            ? "bg-green-600 hover:bg-green-700 text-white shadow-green-200"
-                            : "bg-white hover:bg-gray-50 text-black border-2 border-gray-300"
+                          className={`w-full font-bold text-sm shadow-sm transition-all ${isBestValue
+                              ? "bg-[#25D366] hover:bg-[#20BD5A] text-white"
+                              : "bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-300"
                             }`}
                         >
                           <CreditCard size={16} className="mr-2" /> Buy Now
@@ -496,33 +626,45 @@ export default function Credits() {
                     </Card>
                   );
                 })}
+              </div>
 
-                {/* Custom amount card – full width */}
+              {/* Custom amount card */}
+              <div className="mb-10">
                 <CustomAmountCard onBuy={handlePurchase} />
               </div>
 
               {/* ── How Credits Work ── */}
-              <Card className="mt-10 bg-gradient-to-br from-green-50 to-teal-50 border-2 border-green-300 rounded-2xl shadow-none">
-                <CardHeader className="px-8 pt-8 pb-2">
-                  <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
-                    <Sparkles size={18} className="text-green-600" /> How Credits Work
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="px-8 pt-8 pb-4">
+                  <CardTitle className="text-2xl font-bold text-gray-900 text-center">
+                    How Credits Work
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-8 pb-8">
-                  <div className="grid md:grid-cols-3 gap-6">
+                  <div className="grid md:grid-cols-3 gap-8">
                     {[
-                      { icon: Zap, title: "Buy a Pack", desc: "Choose a preset or custom amount, pay via UPI, upload your proof." },
-                      { icon: Clock, title: "Quick Verification", desc: "Our team verifies within 24 hours and adds credits to your balance." },
-                      { icon: ArrowUpRight, title: "Send Campaigns", desc: "Each message sent uses 1 credit. Monitor usage in real-time." },
+                      {
+                        icon: Zap,
+                        title: "Buy a Pack",
+                        desc: "Choose a preset or custom amount, pay via UPI, upload your proof."
+                      },
+                      {
+                        icon: Clock,
+                        title: "Quick Verification",
+                        desc: "Our team verifies within 24 hours and adds credits to your balance."
+                      },
+                      {
+                        icon: ArrowUpRight,
+                        title: "Send Campaigns",
+                        desc: "Each message sent uses 1 credit. Monitor usage in real-time."
+                      },
                     ].map(({ icon: Icon, title, desc }) => (
-                      <div key={title} className="flex gap-3">
-                        <div className="w-10 h-10 bg-white rounded-xl border-2 border-green-200 flex items-center justify-center shadow-sm flex-shrink-0">
-                          <Icon size={18} className="text-green-600" />
+                      <div key={title} className="text-center">
+                        <div className="w-16 h-16 mx-auto bg-green-50 border border-green-200 flex items-center justify-center mb-4 shadow-sm">
+                          <Icon size={28} className="text-[#25D366]" />
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-800 text-sm">{title}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
-                        </div>
+                        <h3 className="font-semibold text-gray-900 text-base mb-2">{title}</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">{desc}</p>
                       </div>
                     ))}
                   </div>
@@ -537,54 +679,88 @@ export default function Credits() {
             TAB: HISTORY
         ═══════════════════════════════════════════════════ */}
       {activeTab === "history" && (
-        <section className="max-w-6xl mx-auto px-6 pb-24">
-          <Card className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm">
-            <CardHeader className="px-6 py-5 border-b-2 border-gray-200">
-              <CardTitle className="text-xl font-bold text-black">Transaction History</CardTitle>
-              <CardDescription className="text-sm text-gray-500">{pagination.total} total transactions</CardDescription>
+        <section className="max-w-7xl mx-auto px-6 pb-20">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardHeader className="px-8 py-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <Clock size={24} className="text-[#25D366]" />
+                    Transaction History
+                  </CardTitle>
+                  <CardDescription className="text-gray-600 mt-1 font-medium">
+                    {pagination.total} total transactions
+                  </CardDescription>
+                </div>
+                <Button
+                  onClick={() => loadHistory(historyPage)}
+                  variant="outline"
+                  className="border border-gray-300 hover:border-[#25D366] font-medium"
+                >
+                  <RefreshCw size={16} className="mr-2" />
+                  Refresh
+                </Button>
+              </div>
             </CardHeader>
 
-            <CardContent className="p-6">
+            <CardContent className="p-8">
               {history.length === 0 ? (
-                <div className="text-center py-14">
-                  <Clock size={38} className="text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500 text-sm">No transactions yet</p>
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <Clock size={40} className="text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 font-medium text-lg mb-2">No transactions yet</p>
+                  <p className="text-gray-500 text-sm">Your transaction history will appear here</p>
                 </div>
               ) : (
                 <>
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto border border-gray-200">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b-2 border-gray-200">
+                        <tr className="bg-gray-50 border-b border-gray-200">
                           {["Type", "Amount", "Balance After", "Note", "Date"].map((h) => (
-                            <th key={h} className="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{h}</th>
+                            <th
+                              key={h}
+                              className="text-left py-4 px-6 text-xs font-bold text-gray-700 uppercase tracking-wider"
+                            >
+                              {h}
+                            </th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="bg-white">
                         {history.map((txn) => {
                           const meta = getTxnMeta(txn.type);
                           const Icon = meta.icon;
                           const isCredit = ["PURCHASE", "PLAN_REFILL", "ADMIN_ADJUST"].includes(txn.type);
 
                           return (
-                            <tr key={txn._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                              <td className="py-3 px-4">
-                                <div className="flex items-center gap-2.5">
-                                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${meta.bg}`}>
-                                    <Icon size={16} className={meta.color} />
+                            <tr
+                              key={txn._id}
+                              className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                            >
+                              <td className="py-4 px-6">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-10 h-10 flex items-center justify-center ${meta.bg}`}>
+                                    <Icon size={18} className={meta.color} />
                                   </div>
-                                  <span className="font-semibold text-gray-800">{meta.label}</span>
+                                  <span className="font-semibold text-gray-900">{meta.label}</span>
                                 </div>
                               </td>
-                              <td className="py-3 px-4">
+                              <td className="py-4 px-6">
                                 <span className={`font-bold ${isCredit ? "text-green-600" : "text-red-500"}`}>
                                   {isCredit ? "+" : "−"}{Math.abs(txn.amount).toLocaleString("en-IN")}
                                 </span>
                               </td>
-                              <td className="py-3 px-4 font-semibold text-gray-800">{txn.balanceAfter?.toLocaleString("en-IN")}</td>
-                              <td className="py-3 px-4 text-gray-500 text-xs max-w-xs truncate">{txn.meta?.note || "—"}</td>
-                              <td className="py-3 px-4 text-gray-400 text-xs whitespace-nowrap">{fmtDate(txn.createdAt)}</td>
+                              <td className="py-4 px-6 font-semibold text-gray-900">
+                                {txn.balanceAfter?.toLocaleString("en-IN")}
+                              </td>
+                              <td className="py-4 px-6 text-gray-600 text-xs max-w-xs truncate">
+                                {txn.meta?.note || "—"}
+                              </td>
+                              <td className="py-4 px-6 text-gray-500 text-xs whitespace-nowrap font-medium">
+                                {fmtDate(txn.createdAt)}
+                              </td>
                             </tr>
                           );
                         })}
@@ -594,20 +770,34 @@ export default function Credits() {
 
                   {/* pagination */}
                   {pagination.totalPages > 1 && (
-                    <div className="flex items-center justify-center gap-3 mt-6">
+                    <div className="flex items-center justify-center gap-4 mt-8">
                       <Button
                         variant="outline"
                         disabled={historyPage <= 1}
-                        onClick={() => { const p = historyPage - 1; setHistoryPage(p); loadHistory(p); }}
-                        className="rounded-xl border-2 border-gray-300 text-gray-700 hover:border-green-600 disabled:opacity-40"
-                      >Previous</Button>
-                      <span className="text-sm text-gray-600 font-semibold">{historyPage} / {pagination.totalPages}</span>
+                        onClick={() => {
+                          const p = historyPage - 1;
+                          setHistoryPage(p);
+                          loadHistory(p);
+                        }}
+                        className="border border-gray-300 text-gray-700 hover:border-[#25D366] disabled:opacity-40 font-medium"
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm text-gray-600 font-semibold">
+                        Page {historyPage} of {pagination.totalPages}
+                      </span>
                       <Button
                         variant="outline"
                         disabled={historyPage >= pagination.totalPages}
-                        onClick={() => { const p = historyPage + 1; setHistoryPage(p); loadHistory(p); }}
-                        className="rounded-xl border-2 border-gray-300 text-gray-700 hover:border-green-600 disabled:opacity-40"
-                      >Next</Button>
+                        onClick={() => {
+                          const p = historyPage + 1;
+                          setHistoryPage(p);
+                          loadHistory(p);
+                        }}
+                        className="border border-gray-300 text-gray-700 hover:border-[#25D366] disabled:opacity-40 font-medium"
+                      >
+                        Next
+                      </Button>
                     </div>
                   )}
                 </>
@@ -621,50 +811,74 @@ export default function Credits() {
             TAB: MY REQUESTS
         ═══════════════════════════════════════════════════ */}
       {activeTab === "requests" && (
-        <section className="max-w-6xl mx-auto px-6 pb-24">
-          <Card className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm">
-            <CardHeader className="px-6 py-5 border-b-2 border-gray-200">
-              <CardTitle className="text-xl font-bold text-black">My Purchase Requests</CardTitle>
-              <CardDescription className="text-sm text-gray-500">Track the status of your UPI payments</CardDescription>
+        <section className="max-w-7xl mx-auto px-6 pb-20">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardHeader className="px-8 py-6 border-b border-gray-200">
+              <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <Shield size={24} className="text-[#25D366]" />
+                My Purchase Requests
+              </CardTitle>
+              <CardDescription className="text-gray-600 mt-1 font-medium">
+                Track the status of your UPI payments
+              </CardDescription>
             </CardHeader>
 
-            <CardContent className="p-6">
+            <CardContent className="p-8">
               {myRequests.length === 0 ? (
-                <div className="text-center py-14">
-                  <Shield size={38} className="text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500 text-sm mb-4">No purchase requests yet</p>
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <Shield size={40} className="text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 font-medium text-lg mb-2">No purchase requests yet</p>
+                  <p className="text-gray-500 text-sm mb-6">Buy credits to see your payment requests here</p>
                   <Button
                     onClick={() => setActiveTab("packs")}
-                    className="bg-green-600 hover:bg-green-700 text-white font-semibold text-sm rounded-xl shadow-md shadow-green-200"
+                    className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold shadow-sm"
                   >
-                    <CreditCard size={15} className="mr-2" /> Buy Credits
+                    <CreditCard size={16} className="mr-2" /> Buy Credits
                   </Button>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto border border-gray-200">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b-2 border-gray-200">
-                        {["Credits", "Amount", "Txn ID", "Status", "Date"].map((h) => (
-                          <th key={h} className="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{h}</th>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        {["Credits", "Amount", "Transaction ID", "Status", "Date"].map((h) => (
+                          <th
+                            key={h}
+                            className="text-left py-4 px-6 text-xs font-bold text-gray-700 uppercase tracking-wider"
+                          >
+                            {h}
+                          </th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="bg-white">
                       {myRequests.map((req) => (
-                        <tr key={req._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 bg-green-50 border border-green-200 rounded-lg flex items-center justify-center">
-                                <Zap size={16} className="text-green-600" />
+                        <tr
+                          key={req._id}
+                          className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-green-50 border border-green-200 flex items-center justify-center">
+                                <Zap size={18} className="text-[#25D366]" />
                               </div>
-                              <span className="font-semibold text-gray-800">{req.packCredits?.toLocaleString("en-IN")} credits</span>
+                              <span className="font-semibold text-gray-900">
+                                {req.packCredits?.toLocaleString("en-IN")} credits
+                              </span>
                             </div>
                           </td>
-                          <td className="py-3 px-4 font-semibold text-gray-800">₹{req.amount?.toLocaleString("en-IN")}</td>
-                          <td className="py-3 px-4 font-mono text-xs text-gray-500">{req.transactionId}</td>
-                          <td className="py-3 px-4">{statusBadge(req.status)}</td>
-                          <td className="py-3 px-4 text-gray-400 text-xs whitespace-nowrap">{fmtDate(req.createdAt)}</td>
+                          <td className="py-4 px-6 font-semibold text-gray-900">
+                            ₹{req.amount?.toLocaleString("en-IN")}
+                          </td>
+                          <td className="py-4 px-6 font-mono text-xs text-gray-600">
+                            {req.transactionId}
+                          </td>
+                          <td className="py-4 px-6">{statusBadge(req.status)}</td>
+                          <td className="py-4 px-6 text-gray-500 text-xs whitespace-nowrap font-medium">
+                            {fmtDate(req.createdAt)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
