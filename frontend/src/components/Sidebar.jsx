@@ -48,7 +48,7 @@ const navItems = [
 ];
 
 // Reusable sidebar content component
-function SidebarContent({ onLinkClick }) {
+function SidebarContent({ onLinkClick, showBranding = false }) {
     const { user } = useAuth();
 
     const visibleItems = navItems.filter((item) => {
@@ -139,22 +139,24 @@ function SidebarContent({ onLinkClick }) {
 
     return (
         <div className="h-full overflow-y-auto scrollbar-hide">
-            {/* App Branding Header - Sticky */}
-            <div className="px-4 pt-6 pb-4 border-b-2 border-gray-200 bg-white sticky top-0 z-10">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center shadow-md border-2 border-green-700">
-                        <Send className="w-5 h-5 text-white" strokeWidth={2.5} />
-                    </div>
-                    <div className="flex flex-col leading-none">
-                        <span className="text-xl font-black tracking-tight text-gray-900">
-                            Bulk<span className="text-green-600">Send</span>
-                        </span>
-                        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
-                            Messaging Platform
-                        </span>
+            {/* App Branding Header - Only visible in mobile sidebar */}
+            {showBranding && (
+                <div className="px-4 pt-6 pb-4 border-b-2 border-gray-200 bg-white sticky top-0 z-10">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center shadow-md border-2 border-green-700">
+                            <Send className="w-5 h-5 text-white" strokeWidth={2.5} />
+                        </div>
+                        <div className="flex flex-col leading-none">
+                            <span className="text-xl font-black tracking-tight text-gray-900">
+                                Bulk<span className="text-green-600">Send</span>
+                            </span>
+                            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
+                                Messaging Platform
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Navigation Sections - Scrollable */}
             <div className="py-6 px-4">
@@ -261,7 +263,7 @@ export function MobileSidebarTrigger() {
                 </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-72 p-0 border-r-2 border-gray-200">
-                <SidebarContent onLinkClick={() => setOpen(false)} />
+                <SidebarContent onLinkClick={() => setOpen(false)} showBranding={true} />
             </SheetContent>
         </Sheet>
     );
@@ -282,7 +284,7 @@ export default function Sidebar() {
 
     return (
         <aside className="hidden lg:flex w-64 bg-white border-r-2 border-gray-200 h-[calc(100vh-64px)] sticky top-16 overflow-hidden">
-            <SidebarContent onLinkClick={() => {}} />
+            <SidebarContent onLinkClick={() => {}} showBranding={false} />
         </aside>
     );
 }

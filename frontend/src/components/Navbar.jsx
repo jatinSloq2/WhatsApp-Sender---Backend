@@ -49,6 +49,7 @@ export default function Navbar() {
 
     // Get user plan info for badge
     const userPlan = user?.subscription?.planId?.name || 'FREE';
+    const isActivePlan = user?.subscription?.isActive || false;
     const isPaidPlan = userPlan !== 'FREE' && user?.subscription?.isActive;
 
     return (
@@ -107,13 +108,14 @@ export default function Navbar() {
                             </TooltipProvider>
 
                             {/* Upgrade CTA - Hidden on medium and smaller screens */}
-                            <Link to="/plans">
-                                <Button className="hidden xl:flex items-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-bold rounded-xl shadow-md shadow-green-200 transition-all">
-                                    <Sparkles className="w-4 h-4" />
-                                    Upgrade to Pro
-                                </Button>
-                            </Link>
-
+                            {userPlan !== 'ENTERPRISE' && userPlan !== 'MASTER' && (
+                                <Link to="/plans">
+                                    <Button className="hidden xl:flex items-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-bold rounded-xl shadow-md shadow-green-200 transition-all">
+                                        <Sparkles className="w-4 h-4" />
+                                        Upgrade to Enterprise
+                                    </Button>
+                                </Link>
+                            )}
                             {/* Vertical separator - Hidden on small screens */}
                             <div className="h-8 w-px bg-gray-200 hidden md:block" />
 
