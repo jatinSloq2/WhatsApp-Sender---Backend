@@ -89,7 +89,6 @@ export const getCreditHistory = async (req, res) => {
 // ═══════════════════════════════════════════════════════
 export const buyCreditPackManual = async (req, res) => {
   const { packId, amount, transactionId, credits: creditsRaw } = req.body;
-
   // ── basic guards ──
   if (!packId) throw new ApiError(400, 'packId is required.');
   if (!amount || !transactionId) throw new ApiError(400, 'Amount and transaction ID are required.');
@@ -102,6 +101,7 @@ export const buyCreditPackManual = async (req, res) => {
     // ── CUSTOM path ──
     const credits = parseInt(creditsRaw, 10);
     if (isNaN(credits) || credits < CUSTOM_MIN || credits > CUSTOM_MAX)
+      console.log(credits)
       throw new ApiError(400, `Credits must be between ${CUSTOM_MIN} and ${CUSTOM_MAX}.`);
 
     resolvedCredits = credits;
@@ -239,4 +239,23 @@ export const verifyCreditPurchase = async (req, res) => {
     message: 'Credit purchase request rejected.',
     data: { requestId: purchaseRequest._id, reason: purchaseRequest.rejectionReason },
   });
+};
+
+// ═══════════════════════════════════════════════════════
+// GET /api/credits/purchase-history   (ADMIN)
+// Get all processed (APPROVED + REJECTED) credit purchase requests
+// ═══════════════════════════════════════════════════════
+export const getCreditPurchaseHistory = async (req, res) => {
+  if (req.user.role !== 'ADMIN')
+    throw new ApiError(403, 'Only admins can view credit purchase history.');
+
+  const requests = await CreditPurchaseRequest.find({
+    status: { $in: ['APPROVED', 'REJECTED'] },
+  })
+    .populate('userId', 'name email')
+    .populate('verifiedBy', 'name email')
+    .sort({ verifiedAt: -1 }) // Most recently verified first
+    .limit(100); // Limit to last 100 requests
+
+  res.json({ success: true, data: requests });
 };

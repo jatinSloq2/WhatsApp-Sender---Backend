@@ -5,40 +5,32 @@ import {
     CheckCircle2,
     CreditCard,
     ExternalLink,
+    History,
     Loader2,
     RefreshCw,
     Search,
     Shield,
     User,
     X,
-    Zap,
+    Zap
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import {
-    Alert,
-} from '../components/ui/alert';
+import { Alert } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import {
-    Card, CardContent,
-} from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-
+import { useAuth } from '../context/AuthContext';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // ═══════════════════════════════════════════════════════════════
-// shadcn-style UI Components
+// Utility Functions
 // ═══════════════════════════════════════════════════════════════
 
 function cn(...classes) {
     return classes.filter(Boolean).join(' ');
 }
-
-// ═══════════════════════════════════════════════════════════════
-// Utility Functions
-// ═══════════════════════════════════════════════════════════════
 
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-IN', {
@@ -65,17 +57,18 @@ const formatPrice = (price) => {
 export default function AdminVerification() {
     const { user } = useAuth();
 
-    const [activeTab, setActiveTab] = useState('payments');
+    const [activeTab, setActiveTab] = useState('payments-pending');
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState({ type: '', text: '' });
 
     // Payment requests state
-    const [paymentRequests, setPaymentRequests] = useState([]);
-    const [selectedPayment, setSelectedPayment] = useState(null);
+    const [pendingPayments, setPendingPayments] = useState([]);
+    const [paymentHistory, setPaymentHistory] = useState([]);
     const [paymentProcessing, setPaymentProcessing] = useState(null);
 
     // Credit requests state
-    const [creditRequests, setCreditRequests] = useState([]);
+    const [pendingCredits, setPendingCredits] = useState([]);
+    const [creditHistory, setCreditHistory] = useState([]);
     const [selectedCredit, setSelectedCredit] = useState(null);
     const [creditProcessing, setCreditProcessing] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
@@ -87,9 +80,9 @@ export default function AdminVerification() {
     const [selectedImage, setSelectedImage] = useState(null);
 
     // ─────────────────────────────────────────────────────────────
-    // Load Payment Requests
+    // Load Payment Requests (Pending)
     // ─────────────────────────────────────────────────────────────
-    const loadPaymentRequests = useCallback(async () => {
+    const loadPendingPayments = useCallback(async () => {
         try {
             setLoading(true);
             const res = await fetch(`${API}/api/plans/pending-payments`, {
@@ -99,7 +92,7 @@ export default function AdminVerification() {
             if (!res.ok) throw new Error('Failed to load payment requests');
 
             const data = await res.json();
-            setPaymentRequests(data.data || []);
+            setPendingPayments(data.data || []);
         } catch (error) {
             setMessage({ type: 'error', text: error.message });
         } finally {
@@ -108,9 +101,30 @@ export default function AdminVerification() {
     }, []);
 
     // ─────────────────────────────────────────────────────────────
-    // Load Credit Requests
+    // Load Payment History (Approved + Rejected)
     // ─────────────────────────────────────────────────────────────
-    const loadCreditRequests = useCallback(async () => {
+    const loadPaymentHistory = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await fetch(`${API}/api/plans/payment-history`, {
+                credentials: 'include',
+            });
+
+            if (!res.ok) throw new Error('Failed to load payment history');
+
+            const data = await res.json();
+            setPaymentHistory(data.data || []);
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // ─────────────────────────────────────────────────────────────
+    // Load Credit Requests (Pending)
+    // ─────────────────────────────────────────────────────────────
+    const loadPendingCredits = useCallback(async () => {
         try {
             setLoading(true);
             const res = await fetch(`${API}/api/credits/pending-purchases`, {
@@ -123,7 +137,31 @@ export default function AdminVerification() {
             }
 
             const data = await res.json();
-            setCreditRequests(data.data || []);
+            setPendingCredits(data.data || []);
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // ─────────────────────────────────────────────────────────────
+    // Load Credit History (Approved + Rejected)
+    // ─────────────────────────────────────────────────────────────
+    const loadCreditHistory = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await fetch(`${API}/api/credits/purchase-history`, {
+                credentials: 'include',
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error?.message || 'Failed to load credit history');
+            }
+
+            const data = await res.json();
+            setCreditHistory(data.data || []);
         } catch (error) {
             setMessage({ type: 'error', text: error.message });
         } finally {
@@ -157,7 +195,7 @@ export default function AdminVerification() {
                     action === 'APPROVE' ? 'Payment approved!' : 'Payment rejected',
             });
 
-            await loadPaymentRequests();
+            await loadPendingPayments();
         } catch (error) {
             setMessage({ type: 'error', text: error.message });
         } finally {
@@ -199,7 +237,7 @@ export default function AdminVerification() {
 
             setSelectedCredit(null);
             setRejectionReason('');
-            await loadCreditRequests();
+            await loadPendingCredits();
         } catch (error) {
             setMessage({ type: 'error', text: error.message });
         } finally {
@@ -211,31 +249,66 @@ export default function AdminVerification() {
     // Load data based on active tab
     // ─────────────────────────────────────────────────────────────
     useEffect(() => {
-        if (activeTab === 'payments') {
-            loadPaymentRequests();
-        } else {
-            loadCreditRequests();
+        switch (activeTab) {
+            case 'payments-pending':
+                loadPendingPayments();
+                break;
+            case 'payments-history':
+                loadPaymentHistory();
+                break;
+            case 'credits-pending':
+                loadPendingCredits();
+                break;
+            case 'credits-history':
+                loadCreditHistory();
+                break;
+            default:
+                break;
         }
-    }, [activeTab, loadPaymentRequests, loadCreditRequests]);
+    }, [activeTab, loadPendingPayments, loadPaymentHistory, loadPendingCredits, loadCreditHistory]);
 
     // ─────────────────────────────────────────────────────────────
     // Filtered requests based on search
     // ─────────────────────────────────────────────────────────────
-    const filteredPayments = paymentRequests.filter(
-        (r) =>
-            searchQuery === '' ||
-            r.userId?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.userId?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.transactionId?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filterRequests = (requests) => {
+        if (!searchQuery) return requests;
+        return requests.filter(
+            (r) =>
+                r.userId?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                r.userId?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                r.transactionId?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    };
 
-    const filteredCredits = creditRequests.filter(
-        (r) =>
-            searchQuery === '' ||
-            r.userId?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.userId?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.transactionId?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredPendingPayments = filterRequests(pendingPayments);
+    const filteredPaymentHistory = filterRequests(paymentHistory);
+    const filteredPendingCredits = filterRequests(pendingCredits);
+    const filteredCreditHistory = filterRequests(creditHistory);
+
+    // ─────────────────────────────────────────────────────────────
+    // Status Badge Component
+    // ─────────────────────────────────────────────────────────────
+    const StatusBadge = ({ status }) => {
+        if (status === 'APPROVED') {
+            return (
+                <Badge className="bg-green-100 text-green-700 border-green-300 font-bold">
+                    <CheckCircle2 size={14} className="mr-1" /> Approved
+                </Badge>
+            );
+        }
+        if (status === 'REJECTED') {
+            return (
+                <Badge className="bg-red-100 text-red-700 border-red-300 font-bold">
+                    <X size={14} className="mr-1" /> Rejected
+                </Badge>
+            );
+        }
+        return (
+            <Badge className="bg-amber-100 text-amber-700 border-amber-300 font-bold">
+                <AlertCircle size={14} className="mr-1" /> Pending
+            </Badge>
+        );
+    };
 
     // ─────────────────────────────────────────────────────────────
     // Access Control
@@ -243,10 +316,10 @@ export default function AdminVerification() {
     if (user?.email !== 'jatinsingh098hp@gmail.com') {
         return (
             <div className="flex-1 flex items-center justify-center p-8">
-                <Card className="max-w-md w-full p-10 text-center">
-                    <AlertCircle size={40} className="text-red-500 mx-auto mb-3" />
-                    <h2 className="text-xl font-bold text-slate-900">Access Denied</h2>
-                    <p className="text-slate-500 text-sm mt-1">
+                <Card className="max-w-md w-full p-10 text-center border-2 border-red-300 rounded-2xl">
+                    <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h2>
+                    <p className="text-slate-600">
                         Only admins can access this page.
                     </p>
                 </Card>
@@ -254,38 +327,52 @@ export default function AdminVerification() {
         );
     }
 
+    const currentRefresh = () => {
+        switch (activeTab) {
+            case 'payments-pending':
+                loadPendingPayments();
+                break;
+            case 'payments-history':
+                loadPaymentHistory();
+                break;
+            case 'credits-pending':
+                loadPendingCredits();
+                break;
+            case 'credits-history':
+                loadCreditHistory();
+                break;
+            default:
+                break;
+        }
+    };
+
     return (
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto bg-gray-50">
             <div className="max-w-7xl mx-auto p-6">
                 {/* ═══════════════════════════════════════════════════════ */}
                 {/* Header */}
                 {/* ═══════════════════════════════════════════════════════ */}
                 <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
-                            <Shield size={24} className="text-white" />
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg border-2 border-green-700">
+                            <Shield size={28} className="text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-black text-slate-900">
+                            <h1 className="text-3xl font-black text-slate-900">
                                 Admin Verification
                             </h1>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-slate-600 font-medium">
                                 Manage pending payment and credit purchase requests
                             </p>
                         </div>
                     </div>
                     <Button
-                    className={"p-2"}
                         variant="outline"
-                        size="md"
-                        onClick={
-                            activeTab === 'payments'
-                                ? loadPaymentRequests
-                                : loadCreditRequests
-                        }
+                        className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 rounded-xl hover:border-green-600 font-semibold"
+                        onClick={currentRefresh}
                         disabled={loading}
                     >
-                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                        <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
                         Refresh
                     </Button>
                 </div>
@@ -295,21 +382,32 @@ export default function AdminVerification() {
                 {/* ═══════════════════════════════════════════════════════ */}
                 {message.text && (
                     <Alert
-                        variant={message.type === 'success' ? 'success' : 'error'}
-                        className="mb-6"
+                        className={`mb-6 rounded-xl border-2 ${message.type === 'success'
+                            ? 'bg-green-50 border-green-300'
+                            : 'bg-red-50 border-red-300'
+                            }`}
                     >
-                        {message.type === 'success' ? (
-                            <CheckCircle2 size={18} />
-                        ) : (
-                            <AlertCircle size={18} />
-                        )}
-                        <span>{message.text}</span>
-                        <button
-                            onClick={() => setMessage({ type: '', text: '' })}
-                            className="ml-auto"
-                        >
-                            <X size={16} />
-                        </button>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                {message.type === 'success' ? (
+                                    <CheckCircle2 size={18} className="text-green-600" />
+                                ) : (
+                                    <AlertCircle size={18} className="text-red-600" />
+                                )}
+                                <span
+                                    className={`font-semibold ${message.type === 'success' ? 'text-green-700' : 'text-red-700'
+                                        }`}
+                                >
+                                    {message.text}
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => setMessage({ type: '', text: '' })}
+                                className="hover:bg-gray-200 rounded-lg p-1 transition-colors"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
                     </Alert>
                 )}
 
@@ -317,31 +415,53 @@ export default function AdminVerification() {
                 {/* Tabs */}
                 {/* ═══════════════════════════════════════════════════════ */}
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList>
-                        <TabsTrigger value="payments">
+                    <TabsList className="mb-6 bg-white border-2 border-gray-200 p-6 rounded-xl">
+                        <TabsTrigger value="payments-pending" className="flex items-center gap-2 p-4">
                             <CreditCard size={16} />
-                            Payment Verification
-                            {paymentRequests.length > 0 && (
-                                <Badge variant="warning" className="ml-2">
-                                    {paymentRequests.length}
+                            Pending Payments
+                            {pendingPayments.length > 0 && (
+                                <Badge className="bg-amber-100 text-amber-700 border-amber-300 ml-1">
+                                    {pendingPayments.length}
                                 </Badge>
                             )}
                         </TabsTrigger>
-                        <TabsTrigger value="credits">
+                        <TabsTrigger value="payments-history" className="flex items-center gap-2 p-4">
+                            <History size={16} />
+                            Payment History
+                        </TabsTrigger>
+                        <TabsTrigger value="credits-pending" className="flex items-center gap-2 p-4">
                             <Zap size={16} />
-                            Credit Verification
-                            {creditRequests.length > 0 && (
-                                <Badge variant="warning" className="ml-2">
-                                    {creditRequests.length}
+                            Pending Credits
+                            {pendingCredits.length > 0 && (
+                                <Badge className="bg-amber-100 text-amber-700 border-amber-300 ml-1">
+                                    {pendingCredits.length}
                                 </Badge>
                             )}
+                        </TabsTrigger>
+                        <TabsTrigger value="credits-history" className="flex items-center gap-2 p-4">
+                            <History size={16} />
+                            Credit History
                         </TabsTrigger>
                     </TabsList>
 
-                    {/* ───────────────────────────────────────────────────── */}
-                    {/* Payment Verification Tab */}
-                    {/* ───────────────────────────────────────────────────── */}
-                    <TabsContent value="payments" activeValue={activeTab}>
+                    {/* Search Bar - shown for all tabs */}
+                    <Card className="mb-6 border-2 border-gray-200 rounded-xl">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-xl">
+                                <Search size={20} className="text-gray-400" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search by name, email, or transaction ID…"
+                                    className="flex-1 bg-transparent text-sm text-slate-900 placeholder-slate-400 focus:outline-none font-medium"
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* PAYMENTS - PENDING TAB */}
+                    <TabsContent value="payments-pending">
                         {/* Stats */}
                         <div className="grid sm:grid-cols-3 gap-4 mb-6">
                             <Card className="p-5">
@@ -351,7 +471,7 @@ export default function AdminVerification() {
                                             Pending
                                         </p>
                                         <p className="text-2xl font-black text-slate-900 mt-1">
-                                            {paymentRequests.length}
+                                            {pendingPayments.length}
                                         </p>
                                     </div>
                                     <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
@@ -367,7 +487,7 @@ export default function AdminVerification() {
                                         </p>
                                         <p className="text-2xl font-black text-slate-900 mt-1">
                                             {formatPrice(
-                                                paymentRequests.reduce(
+                                                pendingPayments.reduce(
                                                     (sum, r) => sum + (r.amount || 0),
                                                     0
                                                 )
@@ -387,7 +507,7 @@ export default function AdminVerification() {
                                         </p>
                                         <p className="text-2xl font-black text-slate-900 mt-1">
                                             {
-                                                new Set(paymentRequests.map((r) => r.userId?._id))
+                                                new Set(pendingPayments.map((r) => r.userId?._id))
                                                     .size
                                             }
                                         </p>
@@ -399,28 +519,12 @@ export default function AdminVerification() {
                             </Card>
                         </div>
 
-                        {/* Search */}
-                        <Card className="mb-6">
-                            <CardContent className="pt-4">
-                                <div className="flex items-center gap-3 px-4 py-2 bg-slate-100 rounded-lg">
-                                    <Search size={18} className="text-slate-400" />
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Search by name, email, or transaction ID…"
-                                        className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 focus:outline-none"
-                                    />
-                                </div>
-                            </CardContent>
-                        </Card>
-
                         {/* Requests List */}
                         {loading ? (
                             <div className="flex justify-center py-12">
                                 <Loader2 size={32} className="text-green-600 animate-spin" />
                             </div>
-                        ) : filteredPayments.length === 0 ? (
+                        ) : filteredPendingPayments.length === 0 ? (
                             <Card className="p-12 text-center">
                                 <CheckCircle2 size={48} className="text-green-400 mx-auto mb-4" />
                                 <h2 className="text-2xl font-bold text-slate-900 mb-2">
@@ -432,7 +536,7 @@ export default function AdminVerification() {
                             </Card>
                         ) : (
                             <div className="grid gap-6">
-                                {filteredPayments.map((request) => (
+                                {filteredPendingPayments.map((request) => (
                                     <Card
                                         key={request._id}
                                         className="p-6 hover:shadow-lg transition-shadow"
@@ -452,10 +556,10 @@ export default function AdminVerification() {
                                                         />
                                                         <div>
                                                             <p className="font-semibold text-slate-900">
-                                                                {request.userId.name}
+                                                                {request.userId?.name || '—'}
                                                             </p>
                                                             <p className="text-slate-600">
-                                                                {request.userId.email}
+                                                                {request.userId?.email || '—'}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -467,14 +571,14 @@ export default function AdminVerification() {
                                                         />
                                                         <div>
                                                             <p className="font-semibold text-slate-900">
-                                                                {request.planId.name} - {request.billingCycle}
+                                                                {request.planId?.name || '—'} - {request.billingCycle || '—'}
                                                             </p>
                                                             <p className="text-green-600 font-bold">
-                                                                {formatPrice(request.amount)}
+                                                                {formatPrice(request.amount || 0)}
                                                             </p>
                                                             <p className="text-xs text-slate-500">
-                                                                Base: {formatPrice(request.baseAmount)} + GST:{' '}
-                                                                {formatPrice(request.gstAmount)}
+                                                                Base: {formatPrice(request.baseAmount || 0)} + GST:{' '}
+                                                                {formatPrice(request.gstAmount || 0)}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -497,7 +601,7 @@ export default function AdminVerification() {
                                                             Transaction ID
                                                         </p>
                                                         <p className="font-mono font-bold text-slate-900 text-sm break-all">
-                                                            {request.transactionId}
+                                                            {request.transactionId || '—'}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -508,26 +612,34 @@ export default function AdminVerification() {
                                                 <h3 className="font-black text-lg text-slate-900 mb-4">
                                                     Payment Proof
                                                 </h3>
-                                                <div
-                                                    onClick={() =>
-                                                        setSelectedImage(
-                                                            `${API}/${request.paymentProof}`
-                                                        )
-                                                    }
-                                                    className="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-200 cursor-pointer hover:border-green-400 transition-colors group"
-                                                >
-                                                    <img
-                                                        src={`${API}/${request.paymentProof}`}
-                                                        alt="Payment proof"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <ExternalLink className="text-white" size={32} />
+                                                {request.paymentProof ? (
+                                                    <>
+                                                        <div
+                                                            onClick={() =>
+                                                                setSelectedImage(
+                                                                    `${API}/${request.paymentProof}`
+                                                                )
+                                                            }
+                                                            className="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-slate-200 cursor-pointer hover:border-green-400 transition-colors group"
+                                                        >
+                                                            <img
+                                                                src={`${API}/${request.paymentProof}`}
+                                                                alt="Payment proof"
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                <ExternalLink className="text-white" size={32} />
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-xs text-center text-slate-500 mt-2 font-medium">
+                                                            Click to view full size
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    <div className="aspect-[3/4] rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center">
+                                                        <p className="text-slate-400 text-sm">No proof uploaded</p>
                                                     </div>
-                                                </div>
-                                                <p className="text-xs text-center text-slate-500 mt-2 font-medium">
-                                                    Click to view full size
-                                                </p>
+                                                )}
                                             </div>
 
                                             {/* Actions */}
@@ -593,10 +705,135 @@ export default function AdminVerification() {
                         )}
                     </TabsContent>
 
-                    {/* ───────────────────────────────────────────────────── */}
-                    {/* Credit Verification Tab */}
-                    {/* ───────────────────────────────────────────────────── */}
-                    <TabsContent value="credits" activeValue={activeTab}>
+                    {/* PAYMENTS - HISTORY TAB */}
+                    <TabsContent value="payments-history">
+                        {loading ? (
+                            <div className="flex justify-center py-20">
+                                <Loader2 size={40} className="text-green-600 animate-spin" />
+                            </div>
+                        ) : filteredPaymentHistory.length === 0 ? (
+                            <Card className="p-16 text-center border-2 border-gray-200 rounded-2xl">
+                                <History size={56} className="text-gray-300 mx-auto mb-4" />
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                                    No Payment History
+                                </h2>
+                                <p className="text-slate-600">
+                                    Processed payment requests will appear here.
+                                </p>
+                            </Card>
+                        ) : (
+                            <div className="space-y-4">
+                                {filteredPaymentHistory.map((request) => (
+                                    <Card
+                                        key={request._id}
+                                        className="p-6 border-2 border-gray-200 rounded-2xl hover:shadow-lg transition-shadow"
+                                    >
+                                        <div className="grid md:grid-cols-4 gap-6">
+                                            {/* User Info */}
+                                            <div>
+                                                <h3 className="font-black text-base text-slate-900 mb-3">
+                                                    User Details
+                                                </h3>
+                                                <div className="space-y-2 text-sm">
+                                                    <div className="flex items-start gap-2">
+                                                        <User size={16} className="text-slate-400 mt-0.5" />
+                                                        <div>
+                                                            <p className="font-semibold text-slate-900">
+                                                                {request.userId?.name || '—'}
+                                                            </p>
+                                                            <p className="text-slate-600 text-xs">
+                                                                {request.userId?.email || '—'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Plan & Amount */}
+                                            <div>
+                                                <h3 className="font-black text-base text-slate-900 mb-3">
+                                                    Plan Details
+                                                </h3>
+                                                <div className="space-y-2 text-sm">
+                                                    <p className="font-bold text-slate-900">
+                                                        {request.planId?.name || '—'} - {request.billingCycle || '—'}
+                                                    </p>
+                                                    <p className="text-green-600 font-bold text-lg">
+                                                        {formatPrice(request.amount || 0)}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500 font-mono">
+                                                        TXN: {request.transactionId || '—'}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Dates & Status */}
+                                            <div>
+                                                <h3 className="font-black text-base text-slate-900 mb-3">
+                                                    Status & Timeline
+                                                </h3>
+                                                <div className="space-y-2 text-sm">
+                                                    <StatusBadge status={request.status} />
+                                                    <div className="flex items-start gap-2">
+                                                        <Calendar size={14} className="text-slate-400 mt-0.5" />
+                                                        <div className="text-xs">
+                                                            <p className="text-slate-500">Submitted</p>
+                                                            <p className="font-semibold text-slate-700">
+                                                                {formatDate(request.createdAt)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    {request.verifiedAt && (
+                                                        <div className="flex items-start gap-2">
+                                                            <Calendar size={14} className="text-slate-400 mt-0.5" />
+                                                            <div className="text-xs">
+                                                                <p className="text-slate-500">Verified</p>
+                                                                <p className="font-semibold text-slate-700">
+                                                                    {formatDate(request.verifiedAt)}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Actions/Reason */}
+                                            <div>
+                                                {request.status === 'REJECTED' && request.rejectionReason && (
+                                                    <>
+                                                        <h3 className="font-black text-base text-slate-900 mb-3">
+                                                            Rejection Reason
+                                                        </h3>
+                                                        <div className="p-3 bg-red-50 border-2 border-red-200 rounded-xl">
+                                                            <p className="text-sm text-red-700 font-medium">
+                                                                {request.rejectionReason}
+                                                            </p>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {request.paymentProof && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="w-full mt-3"
+                                                        onClick={() =>
+                                                            setSelectedImage(`${API}/${request.paymentProof}`)
+                                                        }
+                                                    >
+                                                        <ExternalLink size={14} className="mr-2" />
+                                                        View Proof
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
+                    </TabsContent>
+
+                    {/* CREDITS - PENDING TAB */}
+                    <TabsContent value="credits-pending">
                         {/* Stats */}
                         <div className="grid sm:grid-cols-3 gap-4 mb-6">
                             <Card className="p-5">
@@ -606,7 +843,7 @@ export default function AdminVerification() {
                                             Pending
                                         </p>
                                         <p className="text-2xl font-black text-slate-900 mt-1">
-                                            {creditRequests.length}
+                                            {pendingCredits.length}
                                         </p>
                                     </div>
                                     <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
@@ -622,7 +859,7 @@ export default function AdminVerification() {
                                         </p>
                                         <p className="text-2xl font-black text-slate-900 mt-1">
                                             {formatPrice(
-                                                creditRequests.reduce(
+                                                pendingCredits.reduce(
                                                     (sum, r) => sum + (r.amount || 0),
                                                     0
                                                 )
@@ -641,7 +878,7 @@ export default function AdminVerification() {
                                             Credits Pending
                                         </p>
                                         <p className="text-2xl font-black text-slate-900 mt-1">
-                                            {creditRequests
+                                            {pendingCredits
                                                 .reduce((sum, r) => sum + (r.packCredits || 0), 0)
                                                 .toLocaleString('en-IN')}
                                         </p>
@@ -653,28 +890,12 @@ export default function AdminVerification() {
                             </Card>
                         </div>
 
-                        {/* Search */}
-                        <Card className="mb-6">
-                            <CardContent className="pt-4">
-                                <div className="flex items-center gap-3 px-4 py-2 bg-slate-100 rounded-lg">
-                                    <Search size={18} className="text-slate-400" />
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Search by name, email, or transaction ID…"
-                                        className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 focus:outline-none"
-                                    />
-                                </div>
-                            </CardContent>
-                        </Card>
-
                         {/* Requests List */}
                         {loading ? (
                             <div className="flex justify-center py-12">
                                 <Loader2 size={32} className="text-green-600 animate-spin" />
                             </div>
-                        ) : filteredCredits.length === 0 ? (
+                        ) : filteredPendingCredits.length === 0 ? (
                             <Card className="p-12 text-center">
                                 <CheckCircle2 size={48} className="text-green-400 mx-auto mb-4" />
                                 <h2 className="text-2xl font-bold text-slate-900 mb-2">
@@ -687,7 +908,7 @@ export default function AdminVerification() {
                         ) : (
                             <>
                                 <div className="grid gap-6">
-                                    {filteredCredits.map((request) => (
+                                    {filteredPendingCredits.map((request) => (
                                         <Card
                                             key={request._id}
                                             className={cn(
@@ -727,11 +948,11 @@ export default function AdminVerification() {
                                                                 <p className="font-semibold text-slate-900">
                                                                     {request.packCredits?.toLocaleString(
                                                                         'en-IN'
-                                                                    )}{' '}
+                                                                    ) || '0'}{' '}
                                                                     Credits
                                                                 </p>
                                                                 <p className="text-green-600 font-bold">
-                                                                    {formatPrice(request.amount)}
+                                                                    {formatPrice(request.amount || 0)}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -754,7 +975,7 @@ export default function AdminVerification() {
                                                                 Transaction ID
                                                             </p>
                                                             <p className="font-mono font-bold text-slate-900 text-sm break-all">
-                                                                {request.transactionId}
+                                                                {request.transactionId || '—'}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -866,9 +1087,9 @@ export default function AdminVerification() {
                                             <p className="text-sm font-bold text-red-900 mb-3">
                                                 Rejecting request for{' '}
                                                 <span className="font-black">
-                                                    {selectedCredit.userId?.name}
+                                                    {selectedCredit.userId?.name || 'Unknown User'}
                                                 </span>{' '}
-                                                ({selectedCredit.packCredits?.toLocaleString('en-IN')}{' '}
+                                                ({selectedCredit.packCredits?.toLocaleString('en-IN') || '0'}{' '}
                                                 credits)
                                             </p>
                                             <input
@@ -911,6 +1132,136 @@ export default function AdminVerification() {
                             </>
                         )}
                     </TabsContent>
+
+                    {/* CREDITS - HISTORY TAB */}
+                    <TabsContent value="credits-history">
+                        {loading ? (
+                            <div className="flex justify-center py-20">
+                                <Loader2 size={40} className="text-green-600 animate-spin" />
+                            </div>
+                        ) : filteredCreditHistory.length === 0 ? (
+                            <Card className="p-16 text-center border-2 border-gray-200 rounded-2xl">
+                                <History size={56} className="text-gray-300 mx-auto mb-4" />
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                                    No Credit History
+                                </h2>
+                                <p className="text-slate-600">
+                                    Processed credit requests will appear here.
+                                </p>
+                            </Card>
+                        ) : (
+                            <div className="space-y-4">
+                                {filteredCreditHistory.map((request) => (
+                                    <Card
+                                        key={request._id}
+                                        className="p-6 border-2 border-gray-200 rounded-2xl hover:shadow-lg transition-shadow"
+                                    >
+                                        <div className="grid md:grid-cols-4 gap-6">
+                                            {/* User Info */}
+                                            <div>
+                                                <h3 className="font-black text-base text-slate-900 mb-3">
+                                                    User Details
+                                                </h3>
+                                                <div className="space-y-2 text-sm">
+                                                    <div className="flex items-start gap-2">
+                                                        <User size={16} className="text-slate-400 mt-0.5" />
+                                                        <div>
+                                                            <p className="font-semibold text-slate-900">
+                                                                {request.userId?.name || '—'}
+                                                            </p>
+                                                            <p className="text-slate-600 text-xs">
+                                                                {request.userId?.email || '—'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Credits & Amount */}
+                                            <div>
+                                                <h3 className="font-black text-base text-slate-900 mb-3">
+                                                    Credit Details
+                                                </h3>
+                                                <div className="space-y-2 text-sm">
+                                                    <div className="flex items-center gap-2">
+                                                        <Zap size={16} className="text-green-600" />
+                                                        <p className="font-bold text-slate-900">
+                                                            {request.packCredits?.toLocaleString('en-IN') || '0'} Credits
+                                                        </p>
+                                                    </div>
+                                                    <p className="text-green-600 font-bold text-lg">
+                                                        {formatPrice(request.amount || 0)}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500 font-mono">
+                                                        TXN: {request.transactionId || '—'}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Dates & Status */}
+                                            <div>
+                                                <h3 className="font-black text-base text-slate-900 mb-3">
+                                                    Status & Timeline
+                                                </h3>
+                                                <div className="space-y-2 text-sm">
+                                                    <StatusBadge status={request.status} />
+                                                    <div className="flex items-start gap-2">
+                                                        <Calendar size={14} className="text-slate-400 mt-0.5" />
+                                                        <div className="text-xs">
+                                                            <p className="text-slate-500">Submitted</p>
+                                                            <p className="font-semibold text-slate-700">
+                                                                {formatDate(request.createdAt)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    {request.verifiedAt && (
+                                                        <div className="flex items-start gap-2">
+                                                            <Calendar size={14} className="text-slate-400 mt-0.5" />
+                                                            <div className="text-xs">
+                                                                <p className="text-slate-500">Verified</p>
+                                                                <p className="font-semibold text-slate-700">
+                                                                    {formatDate(request.verifiedAt)}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Actions/Reason */}
+                                            <div>
+                                                {request.status === 'REJECTED' && request.rejectionReason && (
+                                                    <>
+                                                        <h3 className="font-black text-base text-slate-900 mb-3">
+                                                            Rejection Reason
+                                                        </h3>
+                                                        <div className="p-3 bg-red-50 border-2 border-red-200 rounded-xl">
+                                                            <p className="text-sm text-red-700 font-medium">
+                                                                {request.rejectionReason}
+                                                            </p>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {request.paymentProof && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="w-full mt-3"
+                                                        onClick={() =>
+                                                            setSelectedImage(`${API}/${request.paymentProof}`)
+                                                        }
+                                                    >
+                                                        <ExternalLink size={14} className="mr-2" />
+                                                        View Proof
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
+                    </TabsContent>
                 </Tabs>
             </div>
 
@@ -920,12 +1271,12 @@ export default function AdminVerification() {
             {selectedImage && (
                 <div
                     onClick={() => setSelectedImage(null)}
-                    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6"
+                    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6 cursor-pointer"
                 >
-                    <div className="relative max-w-4xl max-h-full">
+                    <div className="relative max-w-5xl max-h-full">
                         <button
                             onClick={() => setSelectedImage(null)}
-                            className="absolute -top-4 -right-4 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl hover:bg-slate-100 transition-colors z-10"
+                            className="absolute -top-4 -right-4 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-2xl hover:bg-gray-100 transition-colors z-10"
                         >
                             <X size={24} />
                         </button>

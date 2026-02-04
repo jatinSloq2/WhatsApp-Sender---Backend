@@ -7,6 +7,7 @@ import {
     buyCreditPackManual,
     getBalance,
     getCreditHistory,
+    getCreditPurchaseHistory,
     getMyPurchaseRequests,
     getPendingCreditPurchases,
     listCreditPacks,
@@ -46,6 +47,7 @@ router.get('/my-purchase-requests', authenticate, getMyPurchaseRequests);
 
 // ── Admin ─────────────────────────────────────────────
 router.get('/pending-purchases', authenticate, getPendingCreditPurchases);
+router.get('/purchase-history', authenticate, getCreditPurchaseHistory);
 router.post('/verify-purchase/:requestId', authenticate, verifyCreditPurchase);
 
 export default router;

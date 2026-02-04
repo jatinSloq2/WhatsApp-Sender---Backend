@@ -307,6 +307,7 @@ export default function Credits() {
             baseAmount: selectedPack.price,
             gstAmount: selectedPack.gstAmount,
             totalAmount: selectedPack.totalAmount,
+            
           }}
           extraPayload={{
             packId: selectedPack.id,

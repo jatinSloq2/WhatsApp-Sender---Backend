@@ -4,6 +4,7 @@ import path from 'path';
 import {
     cancelSubscription,
     getMyPaymentRequests,
+    getPaymentHistory,
     getPendingPayments,
     getPlan, listPlans,
     subscribeManual,
@@ -51,6 +52,7 @@ router.get('/my-payment-requests', authenticate, getMyPaymentRequests);
 
 // ─── Admin routes (require admin role) ────────────────
 router.get('/pending-payments', authenticate, requireAdmin, getPendingPayments);
+router.get('/payment-history', authenticate, getPaymentHistory);
 router.post('/verify-payment/:requestId', authenticate, requireAdmin, verifyPayment);
 
 // ── Public (anyone can browse plans) ──────────────────

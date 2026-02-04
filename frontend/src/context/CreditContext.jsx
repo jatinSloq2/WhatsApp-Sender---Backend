@@ -70,14 +70,15 @@ export const CreditsProvider = ({ children }) => {
 
   // ─── Submit UPI payment proof for a credit pack ──
   const submitCreditProof = useCallback(
-    async ({ packId, amount, transactionId, paymentProof }) => {
-      if (!packId || !amount || !transactionId || !paymentProof)
-        throw new Error('packId, amount, transactionId, and paymentProof are required');
+    async ({ packId, amount, transactionId, paymentProof, credits }) => {
+      if (!packId || !amount || !transactionId || !paymentProof || !credits)
+        throw new Error('packId, amount, transactionId, paymentProof, and credits are required');
 
       setLoading(true);
       try {
         const formData = new FormData();
         formData.append('packId', packId);
+        formData.append('credits', credits);
         formData.append('amount', amount.toString());
         formData.append('transactionId', transactionId);
         formData.append('paymentProof', paymentProof);

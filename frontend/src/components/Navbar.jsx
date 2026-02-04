@@ -108,7 +108,7 @@ export default function Navbar() {
                             </TooltipProvider>
 
                             {/* Upgrade CTA - Hidden on medium and smaller screens */}
-                            {userPlan !== 'ENTERPRISE' && userPlan !== 'MASTER' && (
+                            {userPlan !== 'ENTERPRISE' && userPlan !== 'MASTER' && isActivePlan && (
                                 <Link to="/plans">
                                     <Button className="hidden xl:flex items-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-bold rounded-xl shadow-md shadow-green-200 transition-all">
                                         <Sparkles className="w-4 h-4" />

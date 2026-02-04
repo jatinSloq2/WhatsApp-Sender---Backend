@@ -410,3 +410,23 @@ export const getMyPaymentRequests = async (req, res) => {
         data: requests,
     });
 };
+
+export const getPaymentHistory = async (req, res) => {
+    if (req.user.role !== 'ADMIN') {
+        throw new ApiError(403, 'Only admins can view payment history.');
+    }
+
+    const requests = await PaymentRequest.find({
+        status: { $in: ['APPROVED', 'REJECTED'] },
+    })
+        .populate('userId', 'name email')
+        .populate('planId', 'name billingCycle price')
+        .populate('verifiedBy', 'name email')
+        .sort({ verifiedAt: -1 }) // Most recently verified first
+        .limit(100); // Limit to last 100 requests
+
+    res.json({
+        success: true,
+        data: requests,
+    });
+};
