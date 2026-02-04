@@ -66,8 +66,12 @@ export default function Navbar() {
                         to={user ? '/dashboard' : '/'}
                         className="flex items-center gap-3 group flex-shrink-0"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-[#25D366] flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
-                            <MessageSquare className="w-6 h-6 text-white" strokeWidth={2.5} />
+                        <div className="w-14 h-14 rounded-xl flex items-center justify-center ">
+                            <img
+                                src="/logofinal.png" // replace with your logo file path
+                                alt="WhatsBot Logo"
+                                className="w-full h-full object-contain"
+                            />
                         </div>
 
                         <div className="flex flex-col leading-none">

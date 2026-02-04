@@ -105,11 +105,10 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
                                     {({ isActive }) => (
                                         <>
                                             <div
-                                                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
-                                                    isActive
+                                                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${isActive
                                                         ? 'bg-white border border-green-200 shadow-sm'
                                                         : 'bg-gray-100 border border-gray-200 group-hover:bg-white'
-                                                }`}
+                                                    }`}
                                             >
                                                 <Icon
                                                     size={18}
@@ -154,9 +153,14 @@ function SidebarContent({ onLinkClick, showBranding = false }) {
             {showBranding && (
                 <div className="px-4 pt-6 pb-4 border-b border-gray-200 bg-white sticky top-0 z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#25D366] flex items-center justify-center shadow-sm">
-                            <MessageSquare className="w-5 h-5 text-white" strokeWidth={2.5} />
+                        <div className="w-14 h-14 rounded-xl flex items-center justify-center ">
+                            <img
+                                src="/logofinal.png" // replace with your logo file path
+                                alt="WhatsBot Logo"
+                                className="w-full h-full object-contain"
+                            />
                         </div>
+
                         <div className="flex flex-col leading-none">
                             <span className="text-xl font-bold tracking-tight text-gray-900">
                                 WhatsBot
@@ -295,7 +299,7 @@ export default function Sidebar() {
 
     return (
         <aside className="hidden lg:flex w-64 bg-white border-r border-gray-200 h-[calc(100vh-64px)] sticky top-16 overflow-hidden">
-            <SidebarContent onLinkClick={() => {}} showBranding={false} />
+            <SidebarContent onLinkClick={() => { }} showBranding={false} />
         </aside>
     );
 }
