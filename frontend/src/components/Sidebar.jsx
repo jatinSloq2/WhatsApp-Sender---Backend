@@ -21,6 +21,7 @@ import {
     Shield,
     Sparkles,
     User,
+    Users,
     Zap,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -42,6 +43,13 @@ const navItems = [
         to: '/admin/verification',
         label: 'Payment Verification',
         icon: Shield,
+        adminOnly: true,
+        category: 'admin',
+    },
+    {
+        to: '/admin/users',
+        label: 'User Management',
+        icon: Users,
         adminOnly: true,
         category: 'admin',
     },

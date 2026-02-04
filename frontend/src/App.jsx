@@ -22,6 +22,7 @@ import Profile from './pages/Profile';
 import ResetPassword from './pages/Resetpassword';
 import Settings from './pages/Settings';
 import VerifyOTP from './pages/VerifyOtp';
+import AdminUserManagement from './pages/AdminUserManagement';
 
 export default function App() {
   return (
@@ -85,6 +86,14 @@ export default function App() {
               element={
                 <AdminRoute>
                   <AdminVerification />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <AdminRoute>
+                  <AdminUserManagement />
                 </AdminRoute>
               }
             />

@@ -16,6 +16,7 @@ import authRoutes from './routes/auth.routes.js';
 import creditRoutes from './routes/credits.routes.js';
 import planRoutes from './routes/plans.routes.js';
 import userRoutes from './routes/user.routes.js';
+import adminRoutes from './routes/adminUser.routes.js';
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/plans', planRoutes);
 app.use('/api/credits', creditRoutes);
+app.use('/api/admin', adminRoutes);
 
 // ─── Error Handler ───────────────────────────────────
 app.use(errorHandler);
