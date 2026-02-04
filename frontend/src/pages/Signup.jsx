@@ -1,4 +1,4 @@
-import { Loader2, Lock, Mail, MessageSquare, Send, ShieldCheck, User, Zap } from "lucide-react";
+import { CheckCircle2, Loader2, Lock, Mail, MessageSquare, Shield, User, Zap } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 
 export default function Signup() {
     const { register } = useAuth();
@@ -49,66 +48,61 @@ export default function Signup() {
 
     return (
         <div className="min-h-[calc(100vh-64px)] grid lg:grid-cols-2">
-            {/* ═══ LEFT BRANDING PANEL ═══ */}
-            <div className="hidden lg:flex flex-col justify-center px-16 bg-gradient-to-br from-green-600 to-teal-600 text-white relative overflow-hidden">
-                {/* Decorative circles */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-
-                <div className="relative z-10">
-                    <div className="mb-8">
-                        <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-                            <Zap className="w-4 h-4" />
-                            <span className="text-sm font-semibold">Join 5,000+ businesses</span>
+            {/* ═══ LEFT PANEL ═══ */}
+            <div className="hidden lg:flex flex-col justify-center px-16 bg-[#25D366] text-white relative">
+                <div className="max-w-md">
+                    {/* Logo */}
+                    <div className="flex items-center gap-3 mb-12">
+                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+                            <MessageSquare className="w-7 h-7 text-[#25D366]" strokeWidth={2.5} />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-2xl font-bold tracking-tight">WhatsBot</span>
+                            <span className="text-xs text-white/80 font-medium">WhatsApp Business Platform</span>
                         </div>
                     </div>
 
-                    <h1 className="text-5xl font-black leading-tight mb-6">
-                        Start Messaging
-                        <br />
-                        at Scale Today
+                    <h1 className="text-4xl font-bold mb-4 leading-tight">
+                        Start messaging at scale today
                     </h1>
-                    <p className="text-green-100 text-lg max-w-md mb-12 leading-relaxed">
-                        Create your free account and launch bulk WhatsApp campaigns or AI chatbots in minutes.
-                        No credit card required.
+                    
+                    <p className="text-white/90 text-lg mb-12 leading-relaxed">
+                        Join thousands of businesses using WhatsBot to automate customer conversations and send bulk messages.
                     </p>
 
-                    {/* Feature highlights */}
-                    <div className="space-y-6">
-                        <Feature
-                            icon={Send}
-                            title="Instant Setup"
-                            desc="Create account and start sending in under 5 minutes"
-                        />
+                    {/* Features */}
+                    <div className="space-y-4">
                         <Feature
                             icon={Zap}
-                            title="50 Free Credits"
-                            desc="Test the platform with 50 complimentary credits"
+                            title="Quick Setup"
+                            desc="Get started in under 5 minutes with our simple onboarding"
                         />
                         <Feature
                             icon={MessageSquare}
-                            title="AI Chatbots Included"
-                            desc="Build automated conversation flows with ease"
+                            title="50 Free Credits"
+                            desc="Test all features with complimentary credits on signup"
                         />
                         <Feature
-                            icon={ShieldCheck}
+                            icon={Shield}
                             title="Enterprise Security"
-                            desc="Bank-level encryption and OTP authentication"
+                            desc="Bank-level encryption and OTP authentication included"
                         />
                     </div>
 
-                    {/* Trust section */}
+                    {/* Stats */}
                     <div className="mt-12 pt-8 border-t border-white/20">
-                        <p className="text-green-100 text-sm font-semibold mb-4">Trusted by companies like:</p>
-                        <div className="flex flex-wrap gap-4">
-                            <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg text-sm font-bold">
-                                TechCorp
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <div className="text-2xl font-bold">5,000+</div>
+                                <div className="text-xs text-white/80">Active Users</div>
                             </div>
-                            <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg text-sm font-bold">
-                                E-Shop
+                            <div>
+                                <div className="text-2xl font-bold">10M+</div>
+                                <div className="text-xs text-white/80">Messages Sent</div>
                             </div>
-                            <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg text-sm font-bold">
-                                StartupHub
+                            <div>
+                                <div className="text-2xl font-bold">99.9%</div>
+                                <div className="text-xs text-white/80">Uptime</div>
                             </div>
                         </div>
                     </div>
@@ -117,14 +111,19 @@ export default function Signup() {
 
             {/* ═══ RIGHT SIGNUP FORM ═══ */}
             <div className="flex items-center justify-center px-6 py-12 bg-gray-50">
-                <Card className="w-full max-w-md rounded-2xl shadow-xl border-2 border-gray-300">
-                    <CardHeader className="text-center space-y-2 pb-6">
-                        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-100 to-teal-100 rounded-2xl border-2 border-green-300 flex items-center justify-center mb-4">
-                            <Zap className="w-8 h-8 text-green-600" />
+                <Card className="w-full max-w-md bg-white shadow-sm border border-gray-200">
+                    <CardHeader className="text-center pb-6">
+                        {/* Mobile Logo */}
+                        <div className="lg:hidden flex items-center justify-center gap-2 mb-6">
+                            <div className="w-10 h-10 bg-[#25D366] rounded-xl flex items-center justify-center">
+                                <MessageSquare className="w-6 h-6 text-white" strokeWidth={2.5} />
+                            </div>
+                            <span className="text-xl font-bold">WhatsBot</span>
                         </div>
-                        <CardTitle className="text-3xl font-black text-black">Create Account</CardTitle>
-                        <CardDescription className="text-base text-gray-600">
-                            Start sending bulk campaigns for free
+
+                        <CardTitle className="text-2xl font-bold text-gray-900">Create your account</CardTitle>
+                        <CardDescription className="text-gray-600">
+                            Start automating your WhatsApp messaging for free
                         </CardDescription>
                     </CardHeader>
 
@@ -132,30 +131,30 @@ export default function Signup() {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Name Input */}
                             <div className="space-y-2">
-                                <Label htmlFor="name" className="text-sm font-bold text-black">
+                                <Label htmlFor="name" className="text-sm font-medium text-gray-900">
                                     Full Name
                                 </Label>
                                 <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                     <Input
                                         id="name"
                                         type="text"
-                                        placeholder="Jatin Mehta"
+                                        placeholder="Your full name"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         required
-                                        className="pl-11 py-3 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:ring-2 focus:ring-green-200 transition-all"
+                                        className="pl-10 h-11 border-gray-300 focus:border-[#25D366] focus:ring-[#25D366]"
                                     />
                                 </div>
                             </div>
 
                             {/* Email Input */}
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-sm font-bold text-black">
+                                <Label htmlFor="email" className="text-sm font-medium text-gray-900">
                                     Email Address
                                 </Label>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                     <Input
                                         id="email"
                                         type="email"
@@ -163,18 +162,18 @@ export default function Signup() {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
-                                        className="pl-11 py-3 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:ring-2 focus:ring-green-200 transition-all"
+                                        className="pl-10 h-11 border-gray-300 focus:border-[#25D366] focus:ring-[#25D366]"
                                     />
                                 </div>
                             </div>
 
                             {/* Password Input */}
                             <div className="space-y-2">
-                                <Label htmlFor="password" className="text-sm font-bold text-black">
+                                <Label htmlFor="password" className="text-sm font-medium text-gray-900">
                                     Password
                                 </Label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                     <Input
                                         id="password"
                                         type="password"
@@ -183,18 +182,18 @@ export default function Signup() {
                                         onChange={(e) => setPassword(e.target.value)}
                                         minLength={8}
                                         required
-                                        className="pl-11 py-3 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:ring-2 focus:ring-green-200 transition-all"
+                                        className="pl-10 h-11 border-gray-300 focus:border-[#25D366] focus:ring-[#25D366]"
                                     />
                                 </div>
                             </div>
 
                             {/* Confirm Password Input */}
                             <div className="space-y-2">
-                                <Label htmlFor="confirmPassword" className="text-sm font-bold text-black">
+                                <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-900">
                                     Confirm Password
                                 </Label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                     <Input
                                         id="confirmPassword"
                                         type="password"
@@ -202,15 +201,15 @@ export default function Signup() {
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         required
-                                        className="pl-11 py-3 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:ring-2 focus:ring-green-200 transition-all"
+                                        className="pl-10 h-11 border-gray-300 focus:border-[#25D366] focus:ring-[#25D366]"
                                     />
                                 </div>
                             </div>
 
                             {/* Error Alert */}
                             {error && (
-                                <Alert className="bg-red-50 border-2 border-red-300 rounded-xl">
-                                    <AlertDescription className="text-sm font-medium text-red-700">
+                                <Alert className="bg-red-50 border-red-200">
+                                    <AlertDescription className="text-sm text-red-800">
                                         {error}
                                     </AlertDescription>
                                 </Alert>
@@ -220,7 +219,7 @@ export default function Signup() {
                             <Button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white font-medium h-11 shadow-sm"
                             >
                                 {loading ? (
                                     <>
@@ -228,39 +227,35 @@ export default function Signup() {
                                         Creating account...
                                     </>
                                 ) : (
-                                    <>
-                                        <Zap className="w-5 h-5 mr-2" />
-                                        Create Free Account
-                                    </>
+                                    "Create Account"
                                 )}
                             </Button>
 
                             {/* Terms notice */}
-                            <p className="text-xs text-center text-gray-600 leading-relaxed">
+                            <p className="text-xs text-center text-gray-500">
                                 By creating an account, you agree to our{" "}
-                                <a href="#" className="text-green-600 hover:text-green-700 font-semibold">
+                                <a href="#" className="text-[#25D366] hover:text-[#20BD5A] font-medium">
                                     Terms of Service
                                 </a>{" "}
                                 and{" "}
-                                <a href="#" className="text-green-600 hover:text-green-700 font-semibold">
+                                <a href="#" className="text-[#25D366] hover:text-[#20BD5A] font-medium">
                                     Privacy Policy
                                 </a>
                             </p>
                         </form>
 
-                        {/* Divider */}
-                        <Separator className="my-8" />
-
                         {/* Sign in link */}
-                        <p className="text-center text-sm text-gray-600">
-                            Already have an account?{" "}
-                            <Link
-                                to="/login"
-                                className="font-bold text-green-600 hover:text-green-700 transition-colors"
-                            >
-                                Sign in instead
-                            </Link>
-                        </p>
+                        <div className="mt-6 pt-6 border-t border-gray-200">
+                            <p className="text-center text-sm text-gray-600">
+                                Already have an account?{" "}
+                                <Link
+                                    to="/login"
+                                    className="font-medium text-[#25D366] hover:text-[#20BD5A]"
+                                >
+                                    Sign in
+                                </Link>
+                            </p>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
@@ -270,13 +265,13 @@ export default function Signup() {
 
 function Feature({ icon: Icon, title, desc }) {
     return (
-        <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center flex-shrink-0">
-                <Icon className="w-6 h-6 text-white" />
+        <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+                <Icon className="w-5 h-5 text-white" />
             </div>
             <div>
-                <h3 className="font-bold text-white text-lg mb-1">{title}</h3>
-                <p className="text-sm text-green-100 leading-relaxed">{desc}</p>
+                <h3 className="font-semibold text-white mb-0.5">{title}</h3>
+                <p className="text-sm text-white/80">{desc}</p>
             </div>
         </div>
     );
