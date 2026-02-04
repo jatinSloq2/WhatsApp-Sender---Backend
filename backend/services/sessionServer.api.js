@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:4000";
+const BASE_URL = "http://localhost:4000/sessions";
 
 export const createRemoteSession = (sessionId) => {
   return axios.post(`${BASE_URL}/create`, { id: sessionId });

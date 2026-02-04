@@ -4,10 +4,13 @@ import {
     deleteSession,
     getSessionStatus,
     listAllSessions,
+    listUserSessions,
     reconnectSession
 } from "../controllers/session.controller.js";
+import { authenticate } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
+router.use(authenticate)
 
 router.post("/", createSession);                 // create session
 router.delete("/:sessionId", deleteSession);     // delete session
