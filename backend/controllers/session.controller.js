@@ -1,12 +1,144 @@
 import WhatsappSession from "../models/Session.model.js";
 import User from "../models/user.model.js";
-import { plans } from "../scripts/seedPlan.js";
 import {
     createRemoteSession,
     deleteRemoteSession,
     getRemoteSessionStatus,
     retryRemoteSession
 } from "../services/sessionServer.api.js";
+
+const plans = [
+    // ─── FREE ───────────────────────────────────────────
+    {
+        name: 'FREE',
+        billingCycle: 'MONTHLY',
+        price: 0,
+        creditsIncluded: 500,
+        maxCampaignsPerMonth: 20,
+        maxRecipientsPerCampaign: 1000,
+        maxActiveSessions: 1, // ✅ new field
+        features: {
+            analyticsAccess: false,
+            prioritySupport: false,
+            customTemplates: false,
+            apiAccess: false,
+        },
+    },
+
+    // ─── STARTER ────────────────────────────────────────
+    {
+        name: 'STARTER',
+        billingCycle: 'MONTHLY',
+        price: 49,
+        creditsIncluded: 5000,
+        maxCampaignsPerMonth: 100,
+        maxRecipientsPerCampaign: 10000,
+        maxActiveSessions: 3,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: false,
+            customTemplates: false,
+            apiAccess: false,
+        },
+    },
+    {
+        name: 'STARTER',
+        billingCycle: 'YEARLY',
+        price: 290,
+        creditsIncluded: 60000,
+        maxCampaignsPerMonth: 100,
+        maxRecipientsPerCampaign: 10000,
+        maxActiveSessions: 3,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: false,
+            customTemplates: false,
+            apiAccess: false,
+        },
+    },
+
+    // ─── PRO ────────────────────────────────────────────
+    {
+        name: 'PRO',
+        billingCycle: 'MONTHLY',
+        price: 99,
+        creditsIncluded: 20000,
+        maxCampaignsPerMonth: 500,
+        maxRecipientsPerCampaign: 50000,
+        maxActiveSessions: 5,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: false,
+        },
+    },
+    {
+        name: 'PRO',
+        billingCycle: 'YEARLY',
+        price: 990,
+        creditsIncluded: 240000,
+        maxCampaignsPerMonth: 500,
+        maxRecipientsPerCampaign: 50000,
+        maxActiveSessions: 5,
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: false,
+        },
+    },
+
+    // ─── ENTERPRISE ─────────────────────────────────────
+    {
+        name: 'ENTERPRISE',
+        billingCycle: 'MONTHLY',
+        price: 249,
+        creditsIncluded: 100000,
+        maxCampaignsPerMonth: 2000,
+        maxRecipientsPerCampaign: 500000,
+        maxActiveSessions: null, // unlimited
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: true,
+        },
+    },
+    {
+        name: 'ENTERPRISE',
+        billingCycle: 'YEARLY',
+        price: 2490,
+        creditsIncluded: 1200000,
+        maxCampaignsPerMonth: 2000,
+        maxRecipientsPerCampaign: 500000,
+        maxActiveSessions: null, // unlimited
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: true,
+        },
+    },
+
+    // ─── MASTER (internal — admin only) ─────────────────
+    {
+        name: 'MASTER',
+        billingCycle: 'LIFETIME',
+        price: 0,
+        creditsIncluded: null,
+        maxCampaignsPerMonth: null,
+        maxRecipientsPerCampaign: null,
+        maxActiveSessions: null, // unlimited
+        features: {
+            analyticsAccess: true,
+            prioritySupport: true,
+            customTemplates: true,
+            apiAccess: true,
+        },
+        isInternal: true,
+    },
+];
 
 /**
  * CREATE SESSION
