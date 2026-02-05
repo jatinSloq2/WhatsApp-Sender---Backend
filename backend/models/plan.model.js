@@ -35,6 +35,12 @@ const planSchema = new mongoose.Schema(
             min: 0,
         },
 
+        maxActiveSessions: {
+            type: Number,
+            default: null,        // null = unlimited
+            min: 0,
+        },
+
         features: {
             analyticsAccess: { type: Boolean, default: false },
             prioritySupport: { type: Boolean, default: false },

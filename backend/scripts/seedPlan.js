@@ -148,47 +148,73 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Connected to MongoDB.\n');
 
-        // ── 1. Seed plans ───────────────────────────────
-        await Plan.deleteMany({});
-        const insertedPlans = await Plan.insertMany(plans);
-        console.log(`✓ Seeded ${insertedPlans.length} plans:`);
-        insertedPlans.forEach((p) =>
-            console.log(`    • ${p.name} (${p.billingCycle}) — ${p.price}/period` +
-                (p.isInternal ? '  [INTERNAL]' : ''))
-        );
+        // ── 1. Upsert plans (by name + billingCycle) ─────
+        for (const plan of plans) {
+            await Plan.updateOne(
+                {
+                    name: plan.name,
+                    billingCycle: plan.billingCycle,
+                },
+                {
+                    $set: {
+                        price: plan.price,
+                        creditsIncluded: plan.creditsIncluded ?? null,
+                        maxCampaignsPerMonth: plan.maxCampaignsPerMonth ?? null,
+                        maxRecipientsPerCampaign: plan.maxRecipientsPerCampaign ?? null,
+                        maxActiveSessions: plan.maxActiveSessions ?? null,
+                        features: plan.features,
+                        isInternal: plan.isInternal ?? false,
+                        isActive: true,
+                    },
+                },
+                { upsert: true }
+            );
+        }
 
-        // ── 2. Seed admin user ──────────────────────────
-        const masterPlan = insertedPlans.find((p) => p.name === 'MASTER');
+        console.log(`✓ Plans upserted (${plans.length})`);
 
-        // Remove existing admin so the seed is idempotent
-        await User.deleteOne({ email: ADMIN_EMAIL });
-
-        // Pass plain password — the pre('save') hook hashes it automatically
-        const admin = await User.create({
-            name: ADMIN_NAME,
-            email: ADMIN_EMAIL,
-            password: ADMIN_PASSWORD,
-            role: 'ADMIN',
-            isVerified: true,
-            subscription: {
-                planId: masterPlan._id,
-                billingCycle: 'LIFETIME',
-                startedAt: new Date(),
-                expiresAt: null,         // never expires
-                isActive: true,
-            },
-            credits: {
-                balance: 0,            // irrelevant — hasUnlimitedAccess() bypasses balance checks
-                lastRefilled: new Date(),
-            },
+        // ── 2. Fetch MASTER plan safely ──────────────────
+        const masterPlan = await Plan.findOne({
+            name: 'MASTER',
+            billingCycle: 'LIFETIME',
         });
 
-        console.log(`\n✓ Admin user seeded:`);
+        if (!masterPlan) {
+            throw new Error('MASTER plan not found after seeding');
+        }
+
+        // ── 3. Upsert admin user ─────────────────────────
+        const admin = await User.findOneAndUpdate(
+            { email: ADMIN_EMAIL },
+            {
+                $set: {
+                    name: ADMIN_NAME,
+                    password: ADMIN_PASSWORD, // hashed via pre-save if changed
+                    role: 'ADMIN',
+                    isVerified: true,
+                    subscription: {
+                        planId: masterPlan._id,
+                        billingCycle: 'LIFETIME',
+                        startedAt: new Date(),
+                        expiresAt: null,
+                        isActive: true,
+                    },
+                    credits: {
+                        balance: 0,
+                        lastRefilled: new Date(),
+                    },
+                },
+            },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+
+        console.log(`\n✓ Admin user ready:`);
         console.log(`    • Name  : ${admin.name}`);
         console.log(`    • Email : ${admin.email}`);
         console.log(`    • Role  : ${admin.role}`);
         console.log(`    • Plan  : MASTER (LIFETIME)`);
-        console.log(`\n  ⚡ Change ADMIN_EMAIL / ADMIN_PASSWORD in .env before deploying!\n`);
+
+        console.log(`\n⚡ Safe to re-run. No data loss.\n`);
 
         await mongoose.disconnect();
     } catch (err) {

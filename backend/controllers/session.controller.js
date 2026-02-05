@@ -1,3 +1,4 @@
+import Plan from "../models/plan.model.js";
 import WhatsappSession from "../models/Session.model.js";
 import User from "../models/user.model.js";
 import {
@@ -6,139 +7,6 @@ import {
     getRemoteSessionStatus,
     retryRemoteSession
 } from "../services/sessionServer.api.js";
-
-const plans = [
-    // ─── FREE ───────────────────────────────────────────
-    {
-        name: 'FREE',
-        billingCycle: 'MONTHLY',
-        price: 0,
-        creditsIncluded: 500,
-        maxCampaignsPerMonth: 20,
-        maxRecipientsPerCampaign: 1000,
-        maxActiveSessions: 1, // ✅ new field
-        features: {
-            analyticsAccess: false,
-            prioritySupport: false,
-            customTemplates: false,
-            apiAccess: false,
-        },
-    },
-
-    // ─── STARTER ────────────────────────────────────────
-    {
-        name: 'STARTER',
-        billingCycle: 'MONTHLY',
-        price: 49,
-        creditsIncluded: 5000,
-        maxCampaignsPerMonth: 100,
-        maxRecipientsPerCampaign: 10000,
-        maxActiveSessions: 3,
-        features: {
-            analyticsAccess: true,
-            prioritySupport: false,
-            customTemplates: false,
-            apiAccess: false,
-        },
-    },
-    {
-        name: 'STARTER',
-        billingCycle: 'YEARLY',
-        price: 290,
-        creditsIncluded: 60000,
-        maxCampaignsPerMonth: 100,
-        maxRecipientsPerCampaign: 10000,
-        maxActiveSessions: 3,
-        features: {
-            analyticsAccess: true,
-            prioritySupport: false,
-            customTemplates: false,
-            apiAccess: false,
-        },
-    },
-
-    // ─── PRO ────────────────────────────────────────────
-    {
-        name: 'PRO',
-        billingCycle: 'MONTHLY',
-        price: 99,
-        creditsIncluded: 20000,
-        maxCampaignsPerMonth: 500,
-        maxRecipientsPerCampaign: 50000,
-        maxActiveSessions: 5,
-        features: {
-            analyticsAccess: true,
-            prioritySupport: true,
-            customTemplates: true,
-            apiAccess: false,
-        },
-    },
-    {
-        name: 'PRO',
-        billingCycle: 'YEARLY',
-        price: 990,
-        creditsIncluded: 240000,
-        maxCampaignsPerMonth: 500,
-        maxRecipientsPerCampaign: 50000,
-        maxActiveSessions: 5,
-        features: {
-            analyticsAccess: true,
-            prioritySupport: true,
-            customTemplates: true,
-            apiAccess: false,
-        },
-    },
-
-    // ─── ENTERPRISE ─────────────────────────────────────
-    {
-        name: 'ENTERPRISE',
-        billingCycle: 'MONTHLY',
-        price: 249,
-        creditsIncluded: 100000,
-        maxCampaignsPerMonth: 2000,
-        maxRecipientsPerCampaign: 500000,
-        maxActiveSessions: null, // unlimited
-        features: {
-            analyticsAccess: true,
-            prioritySupport: true,
-            customTemplates: true,
-            apiAccess: true,
-        },
-    },
-    {
-        name: 'ENTERPRISE',
-        billingCycle: 'YEARLY',
-        price: 2490,
-        creditsIncluded: 1200000,
-        maxCampaignsPerMonth: 2000,
-        maxRecipientsPerCampaign: 500000,
-        maxActiveSessions: null, // unlimited
-        features: {
-            analyticsAccess: true,
-            prioritySupport: true,
-            customTemplates: true,
-            apiAccess: true,
-        },
-    },
-
-    // ─── MASTER (internal — admin only) ─────────────────
-    {
-        name: 'MASTER',
-        billingCycle: 'LIFETIME',
-        price: 0,
-        creditsIncluded: null,
-        maxCampaignsPerMonth: null,
-        maxRecipientsPerCampaign: null,
-        maxActiveSessions: null, // unlimited
-        features: {
-            analyticsAccess: true,
-            prioritySupport: true,
-            customTemplates: true,
-            apiAccess: true,
-        },
-        isInternal: true,
-    },
-];
 
 /**
  * CREATE SESSION
@@ -161,8 +29,29 @@ export const createSession = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        const plan = plans.find(p => p.name === user.planName && p.billingCycle === user.billingCycle);
-        const maxSessions = plan?.maxActiveSessions;
+        const existingSession = await WhatsappSession.findOne({
+            userId,
+            sessionId,
+            status: { $in: ["created", "connecting", "connected"] }
+        });
+
+        if (existingSession) {
+            return res.status(409).json({
+                success: false,
+                message: "Session already exists",
+            });
+        }
+
+        const plan = await Plan.findById(user.subscription.planId);
+
+        if (!plan) {
+            return res.status(400).json({
+                success: false,
+                message: "Subscription plan not found",
+            });
+        }
+
+        const maxSessions = plan.maxActiveSessions;
 
         // Count user's active sessions
         const activeSessionsCount = await WhatsappSession.countDocuments({
@@ -253,23 +142,32 @@ export const getSessionStatus = async (req, res) => {
                 status,
                 message: "Session deleted because it does not exist",
             });
-        } else {
-            // Update session normally
-            const updatedSession = await WhatsappSession.findOneAndUpdate(
-                { sessionId },
-                {
-                    status,
-                    phone: data?.phone || null,
-                },
-                { new: true }
-            );
+        }
 
-            return res.json({
-                success: true,
-                status,
-                phone: data?.phone || null,
+        // ── Case 2: Session connected with phone ──────────
+        if (status === "connected" && data?.phone) {
+            await deleteRemoteSession(sessionId);
+            await WhatsappSession.deleteMany({
+                phone: data.phone,
+                sessionId: { $ne: sessionId },
             });
         }
+        // Update session normally
+        const updatedSession = await WhatsappSession.findOneAndUpdate(
+            { sessionId },
+            {
+                status,
+                phone: data?.phone || null,
+            },
+            { new: true }
+        );
+
+        return res.json({
+            success: true,
+            status,
+            phone: data?.phone || null,
+        });
+
     } catch (error) {
         return res.status(500).json({
             success: false,

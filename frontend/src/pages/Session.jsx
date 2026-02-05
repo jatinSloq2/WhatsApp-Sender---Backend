@@ -265,16 +265,6 @@ const Session = () => {
         </section>
       )}
 
-      {/* ══════════════ ERROR BANNER ══════════════ */}
-      {error && (
-        <section className="max-w-7xl mx-auto px-6 pb-6">
-          <Alert variant="destructive" className="border border-red-200 shadow-sm">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="font-medium">{error}</AlertDescription>
-          </Alert>
-        </section>
-      )}
-
       {/* ══════════════ CREATE SESSION ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-8">
         <Card className="bg-white border border-gray-200 shadow-sm">
