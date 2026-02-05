@@ -94,6 +94,7 @@ const Session = () => {
 
         if (status === "CONNECTED") {
           setQr(null);
+          fetchUserSessions();
           stopPolling();
           setMessage({ type: "success", text: "WhatsApp session connected successfully!" });
         }
@@ -179,7 +180,7 @@ const Session = () => {
   // ─────────────────────────────
   const getStatusBadge = (status) => {
     const statusUpper = status?.toUpperCase();
-    
+
     switch (statusUpper) {
       case "CONNECTED":
         return (
@@ -210,7 +211,7 @@ const Session = () => {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-gray-50">
-      
+
       {/* ══════════════ HERO ══════════════ */}
       <section className="relative overflow-hidden bg-gradient-to-b from-green-50 to-white">
         <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
@@ -235,13 +236,12 @@ const Session = () => {
         <section className="max-w-7xl mx-auto px-6 pb-6">
           <Alert
             variant={message.type === "error" ? "destructive" : "default"}
-            className={`border shadow-sm ${
-              message.type === "success"
+            className={`border shadow-sm ${message.type === "success"
                 ? "bg-green-50 border-green-200"
                 : message.type === "info"
-                ? "bg-blue-50 border-blue-200"
-                : "bg-red-50 border-red-200"
-            }`}
+                  ? "bg-blue-50 border-blue-200"
+                  : "bg-red-50 border-red-200"
+              }`}
           >
             {message.type === "success" ? (
               <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -251,13 +251,12 @@ const Session = () => {
               <AlertCircle className="h-4 w-4 text-red-600" />
             )}
             <AlertDescription
-              className={`font-medium ${
-                message.type === "success"
+              className={`font-medium ${message.type === "success"
                   ? "text-green-700"
                   : message.type === "info"
-                  ? "text-blue-700"
-                  : "text-red-700"
-              }`}
+                    ? "text-blue-700"
+                    : "text-red-700"
+                }`}
             >
               {message.text}
             </AlertDescription>
@@ -452,10 +451,10 @@ const Session = () => {
                         <TableCell className="text-gray-600 font-medium">
                           {session.createdAt
                             ? new Date(session.createdAt).toLocaleDateString("en-IN", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })
                             : "N/A"}
                         </TableCell>
                         <TableCell className="text-right">
@@ -554,7 +553,7 @@ const Session = () => {
               Are you sure you want to delete this session? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="bg-red-50 border border-red-200 p-4 my-4">
             <p className="text-sm font-medium text-red-900 mb-1">
               Session ID: <span className="font-bold">{deleteDialog.sessionId}</span>
