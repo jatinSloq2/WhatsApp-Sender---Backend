@@ -128,6 +128,7 @@ export const deleteSession = async (req, res) => {
  */
 export const getSessionStatus = async (req, res) => {
     try {
+        const userId = req.user?.id;
         const { sessionId } = req.params;
 
         const response = await getRemoteSessionStatus(sessionId);
@@ -146,17 +147,24 @@ export const getSessionStatus = async (req, res) => {
 
         // ── Case 2: Session connected with phone ──────────
         if (status === "connected" && data?.phone) {
-            // Find all other sessions with same phone
+            const basePhone = data.phone.split(":")[0];
+
             const otherSessions = await WhatsappSession.find({
-                phone: data.phone,
+                userId,
                 sessionId: { $ne: sessionId },
+                phone: { $regex: `^${basePhone}:` },
             });
+
+            // Delete remote sessions
             for (const session of otherSessions) {
                 await deleteRemoteSession(session.sessionId);
             }
+
+            // Delete from DB
             await WhatsappSession.deleteMany({
-                phone: data.phone,
+                userId,
                 sessionId: { $ne: sessionId },
+                phone: { $regex: `^${basePhone}:` },
             });
         }
         // Update session normally
