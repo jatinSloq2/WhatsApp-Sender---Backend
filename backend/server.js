@@ -18,6 +18,7 @@ import planRoutes from './routes/plans.routes.js';
 import userRoutes from './routes/user.routes.js';
 import adminRoutes from './routes/adminUser.routes.js';
 import sessionRoutes from './routes/session.routes.js';
+import messageRoutes from './routes/message.routes.js';
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use('/api/plans', planRoutes);
 app.use('/api/credits', creditRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/session', sessionRoutes);
+app.use('/api/message', messageRoutes);
 
 // ─── Error Handler ───────────────────────────────────
 app.use(errorHandler);
