@@ -289,11 +289,10 @@ export default function AdminUserManagement() {
                 {/* Message Alert */}
                 {message.text && (
                     <Alert
-                        className={`mb-6 border shadow-sm flex items-center justify-between ${
-                            message.type === 'success'
+                        className={`mb-6 border shadow-sm flex items-center justify-between ${message.type === 'success'
                                 ? 'bg-green-50 border-green-200'
                                 : 'bg-red-50 border-red-200'
-                        }`}
+                            }`}
                     >
                         <div className="flex w-full">
                             <div className="flex items-center gap-2 w-full">
@@ -303,11 +302,10 @@ export default function AdminUserManagement() {
                                     <AlertCircle size={18} className="text-red-600" />
                                 )}
                                 <span
-                                    className={`font-medium ${
-                                        message.type === 'success'
+                                    className={`font-medium ${message.type === 'success'
                                             ? 'text-green-700'
                                             : 'text-red-700'
-                                    }`}
+                                        }`}
                                 >
                                     {message.text}
                                 </span>
@@ -851,11 +849,10 @@ export default function AdminUserManagement() {
                                                     {txn.type}
                                                 </Badge>
                                                 <span
-                                                    className={`font-bold text-lg ${
-                                                        txn.amount > 0
+                                                    className={`font-bold text-lg ${txn.amount > 0
                                                             ? 'text-green-600'
                                                             : 'text-red-600'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {txn.amount > 0 ? '+' : ''}
                                                     {txn.amount}

@@ -146,24 +146,24 @@ function CustomAmountCard({ onBuy }) {
   };
 
   return (
-    <Card className="col-span-1 sm:col-span-2 lg:col-span-4 border-2 border-dashed border-[#25D366]/50 shadow-sm bg-white">
-      <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b border-green-200 px-6 py-5">
+    <Card className="col-span-1 sm:col-span-2 lg:col-span-4 border-2 border-dashed border-[#25D366]/50 bg-gradient-to-br from-green-50 to-white shadow-sm hover:shadow-md transition-shadow">
+      <CardHeader className="border-b border-green-100 px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#25D366] to-green-600 flex items-center justify-center shadow-md">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#25D366] to-green-600 flex items-center justify-center shadow-md">
               <Sparkles size={22} className="text-white" />
             </div>
             <div>
-              <CardTitle className="text-base font-bold text-gray-900">
-                Pick Your Own Amount
+              <CardTitle className="text-lg font-bold text-gray-900">
+                Custom Amount
               </CardTitle>
-              <CardDescription className="text-xs text-gray-600 font-medium">
-                Rate drops automatically as you buy more
+              <CardDescription className="text-sm text-gray-600 font-medium">
+                Choose your exact credit amount
               </CardDescription>
             </div>
           </div>
-          <Badge className="text-xs font-bold text-[#25D366] bg-green-100 border border-green-200">
-            Custom
+          <Badge className="bg-[#25D366] text-white border-0 font-bold">
+            Flexible
           </Badge>
         </div>
       </CardHeader>
@@ -174,9 +174,9 @@ function CustomAmountCard({ onBuy }) {
           <div className="flex-1 space-y-5">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <Label className="text-sm font-semibold text-gray-900">Credits</Label>
+                <Label className="text-sm font-semibold text-gray-900">Credits Amount</Label>
                 <Badge variant="outline" className="text-xs font-bold text-green-700 bg-green-50 border-green-200">
-                  {activeRateLabel(credits)} marginal
+                  {activeRateLabel(credits)}
                 </Badge>
               </div>
               <div className="flex items-center gap-3">
@@ -186,9 +186,9 @@ function CustomAmountCard({ onBuy }) {
                   value={inputVal}
                   onChange={(e) => applyValue(e.target.value)}
                   onBlur={() => applyValue(inputVal)}
-                  className={`w-32 font-bold text-2xl text-center border-2 focus-visible:ring-offset-0 ${inputError
-                      ? "border-red-300 bg-red-50 focus-visible:border-red-300 focus-visible:ring-red-200"
-                      : "border-gray-300 focus-visible:border-[#25D366] focus-visible:ring-[#25D366]/20"
+                  className={`w-32 h-12 font-bold text-2xl text-center ${inputError
+                      ? "border-red-300 bg-red-50 focus-visible:ring-red-200"
+                      : "border-gray-300 focus-visible:ring-[#25D366]/20"
                     }`}
                 />
                 <span className="text-gray-500 font-semibold">credits</span>
@@ -212,7 +212,7 @@ function CustomAmountCard({ onBuy }) {
                   setInputVal(String(n));
                   setInputErr("");
                 }}
-                className="w-full accent-[#25D366] cursor-pointer h-2"
+                className="w-full accent-[#25D366] cursor-pointer h-2 rounded-lg"
               />
               <div className="flex justify-between text-xs text-gray-500 font-medium mt-2">
                 <span>{CUSTOM_MIN}</span>
@@ -227,13 +227,13 @@ function CustomAmountCard({ onBuy }) {
                 return (
                   <Badge
                     key={t.min}
-                    variant={active ? "secondary" : "outline"}
+                    variant={active ? "default" : "outline"}
                     className={`text-xs px-3 py-1 font-semibold transition-all ${active
                         ? "bg-[#25D366] text-white border-[#25D366]"
                         : "bg-gray-50 border-gray-200 text-gray-500"
                       }`}
                   >
-                    {t.min}–{t.max} → {t.creditsPerRupee} credits/₹1
+                    {t.min}–{t.max} → {t.creditsPerRupee}/₹
                   </Badge>
                 );
               })}
@@ -241,24 +241,24 @@ function CustomAmountCard({ onBuy }) {
           </div>
 
           {/* right – price summary + CTA */}
-          <Card className="lg:w-64 flex flex-col justify-between bg-gray-50 border border-gray-200 shadow-none">
-            <CardContent className="p-5">
-              <div className="space-y-2.5 text-sm mb-5">
-                <div className="flex justify-between">
+          <Card className="lg:w-72 flex flex-col justify-between bg-white border-2 border-gray-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="space-y-3 text-sm mb-6">
+                <div className="flex justify-between items-center">
                   <span className="text-gray-600">Base Amount</span>
                   <span className="font-semibold text-gray-900">
                     ₹{basePrice.toLocaleString("en-IN")}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-gray-600">GST (18%)</span>
                   <span className="font-semibold text-gray-900">
                     ₹{gstAmount.toLocaleString("en-IN")}
                   </span>
                 </div>
-                <div className="border-t-2 border-gray-300 pt-2.5 mt-2 flex justify-between text-base">
-                  <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-[#25D366]">
+                <div className="border-t-2 border-gray-300 pt-3 mt-2 flex justify-between items-center">
+                  <span className="font-bold text-gray-900 text-base">Total</span>
+                  <span className="font-bold text-[#25D366] text-xl">
                     ₹{total.toLocaleString("en-IN")}
                   </span>
                 </div>
@@ -273,12 +273,12 @@ function CustomAmountCard({ onBuy }) {
                   gstAmount,
                   totalAmount: total
                 })}
-                className={`w-full font-bold text-sm shadow-sm transition-all ${inputError || credits < CUSTOM_MIN
+                className={`w-full h-12 font-bold shadow-sm transition-all ${inputError || credits < CUSTOM_MIN
                     ? "bg-gray-200 text-gray-400 hover:bg-gray-200 cursor-not-allowed"
                     : "bg-[#25D366] hover:bg-[#20BD5A] text-white"
                   }`}
               >
-                <CreditCard size={16} className="mr-2" />
+                <CreditCard size={18} className="mr-2" />
                 Buy {credits.toLocaleString()} Credits
               </Button>
             </CardContent>
@@ -386,18 +386,18 @@ export default function Credits() {
   const statusBadge = (status) => {
     if (status === "APPROVED")
       return (
-        <Badge className="text-xs font-bold text-green-700 bg-green-100 border border-green-200">
+        <Badge className="bg-green-100 text-green-700 border-green-200 font-bold">
           <CheckCircle2 size={12} className="mr-1" /> Approved
         </Badge>
       );
     if (status === "REJECTED")
       return (
-        <Badge className="text-xs font-bold text-red-700 bg-red-100 border border-red-200">
+        <Badge className="bg-red-100 text-red-700 border-red-200 font-bold">
           <X size={12} className="mr-1" /> Rejected
         </Badge>
       );
     return (
-      <Badge className="text-xs font-bold text-amber-700 bg-amber-100 border border-amber-200">
+      <Badge className="bg-amber-100 text-amber-700 border-amber-200 font-bold">
         <Clock size={12} className="mr-1" /> Pending
       </Badge>
     );
@@ -433,9 +433,9 @@ export default function Credits() {
 
       {/* ══════════════ HERO ══════════════ */}
       <section className="relative overflow-hidden bg-gradient-to-b from-green-50 to-white">
-        <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
+        <div className="max-w-7xl mx-auto px-6 pt-16 pb-12 text-center">
           <Badge className="inline-flex items-center gap-2 bg-white text-[#25D366] border border-[#25D366]/20 px-4 py-2 font-semibold text-sm mb-6 shadow-sm">
-            <Zap size={16} className="text-[#25D366]" /> Buy Credits
+            <Zap size={16} className="text-[#25D366]" /> Credit Packs
           </Badge>
 
           <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
@@ -444,18 +444,18 @@ export default function Credits() {
             <span className="text-[#25D366]">Campaigns</span>
           </h1>
 
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Credits fuel every message you send. Top up anytime — no subscriptions needed.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Top up credits anytime. No subscriptions. Pay only for what you use.
           </p>
         </div>
       </section>
 
       {/* ══════════════ BALANCE CARD ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-6">
-        <Card className="bg-gradient-to-r from-[#25D366] to-green-600 border-0 shadow-lg shadow-green-200/40">
+        <Card className="bg-gradient-to-r from-[#25D366] to-green-600 border-0 shadow-xl shadow-green-200/50">
           <CardContent className="p-6 text-white flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
                 <Zap size={32} className="text-white" />
               </div>
               <div>
@@ -468,9 +468,9 @@ export default function Credits() {
             </div>
             <Button
               onClick={loadBalance}
-              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 font-semibold backdrop-blur-sm"
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 font-semibold backdrop-blur-sm h-11"
             >
-              <RefreshCw size={16} className="mr-2" /> Refresh
+              <RefreshCw size={16} className="mr-2" /> Refresh Balance
             </Button>
           </CardContent>
         </Card>
@@ -480,16 +480,15 @@ export default function Credits() {
       {message.text && (
         <section className="max-w-7xl mx-auto px-6 pb-6">
           <Alert
-            variant={message.type === "success" ? "default" : "destructive"}
-            className={`border shadow-sm flex ${message.type === "success"
+            className={`border-2 shadow-sm flex ${message.type === "success"
                 ? "bg-green-50 border-green-200"
                 : "bg-red-50 border-red-200"
               }`}
           >
             {message.type === "success" ? (
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
             ) : (
-              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertCircle className="h-5 w-5 text-red-600" />
             )}
             <AlertDescription
               className={`font-medium ${message.type === "success"
@@ -513,7 +512,7 @@ export default function Credits() {
 
       {/* ══════════════ TAB BAR ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-6">
-        <div className="flex gap-2 bg-white border border-gray-200 p-1.5 w-fit shadow-sm">
+        <div className="inline-flex gap-2 bg-white border-2 border-gray-200 p-1.5 rounded-xl shadow-sm">
           {[
             { key: "packs", label: "Buy Credits", icon: Sparkles },
             { key: "history", label: "History", icon: Clock },
@@ -523,7 +522,7 @@ export default function Credits() {
               key={key}
               variant={activeTab === key ? "default" : "ghost"}
               onClick={() => setActiveTab(key)}
-              className={`flex items-center gap-2 px-6 py-2.5 text-sm font-semibold transition-all ${activeTab === key
+              className={`flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg transition-all ${activeTab === key
                   ? "bg-[#25D366] text-white hover:bg-[#25D366]"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
@@ -545,12 +544,12 @@ export default function Credits() {
               <p className="text-gray-600 font-medium">Loading credit packs...</p>
             </div>
           ) : packs.length === 0 ? (
-            <Card className="bg-white border border-gray-200 shadow-sm max-w-md mx-auto">
+            <Card className="bg-white border-2 border-gray-200 shadow-sm max-w-md mx-auto rounded-2xl">
               <CardContent className="p-12 text-center">
                 <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                   <AlertCircle size={32} className="text-gray-400" />
                 </div>
-                <p className="text-gray-600">No credit packs available right now.</p>
+                <p className="text-gray-600 font-medium">No credit packs available right now.</p>
               </CardContent>
             </Card>
           ) : (
@@ -563,20 +562,20 @@ export default function Credits() {
                   return (
                     <Card
                       key={pack.id}
-                      className={`bg-white transition-all ${isBestValue
+                      className={`bg-white transition-all rounded-2xl ${isBestValue
                           ? "border-2 border-[#25D366] shadow-xl shadow-green-100"
-                          : "border border-gray-200 hover:border-[#25D366]/30 hover:shadow-md"
+                          : "border-2 border-gray-200 hover:border-[#25D366]/50 hover:shadow-lg"
                         }`}
                     >
                       {isBestValue && (
-                        <div className="bg-[#25D366] text-white text-center py-2 font-semibold text-sm flex items-center justify-center gap-2">
+                        <div className="bg-[#25D366] text-white text-center py-2.5 font-semibold text-sm flex items-center justify-center gap-2 rounded-t-xl">
                           <TrendingUp size={16} /> Best Value
                         </div>
                       )}
 
                       <CardHeader className="pb-3 px-6 pt-6">
                         <div className="flex items-center justify-between mb-3">
-                          <div className="w-12 h-12 bg-green-50 border border-green-200 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-xl bg-green-50 border-2 border-green-200 flex items-center justify-center">
                             <Zap size={24} className="text-[#25D366]" />
                           </div>
                           <Badge variant="outline" className="text-xs font-bold text-gray-600 bg-gray-50 border-gray-200">
@@ -593,21 +592,21 @@ export default function Credits() {
 
                       <CardContent className="px-6 pb-6">
                         <div className="space-y-2 mb-5 text-sm">
-                          <div className="flex justify-between">
+                          <div className="flex justify-between items-center">
                             <span className="text-gray-600">Base</span>
                             <span className="font-semibold text-gray-900">
                               ₹{pack.price.toLocaleString("en-IN")}
                             </span>
                           </div>
-                          <div className="flex justify-between">
+                          <div className="flex justify-between items-center">
                             <span className="text-gray-600">GST 18%</span>
                             <span className="font-semibold text-gray-900">
                               ₹{pack.gstAmount.toLocaleString("en-IN")}
                             </span>
                           </div>
-                          <div className="border-t-2 border-gray-200 pt-2 mt-2 flex justify-between text-base">
-                            <span className="font-bold text-gray-900">Total</span>
-                            <span className="font-bold text-[#25D366]">
+                          <div className="border-t-2 border-gray-200 pt-2 mt-2 flex justify-between items-center">
+                            <span className="font-bold text-gray-900 text-base">Total</span>
+                            <span className="font-bold text-[#25D366] text-lg">
                               ₹{pack.totalAmount.toLocaleString("en-IN")}
                             </span>
                           </div>
@@ -615,7 +614,7 @@ export default function Credits() {
 
                         <Button
                           onClick={() => handlePurchase(pack)}
-                          className={`w-full font-bold text-sm shadow-sm transition-all ${isBestValue
+                          className={`w-full h-11 font-bold shadow-sm transition-all rounded-xl ${isBestValue
                               ? "bg-[#25D366] hover:bg-[#20BD5A] text-white"
                               : "bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-300"
                             }`}
@@ -634,9 +633,9 @@ export default function Credits() {
               </div>
 
               {/* ── How Credits Work ── */}
-              <Card className="bg-white border border-gray-200 shadow-sm">
-                <CardHeader className="px-8 pt-8 pb-4">
-                  <CardTitle className="text-2xl font-bold text-gray-900 text-center">
+              <Card className="bg-white border-2 border-gray-200 shadow-sm rounded-2xl">
+                <CardHeader className="px-8 pt-8 pb-4 text-center">
+                  <CardTitle className="text-2xl font-bold text-gray-900">
                     How Credits Work
                   </CardTitle>
                 </CardHeader>
@@ -660,7 +659,7 @@ export default function Credits() {
                       },
                     ].map(({ icon: Icon, title, desc }) => (
                       <div key={title} className="text-center">
-                        <div className="w-16 h-16 mx-auto bg-green-50 border border-green-200 flex items-center justify-center mb-4 shadow-sm">
+                        <div className="w-16 h-16 mx-auto rounded-xl bg-green-50 border-2 border-green-200 flex items-center justify-center mb-4 shadow-sm">
                           <Icon size={28} className="text-[#25D366]" />
                         </div>
                         <h3 className="font-semibold text-gray-900 text-base mb-2">{title}</h3>
@@ -680,8 +679,8 @@ export default function Credits() {
         ═══════════════════════════════════════════════════ */}
       {activeTab === "history" && (
         <section className="max-w-7xl mx-auto px-6 pb-20">
-          <Card className="bg-white border border-gray-200 shadow-sm">
-            <CardHeader className="px-8 py-6 border-b border-gray-200">
+          <Card className="bg-white border-2 border-gray-200 shadow-sm rounded-2xl">
+            <CardHeader className="px-8 py-6 border-b-2 border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -695,7 +694,7 @@ export default function Credits() {
                 <Button
                   onClick={() => loadHistory(historyPage)}
                   variant="outline"
-                  className="border border-gray-300 hover:border-[#25D366] font-medium"
+                  className="border-2 border-gray-300 hover:border-[#25D366] font-medium h-11 rounded-xl"
                 >
                   <RefreshCw size={16} className="mr-2" />
                   Refresh
@@ -714,10 +713,10 @@ export default function Credits() {
                 </div>
               ) : (
                 <>
-                  <div className="overflow-x-auto border border-gray-200">
+                  <div className="overflow-x-auto border-2 border-gray-200 rounded-xl">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200">
+                        <tr className="bg-gray-50 border-b-2 border-gray-200">
                           {["Type", "Amount", "Balance After", "Note", "Date"].map((h) => (
                             <th
                               key={h}
@@ -741,7 +740,7 @@ export default function Credits() {
                             >
                               <td className="py-4 px-6">
                                 <div className="flex items-center gap-3">
-                                  <div className={`w-10 h-10 flex items-center justify-center ${meta.bg}`}>
+                                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${meta.bg}`}>
                                     <Icon size={18} className={meta.color} />
                                   </div>
                                   <span className="font-semibold text-gray-900">{meta.label}</span>
@@ -779,7 +778,7 @@ export default function Credits() {
                           setHistoryPage(p);
                           loadHistory(p);
                         }}
-                        className="border border-gray-300 text-gray-700 hover:border-[#25D366] disabled:opacity-40 font-medium"
+                        className="border-2 border-gray-300 text-gray-700 hover:border-[#25D366] disabled:opacity-40 font-medium h-11 rounded-xl"
                       >
                         Previous
                       </Button>
@@ -794,7 +793,7 @@ export default function Credits() {
                           setHistoryPage(p);
                           loadHistory(p);
                         }}
-                        className="border border-gray-300 text-gray-700 hover:border-[#25D366] disabled:opacity-40 font-medium"
+                        className="border-2 border-gray-300 text-gray-700 hover:border-[#25D366] disabled:opacity-40 font-medium h-11 rounded-xl"
                       >
                         Next
                       </Button>
@@ -812,8 +811,8 @@ export default function Credits() {
         ═══════════════════════════════════════════════════ */}
       {activeTab === "requests" && (
         <section className="max-w-7xl mx-auto px-6 pb-20">
-          <Card className="bg-white border border-gray-200 shadow-sm">
-            <CardHeader className="px-8 py-6 border-b border-gray-200">
+          <Card className="bg-white border-2 border-gray-200 shadow-sm rounded-2xl">
+            <CardHeader className="px-8 py-6 border-b-2 border-gray-200">
               <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                 <Shield size={24} className="text-[#25D366]" />
                 My Purchase Requests
@@ -833,16 +832,16 @@ export default function Credits() {
                   <p className="text-gray-500 text-sm mb-6">Buy credits to see your payment requests here</p>
                   <Button
                     onClick={() => setActiveTab("packs")}
-                    className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold shadow-sm"
+                    className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold shadow-sm h-11 rounded-xl"
                   >
                     <CreditCard size={16} className="mr-2" /> Buy Credits
                   </Button>
                 </div>
               ) : (
-                <div className="overflow-x-auto border border-gray-200">
+                <div className="overflow-x-auto border-2 border-gray-200 rounded-xl">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200">
+                      <tr className="bg-gray-50 border-b-2 border-gray-200">
                         {["Credits", "Amount", "Transaction ID", "Status", "Date"].map((h) => (
                           <th
                             key={h}
@@ -861,7 +860,7 @@ export default function Credits() {
                         >
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-green-50 border border-green-200 flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-lg bg-green-50 border-2 border-green-200 flex items-center justify-center">
                                 <Zap size={18} className="text-[#25D366]" />
                               </div>
                               <span className="font-semibold text-gray-900">

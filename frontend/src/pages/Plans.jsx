@@ -30,17 +30,17 @@ import { useAuth } from "../context/AuthContext";
 import { usePlans } from "../context/PlanContext";
 
 /* ── feature icon / label maps ── */
-const FEATURE_ICONS = { 
-  analyticsAccess: BarChart2, 
-  prioritySupport: Shield, 
-  customTemplates: Sparkles, 
-  apiAccess: Code 
+const FEATURE_ICONS = {
+  analyticsAccess: BarChart2,
+  prioritySupport: Shield,
+  customTemplates: Sparkles,
+  apiAccess: Code
 };
-const FEATURE_LABELS = { 
-  analyticsAccess: "Advanced Analytics", 
-  prioritySupport: "Priority Support", 
-  customTemplates: "Custom Templates", 
-  apiAccess: "API Access" 
+const FEATURE_LABELS = {
+  analyticsAccess: "Advanced Analytics",
+  prioritySupport: "Priority Support",
+  customTemplates: "Custom Templates",
+  apiAccess: "API Access"
 };
 
 /* ── FAQ data ── */
@@ -87,11 +87,11 @@ export default function Plans() {
   useEffect(() => { loadPlans(); }, []);
 
   const loadPlans = async () => {
-    try { 
-      setError(null); 
-      setPlans(await getPlans() || []); 
-    } catch (e) { 
-      setError(e.message || "Failed to load plans"); 
+    try {
+      setError(null);
+      setPlans(await getPlans() || []);
+    } catch (e) {
+      setError(e.message || "Failed to load plans");
     }
   };
 
@@ -102,8 +102,8 @@ export default function Plans() {
 
   const isCurrentPlan = (planId) => {
     if (!user?.subscription?.planId) return false;
-    const id = typeof user.subscription.planId === "object" 
-      ? user.subscription.planId._id 
+    const id = typeof user.subscription.planId === "object"
+      ? user.subscription.planId._id
       : user.subscription.planId;
     return id === planId && user.subscription.isActive;
   };
@@ -111,22 +111,22 @@ export default function Plans() {
   /* handlers */
   const handleSubscribe = async (plan) => {
     if (!user) { navigate("/login"); return; }
-    if (isCurrentPlan(plan._id)) { 
-      setMessage({ type: "error", text: "You are already on this plan" }); 
-      return; 
+    if (isCurrentPlan(plan._id)) {
+      setMessage({ type: "error", text: "You are already on this plan" });
+      return;
     }
     setSubscribing(plan._id);
     setMessage({ type: "", text: "" });
     try {
       if (plan.price === 0) {
-        await submitPaymentProof({ 
-          planId: plan._id, 
-          billingCycle: plan.billingCycle, 
-          isFree: true 
+        await submitPaymentProof({
+          planId: plan._id,
+          billingCycle: plan.billingCycle,
+          isFree: true
         });
-        setMessage({ 
-          type: "success", 
-          text: `Successfully subscribed to ${plan.name}! Redirecting…` 
+        setMessage({
+          type: "success",
+          text: `Successfully subscribed to ${plan.name}! Redirecting…`
         });
         setTimeout(() => window.location.reload(), 1500);
       } else {
@@ -134,31 +134,31 @@ export default function Plans() {
         setShowPaymentModal(true);
       }
     } catch (e) {
-      setMessage({ 
-        type: "error", 
-        text: e.message || "Subscription failed. Please try again." 
+      setMessage({
+        type: "error",
+        text: e.message || "Subscription failed. Please try again."
       });
-    } finally { 
-      setSubscribing(null); 
+    } finally {
+      setSubscribing(null);
     }
   };
 
   const handlePaymentProofSubmit = async (proofData) => {
     await submitPaymentProof(proofData);
-    setShowPaymentModal(false); 
+    setShowPaymentModal(false);
     setSelectedPlan(null);
-    setMessage({ 
-      type: "success", 
-      text: "Payment proof submitted! We'll verify and activate your plan within 24 hours." 
+    setMessage({
+      type: "success",
+      text: "Payment proof submitted! We'll verify and activate your plan within 24 hours."
     });
   };
 
   /* helpers */
   const formatPrice = (price) =>
-    new Intl.NumberFormat("en-IN", { 
-      style: "currency", 
-      currency: "INR", 
-      maximumFractionDigits: 0 
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0
     }).format(price);
 
   const calculateYearlySavings = (monthlyPrice) =>
@@ -180,16 +180,16 @@ export default function Plans() {
   if (error) {
     return (
       <div className="min-h-[calc(100vh-64px)] bg-gray-50 flex items-center justify-center p-6">
-        <Card className="max-w-md w-full border border-red-200 shadow-sm">
+        <Card className="max-w-md w-full border-2 border-red-200 shadow-sm rounded-2xl">
           <CardContent className="p-12 text-center">
             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Unable to Load Plans</h2>
             <p className="text-gray-600 mb-6">{error}</p>
-            <Button 
-              onClick={loadPlans} 
-              className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold"
+            <Button
+              onClick={loadPlans}
+              className="bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold h-11 rounded-xl"
             >
               Try Again
             </Button>
@@ -217,9 +217,9 @@ export default function Plans() {
             planId: selectedPlan._id,
             billingCycle: selectedPlan.billingCycle,
           }}
-          onClose={() => { 
-            setShowPaymentModal(false); 
-            setSelectedPlan(null); 
+          onClose={() => {
+            setShowPaymentModal(false);
+            setSelectedPlan(null);
           }}
           onSubmitProof={handlePaymentProofSubmit}
         />
@@ -227,7 +227,7 @@ export default function Plans() {
 
       {/* ══════════════ HERO ══════════════ */}
       <section className="relative overflow-hidden bg-gradient-to-b from-green-50 to-white">
-        <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
+        <div className="max-w-7xl mx-auto px-6 pt-16 pb-12 text-center">
           <Badge className="inline-flex items-center gap-2 bg-white text-[#25D366] border border-[#25D366]/20 px-4 py-2 font-semibold text-sm mb-6 shadow-sm">
             <Crown className="w-4 h-4" /> Subscription Plans
           </Badge>
@@ -237,8 +237,8 @@ export default function Plans() {
             <br />
             <span className="text-[#25D366]">with Confidence</span>
           </h1>
-          
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Start free and upgrade as you grow. Transparent pricing with no hidden fees.
           </p>
         </div>
@@ -247,38 +247,35 @@ export default function Plans() {
       {/* ══════════════ MESSAGE BANNER ══════════════ */}
       {message.text && (
         <section className="max-w-7xl mx-auto px-6 pb-6">
-          <Alert 
-            variant={message.type === "error" ? "destructive" : "default"} 
-            className={`border shadow-sm flex ${
-              message.type === "success" 
-                ? "bg-green-50 border-green-200" 
-                : message.type === "info" 
-                  ? "bg-blue-50 border-blue-200" 
+          <Alert
+            className={`border-2 shadow-sm flex ${message.type === "success"
+                ? "bg-green-50 border-green-200"
+                : message.type === "info"
+                  ? "bg-blue-50 border-blue-200"
                   : "bg-red-50 border-red-200"
-            }`}
+              }`}
           >
             {message.type === "success" ? (
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
             ) : message.type === "info" ? (
-              <AlertCircle className="h-4 w-4 text-blue-600" />
+              <AlertCircle className="h-5 w-5 text-blue-600" />
             ) : (
-              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertCircle className="h-5 w-5 text-red-600" />
             )}
-            <AlertDescription 
-              className={`font-medium ${
-                message.type === "success" 
-                  ? "text-green-700" 
-                  : message.type === "info" 
-                    ? "text-blue-700" 
+            <AlertDescription
+              className={`font-medium ${message.type === "success"
+                  ? "text-green-700"
+                  : message.type === "info"
+                    ? "text-blue-700"
                     : "text-red-700"
-              }`}
+                }`}
             >
               {message.text}
             </AlertDescription>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setMessage({ type: "", text: "" })} 
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMessage({ type: "", text: "" })}
               className="ml-auto p-0 h-auto hover:bg-transparent"
             >
               <X size={16} />
@@ -290,15 +287,14 @@ export default function Plans() {
       {/* ══════════════ BILLING TOGGLE ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-8">
         <div className="flex justify-center">
-          <div className="inline-flex items-center gap-2 p-1.5 bg-white border border-gray-200 shadow-sm">
+          <div className="inline-flex items-center gap-2 p-1.5 bg-white border-2 border-gray-200 rounded-xl shadow-sm">
             <Button
               variant={billingCycle === "MONTHLY" ? "default" : "ghost"}
               onClick={() => setBillingCycle("MONTHLY")}
-              className={`px-8 py-2.5 text-sm font-semibold transition-all ${
-                billingCycle === "MONTHLY"
+              className={`px-8 py-2.5 text-sm font-semibold rounded-lg transition-all ${billingCycle === "MONTHLY"
                   ? "bg-[#25D366] text-white hover:bg-[#25D366]"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
+                }`}
             >
               Monthly
             </Button>
@@ -306,11 +302,10 @@ export default function Plans() {
             <Button
               variant={billingCycle === "YEARLY" ? "default" : "ghost"}
               onClick={() => setBillingCycle("YEARLY")}
-              className={`px-8 py-2.5 text-sm font-semibold transition-all relative ${
-                billingCycle === "YEARLY"
+              className={`px-8 py-2.5 text-sm font-semibold rounded-lg transition-all relative ${billingCycle === "YEARLY"
                   ? "bg-[#25D366] text-white hover:bg-[#25D366]"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
+                }`}
             >
               Yearly
               <Badge className="absolute -top-6 -right-8 bg-[#25D366] text-white text-xs font-bold px-2.5 py-0.5 shadow-lg border-0">
@@ -324,12 +319,12 @@ export default function Plans() {
       {/* ══════════════ PLANS GRID ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-12">
         {filteredPlans.length === 0 ? (
-          <Card className="bg-white border border-gray-200 shadow-sm max-w-md mx-auto">
+          <Card className="bg-white border-2 border-gray-200 shadow-sm max-w-md mx-auto rounded-2xl">
             <CardContent className="p-12 text-center">
               <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                 <Crown className="w-8 h-8 text-gray-400" />
               </div>
-              <p className="text-gray-600">No plans available for {billingCycle.toLowerCase()} billing.</p>
+              <p className="text-gray-600 font-medium">No plans available for {billingCycle.toLowerCase()} billing.</p>
             </CardContent>
           </Card>
         ) : (
@@ -342,17 +337,16 @@ export default function Plans() {
               return (
                 <Card
                   key={plan._id}
-                  className={`bg-white transition-all ${
-                    isPopular
+                  className={`bg-white transition-all rounded-2xl ${isPopular
                       ? "border-2 border-[#25D366] shadow-xl shadow-green-100"
                       : isCurrent
                         ? "border-2 border-blue-500 shadow-lg"
-                        : "border border-gray-200 hover:border-[#25D366]/30 hover:shadow-md"
-                  }`}
+                        : "border-2 border-gray-200 hover:border-[#25D366]/50 hover:shadow-lg"
+                    }`}
                 >
                   {/* Popular badge */}
                   {isPopular && (
-                    <div className="bg-[#25D366] text-white text-center py-2 font-semibold text-sm flex items-center justify-center gap-2">
+                    <div className="bg-[#25D366] text-white text-center py-2.5 font-semibold text-sm flex items-center justify-center gap-2 rounded-t-xl">
                       <TrendingUp size={16} /> Most Popular
                     </div>
                   )}
@@ -378,12 +372,12 @@ export default function Plans() {
 
                   <CardContent className="px-6 pb-6">
                     {/* credits badge */}
-                    <div className="mb-5 p-4 bg-amber-50 border border-amber-200">
+                    <div className="mb-5 p-4 rounded-xl bg-amber-50 border-2 border-amber-200">
                       <div className="flex items-center gap-2">
                         <Zap size={18} className="text-amber-600" />
                         <span className="font-bold text-gray-900 text-sm">
-                          {plan.creditsIncluded !== null 
-                            ? plan.creditsIncluded.toLocaleString("en-IN") 
+                          {plan.creditsIncluded !== null
+                            ? plan.creditsIncluded.toLocaleString("en-IN")
                             : "Unlimited"} credits
                         </span>
                       </div>
@@ -400,8 +394,8 @@ export default function Plans() {
                         <CheckCircle2 size={16} className="text-[#25D366] flex-shrink-0" />
                         <span className="text-gray-700">
                           <strong className="text-gray-900">
-                            {plan.maxCampaignsPerMonth !== null 
-                              ? plan.maxCampaignsPerMonth.toLocaleString("en-IN") 
+                            {plan.maxCampaignsPerMonth !== null
+                              ? plan.maxCampaignsPerMonth.toLocaleString("en-IN")
                               : "Unlimited"}
                           </strong> campaigns/month
                         </span>
@@ -410,8 +404,8 @@ export default function Plans() {
                         <CheckCircle2 size={16} className="text-[#25D366] flex-shrink-0" />
                         <span className="text-gray-700">
                           <strong className="text-gray-900">
-                            {plan.maxRecipientsPerCampaign !== null 
-                              ? plan.maxRecipientsPerCampaign.toLocaleString("en-IN") 
+                            {plan.maxRecipientsPerCampaign !== null
+                              ? plan.maxRecipientsPerCampaign.toLocaleString("en-IN")
                               : "Unlimited"}
                           </strong> recipients/campaign
                         </span>
@@ -437,13 +431,12 @@ export default function Plans() {
                     <Button
                       onClick={() => handleSubscribe(plan)}
                       disabled={subscribing === plan._id || isCurrent}
-                      className={`w-full font-semibold text-sm shadow-sm transition-all ${
-                        isCurrent
+                      className={`w-full h-11 font-semibold shadow-sm transition-all rounded-xl ${isCurrent
                           ? "bg-gray-100 text-gray-400 hover:bg-gray-100 cursor-not-allowed"
                           : isPopular
                             ? "bg-[#25D366] hover:bg-[#20BD5A] text-white"
                             : "bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-300"
-                      }`}
+                        }`}
                     >
                       {subscribing === plan._id ? (
                         <>
@@ -453,7 +446,7 @@ export default function Plans() {
                         "Current Plan"
                       ) : (
                         <>
-                          <CreditCard size={16} className="mr-2" /> 
+                          <CreditCard size={16} className="mr-2" />
                           {isFree ? "Get Started Free" : "Subscribe Now"}
                         </>
                       )}
@@ -468,12 +461,12 @@ export default function Plans() {
 
       {/* ══════════════ WHAT HAPPENS WHEN YOU UPGRADE ══════════════ */}
       <section className="max-w-7xl mx-auto px-6 pb-12">
-        <Card className="bg-white border border-gray-200 shadow-sm">
+        <Card className="bg-white border-2 border-gray-200 shadow-sm rounded-2xl">
           <CardHeader className="px-8 pt-8 pb-4 text-center">
             <CardTitle className="text-3xl font-bold text-gray-900">
               What Happens When You Upgrade?
             </CardTitle>
-            <CardDescription className="text-gray-600 mt-2">
+            <CardDescription className="text-gray-600 mt-2 text-base">
               Understanding your subscription and how it works
             </CardDescription>
           </CardHeader>
@@ -481,28 +474,28 @@ export default function Plans() {
           <CardContent className="px-8 pb-8">
             <div className="grid md:grid-cols-3 gap-8 mb-8">
               {[
-                { 
-                  icon: Zap, 
-                  title: "Instant Credit Refill", 
+                {
+                  icon: Zap,
+                  title: "Instant Credit Refill",
                   desc: "Credits are added immediately to your balance. Start sending campaigns right away.",
                   gradient: "from-[#25D366] to-green-600"
                 },
-                { 
-                  icon: TrendingUp, 
-                  title: "Auto-Renewal Protection", 
+                {
+                  icon: TrendingUp,
+                  title: "Auto-Renewal Protection",
                   desc: "Your plan automatically renews each billing period. Credits refill, limits reset. Cancel anytime.",
                   gradient: "from-blue-500 to-blue-600"
                 },
-                { 
-                  icon: Shield, 
-                  title: "Premium Features Unlocked", 
+                {
+                  icon: Shield,
+                  title: "Premium Features Unlocked",
                   desc: "Access advanced analytics, priority support, and custom templates based on your plan.",
                   gradient: "from-purple-500 to-purple-600"
                 },
               ].map(({ gradient, icon: Icon, title, desc }) => (
                 <div key={title} className="text-center">
-                  <div 
-                    className={`mx-auto w-16 h-16 bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}
+                  <div
+                    className={`mx-auto w-16 h-16 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}
                   >
                     <Icon size={28} className="text-white" />
                   </div>
@@ -513,10 +506,10 @@ export default function Plans() {
             </div>
 
             {/* payment & billing details */}
-            <Card className="bg-green-50 border border-green-200 shadow-none">
+            <Card className="bg-green-50 border-2 border-green-200 shadow-none rounded-xl">
               <CardHeader className="px-6 pt-6 pb-2">
                 <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                  <CreditCard size={18} className="text-[#25D366]" /> 
+                  <CreditCard size={18} className="text-[#25D366]" />
                   Payment & Billing Details
                 </CardTitle>
               </CardHeader>
@@ -552,9 +545,9 @@ export default function Plans() {
 
         <div className="space-y-4">
           {FAQS.map((faq, i) => (
-            <Card 
-              key={i} 
-              className="bg-white border border-gray-200 shadow-sm hover:border-[#25D366]/30 transition-all"
+            <Card
+              key={i}
+              className="bg-white border-2 border-gray-200 shadow-sm hover:border-[#25D366]/50 transition-all rounded-xl"
             >
               <details className="group">
                 <summary className="flex items-center justify-between px-6 py-4 cursor-pointer list-none">
