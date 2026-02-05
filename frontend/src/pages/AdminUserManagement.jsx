@@ -25,10 +25,6 @@ import { useAuth } from '../context/AuthContext';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// ═══════════════════════════════════════════════════════════════
-// Utility Functions
-// ═══════════════════════════════════════════════════════════════
-
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-IN', {
         year: 'numeric',
@@ -47,32 +43,24 @@ const formatDateTime = (date) => {
     });
 };
 
-// ═══════════════════════════════════════════════════════════════
-// Main Component
-// ═══════════════════════════════════════════════════════════════
-
 export default function AdminUserManagement() {
     const { user } = useAuth();
 
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState({ type: '', text: '' });
 
-    // Users data
     const [users, setUsers] = useState([]);
     const [stats, setStats] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
     const [userDetails, setUserDetails] = useState(null);
 
-    // Plans for assignment
     const [plans, setPlans] = useState([]);
 
-    // Modal states
     const [showAddCredits, setShowAddCredits] = useState(false);
     const [showDeductCredits, setShowDeductCredits] = useState(false);
     const [showAssignPlan, setShowAssignPlan] = useState(false);
 
-    // Form states
     const [creditAmount, setCreditAmount] = useState('');
     const [creditNote, setCreditNote] = useState('');
     const [selectedPlan, setSelectedPlan] = useState('');
@@ -80,9 +68,6 @@ export default function AdminUserManagement() {
     const [planNote, setPlanNote] = useState('');
     const [processing, setProcessing] = useState(false);
 
-    // ─────────────────────────────────────────────────────────────
-    // Load Stats
-    // ─────────────────────────────────────────────────────────────
     const loadStats = useCallback(async () => {
         try {
             const res = await fetch(`${API}/api/admin/stats`, {
@@ -96,9 +81,6 @@ export default function AdminUserManagement() {
         }
     }, []);
 
-    // ─────────────────────────────────────────────────────────────
-    // Load Users
-    // ─────────────────────────────────────────────────────────────
     const loadUsers = useCallback(async () => {
         try {
             setLoading(true);
@@ -116,9 +98,6 @@ export default function AdminUserManagement() {
         }
     }, [searchQuery]);
 
-    // ─────────────────────────────────────────────────────────────
-    // Load Plans
-    // ─────────────────────────────────────────────────────────────
     const loadPlans = useCallback(async () => {
         try {
             const res = await fetch(`${API}/api/plans`, { credentials: 'include' });
@@ -130,9 +109,6 @@ export default function AdminUserManagement() {
         }
     }, []);
 
-    // ─────────────────────────────────────────────────────────────
-    // Load User Details
-    // ─────────────────────────────────────────────────────────────
     const loadUserDetails = async (userId) => {
         try {
             const res = await fetch(`${API}/api/admin/users/${userId}`, {
@@ -146,9 +122,6 @@ export default function AdminUserManagement() {
         }
     };
 
-    // ─────────────────────────────────────────────────────────────
-    // Add Credits
-    // ─────────────────────────────────────────────────────────────
     const handleAddCredits = async () => {
         if (!creditAmount || creditAmount <= 0) {
             setMessage({ type: 'error', text: 'Please enter a valid amount' });
@@ -186,9 +159,6 @@ export default function AdminUserManagement() {
         }
     };
 
-    // ─────────────────────────────────────────────────────────────
-    // Deduct Credits
-    // ─────────────────────────────────────────────────────────────
     const handleDeductCredits = async () => {
         if (!creditAmount || creditAmount <= 0) {
             setMessage({ type: 'error', text: 'Please enter a valid amount' });
@@ -229,9 +199,6 @@ export default function AdminUserManagement() {
         }
     };
 
-    // ─────────────────────────────────────────────────────────────
-    // Assign Plan
-    // ─────────────────────────────────────────────────────────────
     const handleAssignPlan = async () => {
         if (!selectedPlan || !selectedBillingCycle) {
             setMessage({ type: 'error', text: 'Please select a plan and billing cycle' });
@@ -271,25 +238,19 @@ export default function AdminUserManagement() {
         }
     };
 
-    // ─────────────────────────────────────────────────────────────
-    // Initial Load
-    // ─────────────────────────────────────────────────────────────
     useEffect(() => {
         loadStats();
         loadUsers();
         loadPlans();
     }, [loadStats, loadUsers, loadPlans]);
 
-    // ─────────────────────────────────────────────────────────────
-    // Access Control
-    // ─────────────────────────────────────────────────────────────
     if (user?.email !== 'jatinsingh098hp@gmail.com') {
         return (
-            <div className="flex-1 flex items-center justify-center p-8">
-                <Card className="max-w-md w-full p-10 text-center border-2 border-red-300 rounded-2xl">
+            <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+                <Card className="max-w-md w-full p-10 text-center border border-red-200 shadow-sm">
                     <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h2>
-                    <p className="text-slate-600">Only admins can access this page.</p>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+                    <p className="text-gray-600">Only admins can access this page.</p>
                 </Card>
             </div>
         );
@@ -301,21 +262,19 @@ export default function AdminUserManagement() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg border-2 border-purple-700">
+                        <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center shadow-sm">
                             <Users size={28} className="text-white" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black text-slate-900">
-                                User Management
-                            </h1>
-                            <p className="text-sm text-slate-600 font-medium">
+                            <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+                            <p className="text-sm text-gray-600 font-medium">
                                 Manage users, credits, and subscriptions
                             </p>
                         </div>
                     </div>
                     <Button
                         variant="outline"
-                        className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 rounded-xl hover:border-purple-600 font-semibold"
+                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:border-[#25D366] font-medium"
                         onClick={() => {
                             loadStats();
                             loadUsers();
@@ -330,10 +289,11 @@ export default function AdminUserManagement() {
                 {/* Message Alert */}
                 {message.text && (
                     <Alert
-                        className={`mb-6 rounded-xl border-2 flex items-center justify-between ${message.type === 'success'
-                            ? 'bg-green-50 border-green-300'
-                            : 'bg-red-50 border-red-300'
-                            }`}
+                        className={`mb-6 border shadow-sm flex items-center justify-between ${
+                            message.type === 'success'
+                                ? 'bg-green-50 border-green-200'
+                                : 'bg-red-50 border-red-200'
+                        }`}
                     >
                         <div className="flex w-full">
                             <div className="flex items-center gap-2 w-full">
@@ -343,17 +303,18 @@ export default function AdminUserManagement() {
                                     <AlertCircle size={18} className="text-red-600" />
                                 )}
                                 <span
-                                    className={`font-semibold ${message.type === 'success'
-                                        ? 'text-green-700'
-                                        : 'text-red-700'
-                                        }`}
+                                    className={`font-medium ${
+                                        message.type === 'success'
+                                            ? 'text-green-700'
+                                            : 'text-red-700'
+                                    }`}
                                 >
                                     {message.text}
                                 </span>
                             </div>
                             <button
                                 onClick={() => setMessage({ type: '', text: '' })}
-                                className="hover:bg-gray-200 rounded-lg p-1 transition-colors"
+                                className="hover:bg-gray-100 rounded-lg p-1 transition-colors"
                             >
                                 <X size={16} />
                             </button>
@@ -364,63 +325,63 @@ export default function AdminUserManagement() {
                 {/* Stats Cards */}
                 {stats && (
                     <div className="grid sm:grid-cols-4 gap-4 mb-6">
-                        <Card className="p-5">
+                        <Card className="p-5 bg-white border border-gray-200 shadow-sm">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">
+                                    <p className="text-xs text-gray-600 font-medium uppercase">
                                         Total Users
                                     </p>
-                                    <p className="text-2xl font-black text-slate-900 mt-1">
+                                    <p className="text-2xl font-bold text-gray-900 mt-1">
                                         {stats.totalUsers}
                                     </p>
                                 </div>
-                                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                                    <Users size={20} className="text-blue-600" />
+                                <div className="w-12 h-12 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center">
+                                    <Users size={22} className="text-blue-600" />
                                 </div>
                             </div>
                         </Card>
-                        <Card className="p-5">
+                        <Card className="p-5 bg-white border border-gray-200 shadow-sm">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">
+                                    <p className="text-xs text-gray-600 font-medium uppercase">
                                         Active Subs
                                     </p>
-                                    <p className="text-2xl font-black text-slate-900 mt-1">
+                                    <p className="text-2xl font-bold text-gray-900 mt-1">
                                         {stats.activeSubscriptions}
                                     </p>
                                 </div>
-                                <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-                                    <CheckCircle2 size={20} className="text-green-600" />
+                                <div className="w-12 h-12 bg-green-50 border border-green-200 rounded-xl flex items-center justify-center">
+                                    <CheckCircle2 size={22} className="text-green-600" />
                                 </div>
                             </div>
                         </Card>
-                        <Card className="p-5">
+                        <Card className="p-5 bg-white border border-gray-200 shadow-sm">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">
+                                    <p className="text-xs text-gray-600 font-medium uppercase">
                                         Total Credits
                                     </p>
-                                    <p className="text-2xl font-black text-slate-900 mt-1">
+                                    <p className="text-2xl font-bold text-gray-900 mt-1">
                                         {stats.totalCreditsInCirculation.toLocaleString('en-IN')}
                                     </p>
                                 </div>
-                                <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
-                                    <Zap size={20} className="text-amber-600" />
+                                <div className="w-12 h-12 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-center">
+                                    <Zap size={22} className="text-amber-600" />
                                 </div>
                             </div>
                         </Card>
-                        <Card className="p-5">
+                        <Card className="p-5 bg-white border border-gray-200 shadow-sm">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">
+                                    <p className="text-xs text-gray-600 font-medium uppercase">
                                         New Today
                                     </p>
-                                    <p className="text-2xl font-black text-slate-900 mt-1">
+                                    <p className="text-2xl font-bold text-gray-900 mt-1">
                                         {stats.usersCreatedToday}
                                     </p>
                                 </div>
-                                <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center">
-                                    <TrendingUp size={20} className="text-purple-600" />
+                                <div className="w-12 h-12 bg-purple-50 border border-purple-200 rounded-xl flex items-center justify-center">
+                                    <TrendingUp size={22} className="text-purple-600" />
                                 </div>
                             </div>
                         </Card>
@@ -428,16 +389,16 @@ export default function AdminUserManagement() {
                 )}
 
                 {/* Search Bar */}
-                <Card className="mb-6 border-2 border-gray-200 rounded-xl">
+                <Card className="mb-6 border border-gray-200 shadow-sm">
                     <CardContent className="p-4">
-                        <div className="flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-xl">
+                        <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200">
                             <Search size={20} className="text-gray-400" />
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search by name or email…"
-                                className="flex-1 bg-transparent text-sm text-slate-900 placeholder-slate-400 focus:outline-none font-medium"
+                                className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none font-medium"
                             />
                         </div>
                     </CardContent>
@@ -449,47 +410,47 @@ export default function AdminUserManagement() {
                         <Loader2 size={32} className="text-purple-600 animate-spin" />
                     </div>
                 ) : users.length === 0 ? (
-                    <Card className="p-12 text-center">
+                    <Card className="p-12 text-center bg-white border border-gray-200 shadow-sm">
                         <Users size={48} className="text-gray-400 mx-auto mb-4" />
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2">No Users Found</h2>
-                        <p className="text-slate-600">Try adjusting your search criteria.</p>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">No Users Found</h2>
+                        <p className="text-gray-600">Try adjusting your search criteria.</p>
                     </Card>
                 ) : (
                     <div className="space-y-4">
                         {users.map((usr) => (
                             <Card
                                 key={usr._id}
-                                className="p-6 border-2 border-gray-200 rounded-2xl hover:shadow-lg transition-shadow"
+                                className="p-6 border border-gray-200 hover:shadow-md transition-shadow bg-white"
                             >
                                 <div className="grid md:grid-cols-5 gap-6">
                                     {/* User Info */}
                                     <div>
-                                        <h3 className="font-black text-base text-slate-900 mb-3">
+                                        <h3 className="font-bold text-base text-gray-900 mb-3">
                                             User Info
                                         </h3>
                                         <div className="space-y-2 text-sm">
                                             <div className="flex items-start gap-2">
-                                                <User size={16} className="text-slate-400 mt-0.5" />
+                                                <User size={16} className="text-gray-400 mt-0.5" />
                                                 <div>
-                                                    <p className="font-semibold text-slate-900">
+                                                    <p className="font-semibold text-gray-900">
                                                         {usr.name}
                                                     </p>
-                                                    <p className="text-slate-600 text-xs">{usr.email}</p>
+                                                    <p className="text-gray-600 text-xs">{usr.email}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Shield size={14} className="text-slate-400" />
+                                                <Shield size={14} className="text-gray-400" />
                                                 <Badge
                                                     className={
                                                         usr.role === 'ADMIN'
-                                                            ? 'bg-purple-100 text-purple-700'
-                                                            : 'bg-blue-100 text-blue-700'
+                                                            ? 'bg-purple-100 text-purple-700 border-purple-200'
+                                                            : 'bg-blue-100 text-blue-700 border-blue-200'
                                                     }
                                                 >
                                                     {usr.role}
                                                 </Badge>
                                             </div>
-                                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                                            <div className="flex items-center gap-2 text-xs text-gray-500">
                                                 <Calendar size={12} />
                                                 Joined {formatDate(usr.createdAt)}
                                             </div>
@@ -498,16 +459,16 @@ export default function AdminUserManagement() {
 
                                     {/* Credits */}
                                     <div>
-                                        <h3 className="font-black text-base text-slate-900 mb-3">
+                                        <h3 className="font-bold text-base text-gray-900 mb-3">
                                             Credits
                                         </h3>
                                         <div className="flex items-center gap-2 mb-3">
-                                            <Zap size={20} className="text-amber-500" />
-                                            <span className="text-2xl font-black text-slate-900">
+                                            <Zap size={20} className="text-[#25D366]" />
+                                            <span className="text-2xl font-bold text-gray-900">
                                                 {usr.credits?.balance?.toLocaleString('en-IN') || 0}
                                             </span>
                                         </div>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-xs text-gray-500">
                                             Last refilled:{' '}
                                             {usr.credits?.lastRefilled
                                                 ? formatDate(usr.credits.lastRefilled)
@@ -517,7 +478,7 @@ export default function AdminUserManagement() {
 
                                     {/* Subscription */}
                                     <div>
-                                        <h3 className="font-black text-base text-slate-900 mb-3">
+                                        <h3 className="font-bold text-base text-gray-900 mb-3">
                                             Subscription
                                         </h3>
                                         {usr.subscription?.isActive ? (
@@ -527,19 +488,19 @@ export default function AdminUserManagement() {
                                                         size={14}
                                                         className="text-green-600"
                                                     />
-                                                    <span className="font-semibold text-slate-900">
+                                                    <span className="font-semibold text-gray-900">
                                                         {usr.subscription.planId?.name || 'Unknown'}
                                                     </span>
                                                 </div>
-                                                <p className="text-xs text-slate-600">
+                                                <p className="text-xs text-gray-600">
                                                     {usr.subscription.billingCycle}
                                                 </p>
-                                                <p className="text-xs text-slate-500">
+                                                <p className="text-xs text-gray-500">
                                                     Expires: {formatDate(usr.subscription.expiresAt)}
                                                 </p>
                                             </div>
                                         ) : (
-                                            <div className="flex items-center gap-2 text-slate-500">
+                                            <div className="flex items-center gap-2 text-gray-500">
                                                 <X size={14} />
                                                 <span className="text-sm">No active plan</span>
                                             </div>
@@ -548,13 +509,13 @@ export default function AdminUserManagement() {
 
                                     {/* Quick Stats */}
                                     <div>
-                                        <h3 className="font-black text-base text-slate-900 mb-3">
+                                        <h3 className="font-bold text-base text-gray-900 mb-3">
                                             Activity
                                         </h3>
-                                        <div className="space-y-2 text-xs text-slate-600">
+                                        <div className="space-y-2 text-xs text-gray-600">
                                             <p>
                                                 Campaigns:{' '}
-                                                <span className="font-bold text-slate-900">
+                                                <span className="font-bold text-gray-900">
                                                     {usr.campaignsUsedThisMonth || 0}
                                                 </span>
                                             </p>
@@ -566,56 +527,55 @@ export default function AdminUserManagement() {
 
                                     {/* Actions */}
                                     <div>
-                                        <h3 className="font-black text-base text-slate-900 mb-3">
+                                        <h3 className="font-bold text-base text-gray-900 mb-3">
                                             Actions
                                         </h3>
                                         <div className="space-y-2">
                                             <Button
-                                                variant="primary"
                                                 size="sm"
-                                                className="w-full text-xs"
+                                                className="w-full text-xs bg-[#25D366] hover:bg-[#20BD5A] text-white font-medium"
                                                 onClick={() => {
                                                     setSelectedUser(usr);
                                                     setShowAddCredits(true);
                                                 }}
                                             >
-                                                <Plus size={14} />
+                                                <Plus size={14} className="mr-1" />
                                                 Add Credits
                                             </Button>
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="w-full text-xs"
+                                                className="w-full text-xs border-gray-300 hover:border-red-500 hover:text-red-600 font-medium"
                                                 onClick={() => {
                                                     setSelectedUser(usr);
                                                     setShowDeductCredits(true);
                                                 }}
                                             >
-                                                <Minus size={14} />
+                                                <Minus size={14} className="mr-1" />
                                                 Deduct Credits
                                             </Button>
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="w-full text-xs"
+                                                className="w-full text-xs border-gray-300 hover:border-purple-500 hover:text-purple-600 font-medium"
                                                 onClick={() => {
                                                     setSelectedUser(usr);
                                                     setShowAssignPlan(true);
                                                 }}
                                             >
-                                                <CreditCard size={14} />
+                                                <CreditCard size={14} className="mr-1" />
                                                 Assign Plan
                                             </Button>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="w-full text-xs"
+                                                className="w-full text-xs hover:bg-gray-100 font-medium"
                                                 onClick={() => {
                                                     setSelectedUser(usr);
                                                     loadUserDetails(usr._id);
                                                 }}
                                             >
-                                                <History size={14} />
+                                                <History size={14} className="mr-1" />
                                                 View History
                                             </Button>
                                         </div>
@@ -629,21 +589,21 @@ export default function AdminUserManagement() {
                 {/* Add Credits Modal */}
                 {showAddCredits && selectedUser && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
-                        <Card className="max-w-md w-full p-6">
+                        <Card className="max-w-md w-full p-6 bg-white border border-gray-200 shadow-xl">
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-xl font-black text-slate-900">
+                                <h2 className="text-xl font-bold text-gray-900">
                                     Add Credits to {selectedUser.name}
                                 </h2>
                                 <button
                                     onClick={() => setShowAddCredits(false)}
-                                    className="hover:bg-gray-100 rounded-lg p-2"
+                                    className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
                             </div>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-900 mb-2">
                                         Credits Amount
                                     </label>
                                     <input
@@ -651,11 +611,11 @@ export default function AdminUserManagement() {
                                         value={creditAmount}
                                         onChange={(e) => setCreditAmount(e.target.value)}
                                         placeholder="Enter credits to add"
-                                        className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none"
+                                        className="w-full px-4 py-2.5 border border-gray-300 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 focus:outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-900 mb-2">
                                         Note (Optional)
                                     </label>
                                     <textarea
@@ -663,28 +623,26 @@ export default function AdminUserManagement() {
                                         onChange={(e) => setCreditNote(e.target.value)}
                                         placeholder="Reason for adding credits"
                                         rows={3}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none resize-none"
+                                        className="w-full px-4 py-2.5 border border-gray-300 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 focus:outline-none resize-none"
                                     />
                                 </div>
                                 <div className="flex gap-3">
                                     <Button
-                                        variant="primary"
-                                        className="flex-1"
+                                        className="flex-1 bg-[#25D366] hover:bg-[#20BD5A] text-white font-medium"
                                         onClick={handleAddCredits}
                                         disabled={processing}
                                     >
                                         {processing ? (
-                                            <Loader2 size={18} className="animate-spin" />
+                                            <Loader2 size={18} className="animate-spin mr-2" />
                                         ) : (
-                                            <>
-                                                <Plus size={18} />
-                                                Add Credits
-                                            </>
+                                            <Plus size={18} className="mr-2" />
                                         )}
+                                        Add Credits
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={() => setShowAddCredits(false)}
+                                        className="border-gray-300"
                                     >
                                         Cancel
                                     </Button>
@@ -697,20 +655,20 @@ export default function AdminUserManagement() {
                 {/* Deduct Credits Modal */}
                 {showDeductCredits && selectedUser && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
-                        <Card className="max-w-md w-full p-6">
+                        <Card className="max-w-md w-full p-6 bg-white border border-gray-200 shadow-xl">
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-xl font-black text-slate-900">
+                                <h2 className="text-xl font-bold text-gray-900">
                                     Deduct Credits from {selectedUser.name}
                                 </h2>
                                 <button
                                     onClick={() => setShowDeductCredits(false)}
-                                    className="hover:bg-gray-100 rounded-lg p-2"
+                                    className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
                             </div>
-                            <div className="mb-4 p-3 bg-amber-50 border-2 border-amber-200 rounded-xl">
-                                <p className="text-sm text-amber-800">
+                            <div className="mb-4 p-3 bg-amber-50 border border-amber-200">
+                                <p className="text-sm text-amber-900 font-medium">
                                     Current Balance:{' '}
                                     <span className="font-bold">
                                         {selectedUser.credits?.balance || 0}
@@ -720,7 +678,7 @@ export default function AdminUserManagement() {
                             </div>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-900 mb-2">
                                         Credits Amount
                                     </label>
                                     <input
@@ -728,11 +686,11 @@ export default function AdminUserManagement() {
                                         value={creditAmount}
                                         onChange={(e) => setCreditAmount(e.target.value)}
                                         placeholder="Enter credits to deduct"
-                                        className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none"
+                                        className="w-full px-4 py-2.5 border border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-900 mb-2">
                                         Note (Optional)
                                     </label>
                                     <textarea
@@ -740,28 +698,26 @@ export default function AdminUserManagement() {
                                         onChange={(e) => setCreditNote(e.target.value)}
                                         placeholder="Reason for deducting credits"
                                         rows={3}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-red-500 focus:outline-none resize-none"
+                                        className="w-full px-4 py-2.5 border border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 focus:outline-none resize-none"
                                     />
                                 </div>
                                 <div className="flex gap-3">
                                     <Button
-                                        variant="danger"
-                                        className="flex-1"
+                                        className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium"
                                         onClick={handleDeductCredits}
                                         disabled={processing}
                                     >
                                         {processing ? (
-                                            <Loader2 size={18} className="animate-spin" />
+                                            <Loader2 size={18} className="animate-spin mr-2" />
                                         ) : (
-                                            <>
-                                                <Minus size={18} />
-                                                Deduct Credits
-                                            </>
+                                            <Minus size={18} className="mr-2" />
                                         )}
+                                        Deduct Credits
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={() => setShowDeductCredits(false)}
+                                        className="border-gray-300"
                                     >
                                         Cancel
                                     </Button>
@@ -774,27 +730,27 @@ export default function AdminUserManagement() {
                 {/* Assign Plan Modal */}
                 {showAssignPlan && selectedUser && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
-                        <Card className="max-w-md w-full p-6">
+                        <Card className="max-w-md w-full p-6 bg-white border border-gray-200 shadow-xl">
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-xl font-black text-slate-900">
+                                <h2 className="text-xl font-bold text-gray-900">
                                     Assign Plan to {selectedUser.name}
                                 </h2>
                                 <button
                                     onClick={() => setShowAssignPlan(false)}
-                                    className="hover:bg-gray-100 rounded-lg p-2"
+                                    className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
                             </div>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-900 mb-2">
                                         Select Plan
                                     </label>
                                     <select
                                         value={selectedPlan}
                                         onChange={(e) => setSelectedPlan(e.target.value)}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none"
+                                        className="w-full px-4 py-2.5 border border-gray-300 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 focus:outline-none"
                                     >
                                         <option value="">Choose a plan...</option>
                                         {plans.map((plan) => (
@@ -806,13 +762,13 @@ export default function AdminUserManagement() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-900 mb-2">
                                         Billing Cycle
                                     </label>
                                     <select
                                         value={selectedBillingCycle}
                                         onChange={(e) => setSelectedBillingCycle(e.target.value)}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none"
+                                        className="w-full px-4 py-2.5 border border-gray-300 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 focus:outline-none"
                                     >
                                         <option value="">Choose billing cycle...</option>
                                         <option value="MONTHLY">Monthly</option>
@@ -820,7 +776,7 @@ export default function AdminUserManagement() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-900 mb-2">
                                         Note (Optional)
                                     </label>
                                     <textarea
@@ -828,28 +784,26 @@ export default function AdminUserManagement() {
                                         onChange={(e) => setPlanNote(e.target.value)}
                                         placeholder="Reason for assigning plan"
                                         rows={3}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none resize-none"
+                                        className="w-full px-4 py-2.5 border border-gray-300 focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/20 focus:outline-none resize-none"
                                     />
                                 </div>
                                 <div className="flex gap-3">
                                     <Button
-                                        variant="primary"
-                                        className="flex-1"
+                                        className="flex-1 bg-[#25D366] hover:bg-[#20BD5A] text-white font-medium"
                                         onClick={handleAssignPlan}
                                         disabled={processing}
                                     >
                                         {processing ? (
-                                            <Loader2 size={18} className="animate-spin" />
+                                            <Loader2 size={18} className="animate-spin mr-2" />
                                         ) : (
-                                            <>
-                                                <CreditCard size={18} />
-                                                Assign Plan
-                                            </>
+                                            <CreditCard size={18} className="mr-2" />
                                         )}
+                                        Assign Plan
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={() => setShowAssignPlan(false)}
+                                        className="border-gray-300"
                                     >
                                         Cancel
                                     </Button>
@@ -862,9 +816,9 @@ export default function AdminUserManagement() {
                 {/* User Details Modal */}
                 {userDetails && selectedUser && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6 overflow-y-auto">
-                        <Card className="max-w-2xl w-full p-6 my-6">
+                        <Card className="max-w-2xl w-full p-6 my-6 bg-white border border-gray-200 shadow-xl">
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-xl font-black text-slate-900">
+                                <h2 className="text-xl font-bold text-gray-900">
                                     Transaction History - {selectedUser.name}
                                 </h2>
                                 <button
@@ -872,7 +826,7 @@ export default function AdminUserManagement() {
                                         setUserDetails(null);
                                         setSelectedUser(null);
                                     }}
-                                    className="hover:bg-gray-100 rounded-lg p-2"
+                                    className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
@@ -882,41 +836,42 @@ export default function AdminUserManagement() {
                                     userDetails.recentTransactions.map((txn) => (
                                         <div
                                             key={txn._id}
-                                            className="p-4 border-2 border-gray-200 rounded-xl"
+                                            className="p-4 border border-gray-200 bg-gray-50"
                                         >
                                             <div className="flex items-center justify-between mb-2">
                                                 <Badge
                                                     className={
                                                         txn.type === 'ADMIN_MANUAL'
-                                                            ? 'bg-purple-100 text-purple-700'
+                                                            ? 'bg-purple-100 text-purple-700 border-purple-200'
                                                             : txn.type === 'PURCHASE'
-                                                                ? 'bg-blue-100 text-blue-700'
-                                                                : 'bg-green-100 text-green-700'
+                                                                ? 'bg-blue-100 text-blue-700 border-blue-200'
+                                                                : 'bg-green-100 text-green-700 border-green-200'
                                                     }
                                                 >
                                                     {txn.type}
                                                 </Badge>
                                                 <span
-                                                    className={`font-bold text-lg ${txn.amount > 0
-                                                        ? 'text-green-600'
-                                                        : 'text-red-600'
-                                                        }`}
+                                                    className={`font-bold text-lg ${
+                                                        txn.amount > 0
+                                                            ? 'text-green-600'
+                                                            : 'text-red-600'
+                                                    }`}
                                                 >
                                                     {txn.amount > 0 ? '+' : ''}
                                                     {txn.amount}
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-slate-600 mb-1">
+                                            <p className="text-sm text-gray-700 mb-1 font-medium">
                                                 {txn.meta?.note || 'No note'}
                                             </p>
-                                            <p className="text-xs text-slate-500">
+                                            <p className="text-xs text-gray-500">
                                                 {formatDateTime(txn.createdAt)} • Balance after:{' '}
                                                 {txn.balanceAfter}
                                             </p>
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-center text-slate-500 py-8">
+                                    <p className="text-center text-gray-500 py-8">
                                         No transactions found
                                     </p>
                                 )}
