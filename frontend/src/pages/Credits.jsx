@@ -481,7 +481,7 @@ export default function Credits() {
         <section className="max-w-7xl mx-auto px-6 pb-6">
           <Alert
             variant={message.type === "success" ? "default" : "destructive"}
-            className={`border shadow-sm ${message.type === "success"
+            className={`border shadow-sm flex ${message.type === "success"
                 ? "bg-green-50 border-green-200"
                 : "bg-red-50 border-red-200"
               }`}

@@ -249,7 +249,7 @@ export default function Plans() {
         <section className="max-w-7xl mx-auto px-6 pb-6">
           <Alert 
             variant={message.type === "error" ? "destructive" : "default"} 
-            className={`border shadow-sm ${
+            className={`border shadow-sm flex ${
               message.type === "success" 
                 ? "bg-green-50 border-green-200" 
                 : message.type === "info" 
