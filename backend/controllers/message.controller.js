@@ -1,9 +1,9 @@
 // controllers/message.controller.js
-import { bulkMessageApi, sendMessageApi } from "../services/sessionServer.api.js";
-import User from "../models/user.model.js";
+import { ApiError } from "../middleware/errorHandler.js";
 import Campaign from "../models/campaign.model.js";
 import CreditTransaction from "../models/creditTransaction.model.js";
-import { ApiError } from "../middleware/errorHandler.js";
+import User from "../models/user.model.js";
+import { bulkMessageApi, sendMessageApi } from "../services/sessionServer.api.js";
 
 // Credit cost per message (can be configured)
 const CREDIT_COST_PER_MESSAGE = 1;
@@ -55,8 +55,7 @@ const deductCredits = async (userId, amount, campaignId, note) => {
  */
 export const sendMessage = async (req, res) => {
     try {
-        const { receiver, text, caption, mimetype, campaignName } = req.body;
-        const sessionId = req.user.sessionId;
+        const { receiver, text, caption, mimetype, campaignName, sessionId } = req.body;
         const userId = req.user._id;
 
         // Validation
@@ -64,6 +63,13 @@ export const sendMessage = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Receiver phone number is required"
+            });
+        }
+
+        if (!sessionId) {
+            return res.status(400).json({
+                success: false,
+                message: "Session ID is required"
             });
         }
 
@@ -160,6 +166,7 @@ export const sendMessage = async (req, res) => {
 
             // Prepare API payload
             const payload = {
+                id: sessionId, // Use sessionId from request body
                 receiver,
                 message
             };
@@ -232,11 +239,17 @@ export const sendMessage = async (req, res) => {
  */
 export const bulkMessageSender = async (req, res) => {
     try {
-        const { numbers, text, caption, mimetype, delay, campaignName } = req.body;
-        const sessionId = req.user.sessionId;
+        const { numbers, text, caption, mimetype, delay, campaignName, sessionId } = req.body;
         const userId = req.user._id;
 
         // Validation
+        if (!sessionId) {
+            return res.status(400).json({
+                success: false,
+                message: "Session ID is required"
+            });
+        }
+
         if (!numbers || !Array.isArray(numbers) || numbers.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -341,7 +354,7 @@ export const bulkMessageSender = async (req, res) => {
 
             // Prepare bulk API payload
             const payload = {
-                id: sessionId,
+                id: sessionId, // Use sessionId from request body
                 numbers,
                 message,
                 delay: delay || 2000

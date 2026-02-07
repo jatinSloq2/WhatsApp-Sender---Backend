@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import { CampaignProvider } from './context/CampaignContext.jsx'
 import { CreditsProvider } from './context/CreditContext.jsx'
 import { PlansProvider } from './context/PlanContext.jsx'
 import { SessionProvider } from './context/SessionContext.jsx'
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')).render(
           <PlansProvider>
             <CreditsProvider>
               <SessionProvider>
-                <App />
+                <CampaignProvider>
+                  <App />
+                </CampaignProvider>
               </SessionProvider>
             </CreditsProvider>
           </PlansProvider>
