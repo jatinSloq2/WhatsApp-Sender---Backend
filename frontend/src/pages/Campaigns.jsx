@@ -126,6 +126,8 @@ const Campaigns = () => {
 
   // Handle campaign creation
   const handleCreateCampaign = async () => {
+    console.log("Creating campaign with data:", formData, "Media file:", mediaFile);
+
     // Validation
     if (campaignType === "SINGLE" && !formData.receiver.trim()) {
       setMessage({ type: "error", text: "Receiver phone number is required" });

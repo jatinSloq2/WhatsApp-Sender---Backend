@@ -73,12 +73,10 @@ export const CampaignProvider = ({ children }) => {
         setError(null);
         try {
             const response = await axios.post(
-                `${API_BASE}/api/message/send`,
+                "/message/send",
                 formData,
                 {
-                    ...getAuthHeaders(),
                     headers: {
-                        ...getAuthHeaders().headers,
                         "Content-Type": "multipart/form-data",
                     },
                 }
@@ -89,8 +87,7 @@ export const CampaignProvider = ({ children }) => {
 
             return response.data;
         } catch (err) {
-            const errorMsg = err.response?.data?.message || "Failed to send message";
-            setError(errorMsg);
+            const errorMsg = handleError(err);
             throw new Error(errorMsg);
         } finally {
             setLoading(false);
@@ -105,12 +102,10 @@ export const CampaignProvider = ({ children }) => {
         setError(null);
         try {
             const response = await axios.post(
-                `${API_BASE}/api/message/bulk`,
+                "/message/bulk",
                 formData,
                 {
-                    ...getAuthHeaders(),
                     headers: {
-                        ...getAuthHeaders().headers,
                         "Content-Type": "multipart/form-data",
                     },
                 }
@@ -121,8 +116,7 @@ export const CampaignProvider = ({ children }) => {
 
             return response.data;
         } catch (err) {
-            const errorMsg = err.response?.data?.message || "Failed to send bulk messages";
-            setError(errorMsg);
+            const errorMsg = handleError(err);
             throw new Error(errorMsg);
         } finally {
             setLoading(false);
@@ -137,9 +131,7 @@ export const CampaignProvider = ({ children }) => {
         setError(null);
         try {
             const response = await axios.post(
-                `${API_BASE}/api/message/campaigns/${campaignId}/cancel`,
-                {},
-                getAuthHeaders()
+                `/message/campaigns/${campaignId}/cancel`
             );
 
             // Refresh campaigns list
@@ -147,8 +139,7 @@ export const CampaignProvider = ({ children }) => {
 
             return response.data;
         } catch (err) {
-            const errorMsg = err.response?.data?.message || "Failed to cancel campaign";
-            setError(errorMsg);
+            const errorMsg = handleError(err);
             throw new Error(errorMsg);
         } finally {
             setLoading(false);
